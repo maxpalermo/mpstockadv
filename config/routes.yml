@@ -1,0 +1,59 @@
+mpstockadv_admin_stockadv:
+  path: /admin/mpstockadv
+  controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::index
+  methods: [GET]
+
+mpstockadv_admin_stockadv_index:
+  path: /admin/mpstockadv
+  controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::index
+  methods: [GET]
+
+mpstockadv_admin_warehouse:
+  path: /admin/mpstockadv/warehouse
+  controller: MpSoft\MpStockAdv\Controller\Admin\WarehouseController::index
+  methods: [GET]
+
+mpstockadv_admin_warehouse_edit:
+  path: /admin/mpstockadv/warehouse/edit/{id}
+  controller: MpSoft\MpStockAdv\Controller\Admin\WarehouseController::edit
+  methods: [GET, POST]
+
+mpstockadv_admin_stockmovement:
+  path: /admin/mpstockadv/stock-movement
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMovementController::index
+  methods: [GET]
+
+mpstockadv_admin_stockentry:
+  path: /admin/mpstockadv/stock-entry
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockEntryController::index
+  methods: [GET]
+
+mpstockadv_admin_stockexit:
+  path: /admin/mpstockadv/stock-exit
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockExitController::index
+  methods: [GET]
+
+mpstockadv_admin_stockview:
+  path: /admin/mpstockadv/stock-view
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockViewController::index
+  methods: [GET]
+
+mpstockadv_admin_stockview_redirect:
+  path: /admin/mpstockadv/stock-view/redirect
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockViewController::redirectToStockView
+  methods: [GET]
+
+mpstockadv_admin_stockview_default_qty:
+  path: /admin/mpstockadv/stock-view/default-qty
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockViewController::defaultQtyAction
+  methods: [GET]
+
+mpstockadv_admin_stockview_set_default:
+  path: /admin/mpstockadv/stock-view/set-default/{id_product_attribute}
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockViewController::setDefaultCombinationAction
+  methods: [GET]
+
+mpstockadv_admin_stockimportexport:
+  path: /admin/mpstockadv/stock-import-export
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockImportExportController::index
+  methods: [GET]

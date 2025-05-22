@@ -1,0 +1,10 @@
+services:
+  _defaults:
+    public: true
+    autowire: true
+    autoconfigure: true
+
+  MpSoft\MpStockAdv\Controller\Admin\:
+    resource: "../src/Controller/Admin"
+    public: true
+    tags: ["controller.service_arguments"]

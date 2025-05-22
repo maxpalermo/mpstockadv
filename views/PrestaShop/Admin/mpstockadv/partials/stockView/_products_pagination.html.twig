@@ -1,0 +1,78 @@
+{# Pagina parziale per la paginazione prodotti #}
+<div class="pagination-parent d-flex align-items-center" style="width:100%">
+	{% set startPage = page > 3 ? page-2 : 1 %}
+	{% set endPage = (startPage+4) > totalPages ? totalPages : (startPage+4) %}
+	{% set startPage = endPage-4 > 0 ? endPage-4 : 1 %}
+
+	<input type="hidden" name="search" value="{{ search }}">
+	<input type="hidden" name="startPage" value="{{ startPage }}">
+	<input type="hidden" name="endPage" value="{{ endPage }}">
+	<input type="hidden" name="totalPages" value="{{ totalPages }}">
+	<input type="hidden" name="page" value="{{ page }}">
+	<input type="hidden" name="limit" value="{{ limit }}">
+	<input type="hidden" name="total" value="{{ total }}">
+
+	<div class="flex-1 justify-content-start">
+		<span>Mostrati</span>
+		<span>
+			{{ (page-1)*limit+1 }}-
+		</span>
+		{%- if products is iterable -%}
+			<span>
+				{{ (page-1)*limit + (products|length) }}
+			</span>
+		{%- else -%}
+			<span>
+				{{ (page-1)*limit + products }}
+			</span>
+		{%- endif -%}
+		<span>
+			di
+		</span>
+		<span>
+			<strong>{{ total }}</strong>
+		</span>
+		<span>
+			prodotti
+		</span>
+	</div>
+
+	<div class="flex-1 justify-content-center">
+		<label class="mb-0 me-2" for="limit-select">Righe per pagina:</label>
+		<select name="limit" id="limit-select" class="form-control form-select form-select-sm" style="width: auto; min-width: 80px;">
+			{% for l in [10,20,50,100] %}
+				<option value="{{ l }}" {% if l == limit %} selected {% endif %}>{{ l }}</option>
+			{% endfor %}
+		</select>
+	</div>
+
+	<div class="flex-1 justify-content-end">
+		<nav aria-label="Paginazione prodotti">
+			<ul class="pagination mb-0">
+				<li class="page-item {% if page == 1 %}disabled{% endif %}">
+					<a class="page-link" href="javascript:void(0)" data-page="1" title="Prima pagina">&laquo;</a>
+				</li>
+				<li class="page-item {% if page == 1 %}disabled{% endif %}">
+					<a class="page-link" href="javascript:void(0)" data-page="{{ page-1 }}" title="Pagina precedente">&lsaquo;</a>
+				</li>
+				{% for p in startPage..endPage %}
+					{% if p == page %}
+						<li class="page-item active">
+							<input id="inputPageSet" type="number" name="page" min="1" max="{{ totalPages }}" value="{{ page }}" class="form-control page-input" style="width: 70px; padding: .25rem .5rem; text-align:center;" title="Vai a pagina">
+						</li>
+					{% else %}
+						<li class="page-item">
+							<a class="page-link" href="javascript:void(0)" data-page="{{ p }}">{{ p }}</a>
+						</li>
+					{% endif %}
+				{% endfor %}
+				<li class="page-item {% if page == totalPages %}disabled{% endif %}">
+					<a class="page-link" href="javascript:void(0)" data-page="{{ page+1 }}" title="Pagina successiva">&rsaquo;</a>
+				</li>
+				<li class="page-item {% if page == totalPages %}disabled{% endif %}">
+					<a class="page-link" href="javascript:void(0)" data-page="{{ totalPages }}" title="Ultima pagina">&raquo;</a>
+				</li>
+			</ul>
+		</nav>
+	</div>
+</div>

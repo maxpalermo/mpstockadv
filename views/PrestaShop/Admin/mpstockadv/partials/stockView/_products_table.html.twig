@@ -1,0 +1,94 @@
+{# Partial per la tabella prodotti e combinazioni, da usare sia per il render completo che per l'aggiornamento AJAX #}
+<form id="products-table-state">
+    <input type="hidden" name="search" value="{{ search }}">
+    <input type="hidden" name="page" value="{{ page }}">
+    <input type="hidden" name="limit" value="{{ limit }}">
+</form>
+<table id="table-stock" class="table table-hover table-striped align-middle mb-0">
+    <thead class="thead-light">
+        <tr>
+            <th class="sortable" data-sort-key="name" data-sort-dir="{{ sort == 'name' ? direction : 'asc' }}">Nome
+    {% if sort == 'name' %}<span class="sort-indicator">{{ direction == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+</th>
+            <th class="sortable" data-sort-key="reference" data-sort-dir="{{ sort == 'reference' ? direction : 'asc' }}">Riferimento
+    {% if sort == 'reference' %}<span class="sort-indicator">{{ direction == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+</th>
+            <th class="sortable" data-sort-key="ean13" data-sort-dir="{{ sort == 'ean13' ? direction : 'asc' }}">EAN13
+    {% if sort == 'ean13' %}<span class="sort-indicator">{{ direction == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+</th>
+            <th class="sortable" data-sort-key="upc" data-sort-dir="{{ sort == 'upc' ? direction : 'asc' }}">UPC
+    {% if sort == 'upc' %}<span class="sort-indicator">{{ direction == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+</th>
+            <th class="sortable" data-sort-key="isbn" data-sort-dir="{{ sort == 'isbn' ? direction : 'asc' }}">ISBN
+    {% if sort == 'isbn' %}<span class="sort-indicator">{{ direction == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+</th>
+            <th class="text-end sortable" data-sort-key="quantity" data-sort-dir="{{ sort == 'quantity' ? direction : 'asc' }}">Giacenza
+    {% if sort == 'quantity' %}<span class="sort-indicator">{{ direction == 'asc' ? '▲' : '▼' }}</span>{% endif %}
+</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+            <tr class="{{ loop.index is odd ? 'odd' : 'even' }}">
+                <td>{{ product.name }}</td>
+                <td>{{ product.reference }}</td>
+                <td>{{ product.ean13 }}</td>
+                <td>{{ product.upc }}</td>
+                <td>{{ product.isbn }}</td>
+                <td class="text-end">
+                    <span class="badge badge-{{ product.quantity > 0 ? 'success' : 'danger' }}">{{ product.quantity }}</span>
+                </td>
+                <td>
+                    {# ... azioni, pulsanti, ecc ... #}
+                    {% if product.combinations and product.combinations|length > 0 %}
+                        <button class="btn btn-link" data-bs-toggle="collapse" data-bs-target="#comb-{{ product.id_product }}">
+                            <i class="material-icons">expand_more</i> Combinazioni ({{ product.combinations|length }})
+                        </button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% if product.combinations and product.combinations|length > 0 %}
+                <tr class="collapse" id="comb-{{ product.id_product }}">
+                    <td colspan="7">
+                        <div class="p-2 bg-light border rounded">
+                            <strong>Combinazioni:</strong>
+                            <table class="table table-sm table-bordered mt-2 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Attributi</th>
+                                        <th>EAN13</th>
+                                        <th class="text-end">Giacenza</th>
+                                        <th class="sortable text-center" data-sort-key="default">Default</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for comb in product.combinations %}
+                                        <tr>
+                                            <td>{{ comb.attributes }}</td>
+                                            <td>{{ comb.ean13 }}</td>
+                                            <td class="text-end">
+                                                <span class="ml-2 badge badge-{{ comb.quantity > 0 ? 'success' : 'danger' }}">{{ comb.quantity }}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                {% if comb.default_on == 1 %}
+                                                    <button type="button" class="btn btn-link p-0 isDefaultComboBtn" data-id="{{ comb.id_product_attribute }}" title="Imposta come quantità di default" disabled>
+                                                        <i class="material-icons text-success" title="Quantità di default">check_circle</i>
+                                                    </button>
+                                                {% else %}
+                                                    <button type="button" class="btn btn-link p-0 set-default-btn" data-id="{{ comb.id_product_attribute }}" title="Imposta come quantità di default">
+                                                        <i class="material-icons text-secondary" style="cursor:pointer;">radio_button_unchecked</i>
+                                                    </button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+        {% endfor %}
+    </tbody>
+</table>

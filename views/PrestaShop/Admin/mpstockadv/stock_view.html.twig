@@ -1,0 +1,76 @@
+{# Giacenze di Magazzino - Lista Prodotti con Ricerca, Paginazione e Combinazioni #}
+
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/css/controllers/admin/stockView/style.css') }}">
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script>
+		window.pathSetDefaultCombination = "{{ path('mpstockadv_admin_stockview_set_default', {'id_product_attribute': 'ID_REPLACE'}) }}";
+window.flashMsgSuccess = "Combinazione aggiornata come quantità di default.";
+window.flashMsgError = "Errore di comunicazione con il server.";
+	</script>
+
+	<script src="{{ asset('../modules/mpstockadv/views/js/controllers/admin/stockView.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+	<div class="card mt-3">
+		<div class="card-header d-flex justify-content-between align-items-center">
+			{% for type, messages in app.flashes %}
+				{% for message in messages %}
+					<div class="alert alert-{{ type }} alert-dismissible fade show my-2" role="alert">
+						{{ message }}
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+					</div>
+				{% endfor %}
+			{% endfor %}
+			<h3 class="mb-0">Giacenze di Magazzino</h3>
+			<div class="d-flex align-items-center gap-2 pagination-modern" style="flex-wrap: wrap;">
+				<div class="btn-group" role="group" aria-label="">
+					<a href="{{ path('mpstockadv_admin_stockview_default_qty') }}" class="btn btn-success">
+						<i class="material-icons text-white">refresh</i>
+						Rigenera quantità di default
+					</a>
+					<a href="{{ path('mpstockadv_admin_stockadv_index') }}" class="btn btn-primary">
+						<i class="material-icons">home</i>
+						Menu principale
+					</a>
+				</div>
+				<form id="formStockSearch" method="POST" class="ml-3 form-inline" style="gap: 8px;">
+					<input type="text" name="search" value="{{ search }}" class="form-control" placeholder="Cerca per nome, riferimento, EAN, UPC, ISBN" autocomplete="off" style="min-width:220px;">
+					<button type="submit" class="btn btn-primary">Cerca</button>
+				</form>
+			</div>
+		</div>
+		<div class="table-responsive">
+			<div id="products-table-wrapper">
+				{% include '@Modules/mpstockadv/views/PrestaShop/Admin/mpstockadv/partials/stockView/_products_table.html.twig' with {
+                    products: products,
+                    sort: sort,
+                    direction: direction,
+                    search: search,
+                    page: page,
+                    limit: limit,
+                    total: total
+                } %}
+			</div>
+		</div>
+	</div>
+	<div class="card-footer">
+		<form id="formPagination" method="get" action="{{ path('mpstockadv_admin_stockview_redirect') }}" class="d-flex align-items-center gap-2 pagination-modern">
+			{% set totalPages = (total / limit)|round(0, 'ceil') %}
+			{% include '@Modules/mpstockadv/views/PrestaShop/Admin/mpstockadv/partials/stockView/_products_pagination.html.twig' with {
+                page: page,
+                limit: limit,
+                total: total,
+                totalPages: totalPages,
+                search: search
+            } %}
+		</form>
+	</div>
+</div>{% endblock %}
