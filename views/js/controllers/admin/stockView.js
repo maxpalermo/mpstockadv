@@ -194,7 +194,7 @@ function setupPaginationLinks() {
                 const url = new URL(window.location.href);
                 const sort = url.searchParams.get("sort");
                 const direction = url.searchParams.get("direction");
-                const search = url.searchParams.get("search");
+                const search = document.getElementById("search").value || "";
                 const page = link.dataset.page || 1;
                 const limit = document.getElementById("limit-select").value || 20;
 

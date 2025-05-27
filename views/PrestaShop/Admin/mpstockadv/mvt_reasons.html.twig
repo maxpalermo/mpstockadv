@@ -1,0 +1,45 @@
+{% extends "@PrestaShop/Admin/layout.html.twig" %}
+
+{% block content %}
+	<div class="container my-4">
+		<h2 class="mb-4">Tipi di movimento magazzino</h2>
+		<div class="mb-3 text-end">
+			<button id="add-mvt-reason" class="btn btn-primary">Aggiungi nuovo</button>
+			<a href="{{ path('mpstockadv_admin_stockadv') }}" id="back-menu" class="btn btn-outline-primary">Torna al menu</a>
+
+
+		</div>
+		<div class="table-responsive">
+			<table class="table table-striped table-hover align-middle" id="mvt-reasons-table">
+				<thead class="table-light">
+					<tr>
+						<th>ID</th>
+						<th>Alias</th>
+						<th>Nome</th>
+						<th>Segno</th>
+						<th>Stato</th>
+						<th>Azioni</th>
+					</tr>
+				</thead>
+				<tbody>
+					{# Il contenuto verrà popolato via JS #}
+				</tbody>
+			</table>
+		</div>
+	</div>
+	<dialog id="mvt-reason-dialog"></dialog>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script type="module">
+		import MvtReasons from '{{ asset('../modules/mpstockadv/views/js/controllers/admin/mvtReasons.js') }}';
+        document.addEventListener('DOMContentLoaded', () => {
+            const mvtReasons = new MvtReasons({
+                list: '{{ path('mpstockadv_admin_mvtreasons_list') }}',
+                save: '{{ path('mpstockadv_admin_mvtreasons_save') }}',
+                delete: '{{ path('mpstockadv_admin_mvtreasons_delete') }}'
+            });
+        });
+	</script>
+{% endblock %}

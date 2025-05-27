@@ -1,0 +1,170 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+
+{% block content %}
+	<h1>Documenti di Carico</h1>
+	<div class="d-flex justify-content-between align-items-center mb-3">
+		<div class="btn-group">
+			<a href="#" class="btn btn-success" id="btn-new-supply-order">Nuovo Documento</a>
+			<a href="{{ path('mpstockadv_admin_stockadv') }}" class="btn btn-secondary">Torna al Menu</a>
+		</div>
+		<form class="form-inline" id="supply-order-search-form" method="get" action="">
+			<input type="text" name="q" class="form-control mr-2" placeholder="Cerca..." value="{{ app.request.get('q') }}">
+			<button type="submit" class="btn btn-outline-primary">Cerca</button>
+		</form>
+	</div>
+	<table id="supply-orders-table" class="table table-striped">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>Data</th>
+				<th>Fornitore</th>
+				<th>Stato</th>
+				<th>Azioni</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for order in orders %}
+				<tr data-id="{{ order.id_supply_order }}">
+					<td>{{ order.id_supply_order }}</td>
+					<td>{{ order.date_add|date('d/m/Y H:i') }}</td>
+					<td>{{ order.supplier_name }}</td>
+					<td>{{ order.state_name }}</td>
+					<td>
+						<div class="btn-group">
+							<a href="{{ path('mpstockadv_admin_supplyorders_edit', {'id': order.id_supply_order}) }}" class="btn btn-sm btn-primary btn-edit">Modifica</a>
+							<button type="button" class="btn btn-sm btn-success btn-receive">Ricevi</button>
+						</div>
+					</td>
+				</tr>
+			{% else %}
+				<tr>
+					<td colspan="5">Nessun documento di carico trovato.</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+
+	<nav aria-label="Paginazione documenti di carico">
+		<ul class="pagination justify-content-center">
+			{% set total_pages = (total // limit) + ((total % limit) > 0 ? 1 : 0) %}
+			{% for p in 1..total_pages %}
+				<li class="page-item {% if p == page %}active{% endif %}">
+					<a class="page-link" href="?page={{ p }}{% if search %}&q={{ search }}{% endif %}">{{ p }}</a>
+				</li>
+			{% endfor %}
+		</ul>
+	</nav>
+
+	<dialog id="supply-order-dialog" class="modal-xxl">
+		<form id="supply-order-form" class="bootstrap">
+			<div class="card">
+				<div class="card-heading">
+					<h3>
+						<i class="material-icons">local_shipping</i>
+						<span class="ml-2">Nuovo Documento di Carico</span>
+					</h3>
+				</div>
+
+				<div class="card-body border-bottom pb-2 mb-2">
+					<h4>
+						<i class="material-icons">receipt</i>
+						<span class="ml-2">Dettagli Documento</span>
+					</h4>
+					<div class="row">
+						<div class="col-md-6 mb-2">
+							<label>Fornitore</label>
+							<div class="input-group">
+								<select name="supplier_name" id="supplier-select" class="form-control" required>
+									<option value="">Seleziona fornitore...</option>
+									{% for supplier in suppliers %}
+										<option value="{{ supplier.name|e }}">{{ supplier.name }}</option>
+									{% endfor %}
+								</select>
+								<span class="input-group-text">
+									<i class="material-icons">local_shipping</i>
+								</span>
+							</div>
+						</div>
+						<div class="col-md-6 mb-2">
+							<label>Data Documento</label>
+							<input type="date" name="date_add" class="form-control" required>
+						</div>
+						<div class="col-md-6 mb-2">
+							<label>Riferimento</label>
+							<input type="text" name="reference" class="form-control">
+						</div>
+						<div class="col-md-6 mb-2">
+							<label>Note</label>
+							<input type="text" name="note" class="form-control">
+						</div>
+					</div>
+				</div>
+
+				<div class="card-body border-bottom pb-2 mb-2">
+					<h4>
+						<i class="material-icons">list</i>
+						<span class="ml-2">Prodotti</span>
+					</h4>
+					<table class="table table-striped table-condensed table-hover" id="products-table">
+						<thead>
+							<tr>
+								<th>Prodotto</th>
+								<th>Riferimento</th>
+								<th>EAN13</th>
+								<th>Quantità</th>
+								<th></th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<select name="products[0][name]" class="form-control product-autocomplete" required data-row="0"></select>
+								</td>
+								<td><input type="text" name="products[0][reference]" class="form-control"></td>
+								<td><input type="text" name="products[0][ean13]" class="form-control"></td>
+								<td><input type="number" name="products[0][quantity_expected]" class="form-control" min="1" required></td>
+								<td>
+									<button type="button" class="btn btn-danger btn-remove-row">&times;</button>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+					<button type="button" class="btn btn-info" id="btn-add-product">Aggiungi Prodotto</button>
+				</div>
+
+				<div class="card-footer">
+					<div class="mt-1 d-flex justify-content-end">
+						<button type="button" class="btn btn-secondary mr-2" id="btn-cancel-dialog">Annulla</button>
+						<button type="submit" class="btn btn-success">Crea Documento</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+</dialog>
+<script>
+window.suppliersData = [
+    {% for supplier in suppliers %}
+    {
+        id: "{{ supplier.name|e('js') }}",
+        text: "{{ supplier.name|e('js') }}",
+        logo: "{{ supplier.logo|e('js') }}"
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+</script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>{% endblock %}{% block javascripts %}
+{{ parent() }}
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="module">
+	import SupplyOrders from '{{ asset('../modules/mpstockadv/views/js/controllers/admin/supplyOrders.js') }}';
+document.addEventListener('DOMContentLoaded', () => {
+const endpoints = {
+productSearch: "{{ path('mpstockadv_supply_orders_product_search') }}"
+};
+// Debug: mostra endpoints in console
+console.log("Endpoints:", endpoints);
+new SupplyOrders("#supply-orders-table", endpoints);
+});
+</script>{% endblock %}

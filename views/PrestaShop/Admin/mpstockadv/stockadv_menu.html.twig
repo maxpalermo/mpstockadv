@@ -1,15 +1,17 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block content %}
-<div class="container my-4">
-  <h1 class="mb-4">MP Magazzino Avanzato</h1>
-  <div class="list-group">
-    <a href="{{ path('mpstockadv_admin_warehouse') }}" class="list-group-item list-group-item-action">Gestione Magazzini</a>
-    <a href="{{ path('mpstockadv_admin_stockview') }}" class="list-group-item list-group-item-action">Giacenze</a>
-    <a href="{{ path('mpstockadv_admin_stockmovement') }}" class="list-group-item list-group-item-action">Movimenti</a>
-    <a href="{{ path('mpstockadv_admin_stockentry') }}" class="list-group-item list-group-item-action">Documenti di Carico</a>
-    <a href="{{ path('mpstockadv_admin_stockexit') }}" class="list-group-item list-group-item-action">Documenti di Scarico</a>
-    <a href="{{ path('mpstockadv_admin_stockimportexport') }}" class="list-group-item list-group-item-action">Import/Export</a>
-  </div>
-</div>
+	<div class="container my-4">
+		<h1 class="mb-4">MP Magazzino Avanzato</h1>
+		<div class="list-group">
+			<a href="{{ path('mpstockadv_admin_warehouse') }}" class="list-group-item list-group-item-action">Gestione Magazzini</a>
+			<a href="{{ path('mpstockadv_admin_stockview') }}" class="list-group-item list-group-item-action">Giacenze</a>
+			<a href="{{ path('mpstockadv_admin_stockmvt') }}" class="list-group-item list-group-item-action">Movimenti</a>
+			<a href="{{ path('mpstockadv_admin_mvtreasons_index') }}" class="list-group-item list-group-item-action">Tipi di movimento</a>
+			<!--<a href="{{ path('mpstockadv_admin_stockentry') }}" class="list-group-item list-group-item-action">Documenti di Carico</a>-->
+			<!--<a href="{{ path('mpstockadv_admin_stockexit') }}" class="list-group-item list-group-item-action">Documenti di Scarico</a>-->
+			<a href="{{ path('mpstockadv_admin_supplyorders') }}" class="list-group-item list-group-item-action">Documenti di Carico</a>
+			<a href="{{ path('mpstockadv_admin_stockimportexport') }}" class="list-group-item list-group-item-action">Import/Export</a>
+		</div>
+	</div>
 {% endblock %}

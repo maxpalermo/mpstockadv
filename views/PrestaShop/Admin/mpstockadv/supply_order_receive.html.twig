@@ -1,0 +1,53 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+{% block content %}
+<h1>Ricezione merce - Ordine #{{ order.id_supply_order }}</h1>
+<p>Fornitore: {{ order.supplier_name }}</p>
+<p>Data ordine: {{ order.date_add|date('d/m/Y H:i') }}</p>
+<form id="receive-form" method="post">
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Prodotto</th>
+                <th>Riferimento</th>
+                <th>Ordinati</th>
+                <th>Ricevuti</th>
+                <th>Ricevi ora</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for d in details %}
+            <tr>
+                <td>{{ d.name }}</td>
+                <td>{{ d.reference }}</td>
+                <td>{{ d.quantity_expected }}</td>
+                <td>{{ d.quantity_received }}</td>
+                <td>
+                    <input type="number" class="form-control" name="received[{{ d.id_supply_order_detail }}]" min="0" max="{{ d.quantity_expected - d.quantity_received }}" value="0">
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-success">Registra ricezione</button>
+    <a href="{{ path('mpstockadv_admin_supplyorders') }}" class="btn btn-secondary">Annulla</a>
+</form>
+<script>
+document.getElementById('receive-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const form = e.target;
+    fetch(window.location.href, {
+        method: 'POST',
+        body: new FormData(form)
+    })
+    .then(r => r.json())
+    .then(data => {
+        if(data.success) {
+            alert('Ricezione registrata!');
+            window.location.href = "{{ path('mpstockadv_admin_supplyorders') }}";
+        } else {
+            alert('Errore: ' + (data.message || 'Impossibile registrare la ricezione.'));
+        }
+    });
+});
+</script>
+{% endblock %}

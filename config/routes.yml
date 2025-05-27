@@ -57,3 +57,78 @@ mpstockadv_admin_stockimportexport:
   path: /admin/mpstockadv/stock-import-export
   controller: MpSoft\MpStockAdv\Controller\Admin\StockImportExportController::index
   methods: [GET]
+
+mpstockadv_admin_mvtreasons_index:
+  path: /admin/mpstockadv/mvt-reasons
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtReasonsController::index
+  methods: [GET]
+
+mpstockadv_admin_mvtreasons_list:
+  path: /admin/mpstockadv/mvt-reasons/list
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtReasonsController::list
+  methods: [GET, POST]
+
+mpstockadv_admin_mvtreasons_save:
+  path: /admin/mpstockadv/mvt-reasons/save
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtReasonsController::save
+  methods: [POST]
+
+mpstockadv_admin_supplyorders:
+  path: /admin/mpstockadv/supply-orders
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockSupplyOrderController::index
+  methods: [GET]
+
+mpstockadv_admin_supplyorders_edit:
+  path: /admin/mpstockadv/supply-orders/edit/{id}
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockSupplyOrderController::edit
+  methods: [GET, POST]
+
+mpstockadv_admin_supplyorders_receive:
+  path: /admin/mpstockadv/supply-orders/receive/{id}
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockSupplyOrderController::receive
+  methods: [POST]
+
+mpstockadv_admin_supplyorders_create:
+  path: /admin/mpstockadv/supply-orders/create
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockSupplyOrderController::create
+  methods: [POST]
+
+mpstockadv_admin_supplyorders_product_search:
+  path: /admin/mpstockadv/supply-orders/product-search
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockSupplyOrderController::productSearch
+  methods: [GET]
+
+mpstockadv_admin_mvtreasons_delete:
+  path: /admin/mpstockadv/mvt-reasons/delete
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtReasonsController::delete
+  methods: [POST]
+
+mpstockadv_admin_stockimportexport_import_mvt_reason:
+  path: /admin/mpstockadv/import/mvt-reason
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockImportExportController::importMvtReason
+  methods: [POST]
+
+mpstockadv_admin_stockimportexport_import_orders:
+  path: /admin/mpstockadv/import/orders
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockImportExportController::importOrders
+  methods: [POST]
+
+mpstockadv_admin_stockimportexport_import_xml:
+  path: /admin/mpstockadv/import/xml
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockImportExportController::importXml
+  methods: [POST]
+
+mpstockadv_supply_orders_product_search:
+  path: /admin/mpstockadv/supply-orders/product-search
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockSupplyOrderController::productSearch
+  methods: [GET]
+
+mpstockadv_admin_stockmvt:
+  path: /admin/mpstockadv/stock-mvt
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::indexAction
+  methods: [GET]
+
+mpstockadv_admin_stockmvt_ajax_list:
+  path: /admin/mpstockadv/stock-mvt/ajax-list
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::ajaxListAction
+  methods: [GET]
