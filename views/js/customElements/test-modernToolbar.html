@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Modern Toolbar</title>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <script type="module" src="./modernToolbar.js"></script>
+        <style>
+            body {
+                margin: 0;
+                font-family: "Segoe UI", Arial, sans-serif;
+                background-color: #f4f7f6;
+            }
+            .toolbar-placeholder {
+                height: 60px; /* Match toolbar height */
+                /* background-color: #e0e0e0; */ /* For visualizing placeholder */
+            }
+            .content {
+                padding: 20px;
+            }
+            .event-log {
+                margin-top: 20px;
+                padding: 15px;
+                background-color: #fff;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                max-height: 300px;
+                overflow-y: auto;
+                font-size: 0.9em;
+            }
+            .event-log p {
+                margin: 5px 0;
+                border-bottom: 1px solid #eee;
+                padding-bottom: 5px;
+            }
+            .event-log p:last-child {
+                border-bottom: none;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="toolbar-container" class="toolbar-placeholder"></div>
+
+        <div class="content">
+            <h1>Contenuto della Pagina di Test</h1>
+            <p>Questa è una pagina di esempio per testare il componente Modern Toolbar.</p>
+            <div class="event-log" id="eventLog">
+                <p><em>Log degli eventi apparirà qui...</em></p>
+            </div>
+        </div>
+
+        <script type="module">
+            import { ModernToolbarManager } from "./modernToolbar.js";
+
+            const menuData = [
+                {
+                    icon: "home",
+                    label: "Home",
+                    href: "#home"
+                },
+                {
+                    icon: "settings",
+                    label: "Impostazioni",
+                    // No href, should trigger event
+                    children: [
+                        { label: "Profilo", href: "#profilo", icon: "person" },
+                        {
+                            label: "Preferenze",
+                            // No href, should trigger event
+                            children: [
+                                { label: "Notifiche", onclickAction: "toggleNotifications" }, // Custom data for event
+                                { label: "Tema", href: "#tema", background: "#4CAF50", color: "white" }
+                            ]
+                        },
+                        { label: "Privacy", href: "#privacy" }
+                    ]
+                },
+                {
+                    icon: "info",
+                    label: "About",
+                    href: "#about",
+                    background: "#2196F3",
+                    color: "#ffffff"
+                },
+                {
+                    icon: "help_outline",
+                    label: "Aiuto"
+                    // No href, should trigger event
+                }
+            ];
+
+            const actionButtonsData = [
+                {
+                    icon: "add_circle",
+                    label: "Nuovo",
+                    actionId: "createNew"
+                },
+                {
+                    icon: "save",
+                    label: "Salva",
+                    actionId: "saveDocument",
+                    background: "#ff9800",
+                    color: "white"
+                }
+            ];
+
+            const toolbarManager = new ModernToolbarManager({
+                targetElement: "#toolbar-container",
+                logoSrc: "https://dummyimage.com/150x50/007bff/fff&text=LOGO",
+                menuItems: menuData,
+                actionButtons: actionButtonsData
+            });
+
+            const logElement = document.getElementById("eventLog");
+            let eventCounter = 0;
+
+            function logEvent(eventName, detail) {
+                eventCounter++;
+                const p = document.createElement("p");
+                p.innerHTML = `<b>${eventCounter}. ${eventName}:</b> ${JSON.stringify(detail, null, 2)}`;
+                if (logElement.firstChild && logElement.firstChild.textContent.startsWith("Log degli eventi")) {
+                    logElement.innerHTML = ""; // Clear initial message
+                }
+                logElement.appendChild(p);
+                logElement.scrollTop = logElement.scrollHeight; // Auto-scroll
+            }
+
+            const toolbarInstance = toolbarManager.getToolbarInstance();
+
+            toolbarInstance.addEventListener("menu-item-click", (e) => {
+                logEvent("menu-item-click", e.detail);
+                // Example of handling specific onclickAction from JSON
+                if (e.detail.onclickAction === "toggleNotifications") {
+                    alert("Azione: Attiva/Disattiva Notifiche!");
+                }
+            });
+
+            toolbarInstance.addEventListener("action-button-click", (e) => {
+                logEvent("action-button-click", e.detail);
+                if (e.detail.actionId === "createNew") {
+                    alert("Azione: Crea Nuovo Elemento!");
+                }
+            });
+
+            toolbarInstance.addEventListener("toolbar-search", (e) => {
+                logEvent("toolbar-search", e.detail);
+                alert(`Ricerca per: ${e.detail.query}`);
+            });
+        </script>
+    </body>
+</html>

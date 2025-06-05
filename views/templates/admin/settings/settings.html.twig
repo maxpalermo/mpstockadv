@@ -1,0 +1,88 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block stylesheets %}
+	{{ parent() }}
+	<link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.css') }}" rel="stylesheet" />
+	<link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2-bootstrap4.min.css') }}" rel="stylesheet">
+
+	<style>
+		.gap-2 {
+			gap: 0.5rem !important;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<div class="container my-4">
+		<h1 class="mb-4">Impostazioni Magazzino Avanzato</h1>
+		<form method="post" action="{{ path('mpstockadv_admin_stocksettings') }}">
+			<div class="card mb-4">
+				<div class="card-header">
+					<h4 class="mb-0">Configurazione Modulo</h4>
+				</div>
+				<div class="card-body">
+					<div class="form-group mb-3">
+						<label for="default_warehouse">Magazzino di default</label>
+						<select id="default_warehouse" name="default_warehouse" class="form-control" data-live-search="true">
+							{% for warehouse in warehouses %}
+								<option value="{{ warehouse.id_warehouse }}" {% if warehouse.id_warehouse == current_default_warehouse %} selected {% endif %}>
+									{{ warehouse.name }}
+								</option>
+							{% endfor %}
+						</select>
+						<small class="form-text text-muted">Seleziona il magazzino di default per i movimenti automatici.</small>
+					</div>
+					<div class="form-group mb-3">
+						<label for="default_stock_mvt">Movimento di default</label>
+						<select id="default_stock_mvt" name="default_stock_mvt" class="form-control" data-live-search="true">
+							{% for stockMvtReason in stockMvtReasons %}
+								<option value="{{ stockMvtReason.id_stock_mvt_reason }}" {% if stockMvtReason.id_stock_mvt_reason == current_default_stock_mvt %} selected {% endif %}>
+									{{ stockMvtReason.name }}
+								</option>
+							{% endfor %}
+						</select>
+						<small class="form-text text-muted">Seleziona il motivo di default per i movimenti automatici.</small>
+					</div>
+				</div>
+				<div class="card-footer d-flex justify-content-end gap-2">
+					<button type="submit" name="submit_form" class="btn btn-primary">Salva impostazioni</button>
+					<a href="{{ path('mpstockadv_admin_stockadv') }}" class="btn btn-secondary">Torna al menu</a>
+				</div>
+			</div>
+		</form>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.js') }}"></script>
+	<script type="text/javascript">
+		document.addEventListener('DOMContentLoaded', function() {
+			const selectWarehouses = document.getElementById('default_warehouse');
+			const selectStockMvt = document.getElementById('default_stock_mvt');
+			
+			$(selectWarehouses).select2();
+
+			$(selectWarehouses).on('select2:open', function() {
+				setTimeout(function() {
+					let searchField = document.querySelector('.select2-container--open .select2-search__field');
+					if (searchField) searchField.focus();
+				}, 0);
+			});
+			$(selectWarehouses).on('click', function() {
+				$(this).select2('open');
+			});
+			$(selectStockMvt).select2();
+
+			$(selectStockMvt).on('select2:open', function() {
+				setTimeout(function() {
+					let searchField = document.querySelector('.select2-container--open .select2-search__field');
+					if (searchField) searchField.focus();
+				}, 0);
+			});
+			$(selectStockMvt).on('click', function() {
+				$(this).select2('open');
+			});
+		});
+	</script>
+{% endblock %}

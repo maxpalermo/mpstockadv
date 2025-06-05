@@ -11,8 +11,8 @@
 	{{ parent() }}
 	<script>
 		window.pathSetDefaultCombination = "{{ path('mpstockadv_admin_stockview_set_default', {'id_product_attribute': 'ID_REPLACE'}) }}";
-window.flashMsgSuccess = "Combinazione aggiornata come quantità di default.";
-window.flashMsgError = "Errore di comunicazione con il server.";
+		window.flashMsgSuccess = "Combinazione aggiornata come quantità di default.";
+		window.flashMsgError = "Errore di comunicazione con il server.";
 	</script>
 
 	<script src="{{ asset('../modules/mpstockadv/views/js/controllers/admin/stockView.js') }}"></script>

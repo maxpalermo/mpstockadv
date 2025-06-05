@@ -3,6 +3,16 @@ mpstockadv_admin_stockadv:
   controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::index
   methods: [GET]
 
+mpstockadv_admin_stockadv_product_search:
+  path: /admin/mpstockadv/product-search
+  controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::productSearchAction
+  methods: [GET]
+
+mpstockadv_admin_stockadv_mvt_reasons:
+  path: /admin/mpstockadv/mvt-reasons
+  controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::getMvtReasonsAction
+  methods: [GET]
+
 mpstockadv_admin_stockadv_index:
   path: /admin/mpstockadv
   controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::index
@@ -21,6 +31,11 @@ mpstockadv_admin_warehouse_edit:
 mpstockadv_admin_stockmovement:
   path: /admin/mpstockadv/stock-movement
   controller: MpSoft\MpStockAdv\Controller\Admin\StockMovementController::index
+  methods: [GET]
+
+mpstockadv_admin_stockadv_render_form:
+  path: /admin/mpstockadv/render-form
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::renderFormAction
   methods: [GET]
 
 mpstockadv_admin_stockentry:
@@ -131,4 +146,64 @@ mpstockadv_admin_stockmvt:
 mpstockadv_admin_stockmvt_ajax_list:
   path: /admin/mpstockadv/stock-mvt/ajax-list
   controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::ajaxListAction
+  methods: [GET, POST]
+
+mpstockadv_admin_stockmvt_ajax_save:
+  path: /admin/module/mpstockadv/stockmvt/ajax-save
+  methods: [POST]
+  defaults:
+    _controller: 'MpSoft\MpStockAdv\Controller\Admin\StockMvtController::ajaxSaveAction'
+
+mpstockadv_admin_stockmvt_ajax_get_orders:
+  path: /admin/module/mpstockadv/stockmvt/ajax-get-orders
+  methods: [POST]
+  defaults:
+    _controller: 'MpSoft\MpStockAdv\Controller\Admin\StockMvtController::getOrdersAction'
+
+mpstockadv_admin_stockmvt_ajax_get_valid_orders_state:
+  path: /admin/module/mpstockadv/stockmvt/ajax-get-valid-orders-state
   methods: [GET]
+  defaults:
+    _controller: 'MpSoft\MpStockAdv\Controller\Admin\StockMvtController::getValidOrderStatesAction'
+
+mpstockadv_admin_stockmvt_ajax_import_orders_mvt:
+  path: /admin/module/mpstockadv/stockmvt/ajax-import-orders-mvt
+  methods: [POST]
+  defaults:
+    _controller: 'MpSoft\MpStockAdv\Controller\Admin\StockMvtController::importOrdersMvtAction'
+
+mpstockadv_admin_stockmvt_ajax_reasons:
+  path: /admin/module/mpstockadv/stockmvt/ajax-reasons
+  methods: [GET]
+  defaults:
+    _controller: 'MpSoft\MpStockAdv\Controller\Admin\StockMvtController::ajaxReasonsAction'
+
+mpstockadv_admin_stocksettings:
+  path: /admin/mpstockadv/stock-settings
+  controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockSettingsController::index
+  methods: [GET, POST]
+
+mpstockadv_admin_stockmvt_save_mvt:
+  path: /admin/module/mpstockadv/stockmvt/save-mvt
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::saveMvtAction
+  methods: [POST]
+
+mpstockadv_admin_stockmvt_truncate_tables:
+  path: /admin/module/mpstockadv/stockmvt/truncate-tables
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::truncateTablesAction
+  methods: [GET]
+
+mpstockadv_admin_stockmvt_get_json_init_stock:
+  path: /admin/module/mpstockadv/stockmvt/get-json-init-stock
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::getJsonInitStockAction
+  methods: [GET]
+
+mpstockadv_admin_stockmvt_import_init_stock:
+  path: /admin/module/mpstockadv/stockmvt/import-init-stock
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::importInitStockAction
+  methods: [POST]
+
+mpstockadv_admin_stockmvt_product_autocomplete:
+  path: /admin/module/mpstockadv/stockmvt/product-autocomplete
+  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::productAutocompleteAction
+  methods: [GET, POST]

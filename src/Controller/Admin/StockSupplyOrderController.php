@@ -2,6 +2,7 @@
 
 namespace MpSoft\MpStockAdv\Controller\Admin;
 
+use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -9,6 +10,14 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class StockSupplyOrderController extends FrameworkBundleAdminController
 {
+    private $context;
+
+    public function __construct(LegacyContext $context)
+    {
+        /* @var LegacyContext $context */
+        $this->context = $context;
+    }
+
     /**
      * @Route("/mpstockadv/supply-orders", name="mpstockadv_supply_orders")
      */
@@ -122,58 +131,12 @@ class StockSupplyOrderController extends FrameworkBundleAdminController
     public function productSearch(Request $request)
     {
         $q = $request->query->get('q', '');
-        if (mb_strlen($q) < 3) {
-            return $this->json(['results' => []]);
-        }
-        $results = \MpSoft\MpStockAdv\Models\ModelProductSearch::search($q);
-        $items = [];
-        foreach ($results as $row) {
-            $label = $row['product_name'];
-            if ($row['id_product_attribute']) {
-                $label .= ' — '.$row['attribute_names'];
-            }
-            $label .= ' [Rif: '.($row['attr_reference'] ?: $row['reference']).']';
-            if ($row['ean13'] || $row['attr_ean13']) {
-                $label .= ' EAN: '.($row['attr_ean13'] ?: $row['ean13']);
-            }
-            if ($row['upc'] || $row['attr_upc']) {
-                $label .= ' UPC: '.($row['attr_upc'] ?: $row['upc']);
-            }
-            if ($row['isbn'] || $row['attr_isbn']) {
-                $label .= ' ISBN: '.($row['attr_isbn'] ?: $row['isbn']);
-            }
-            // Recupera l'immagine di default
-            $image_url = null;
-            $id_product = (int) $row['id_product'];
-            $id_product_attribute = (int) $row['id_product_attribute'];
-
-            // Costruisci URL immagine (usa link di PrestaShop)
-            $cover = \Product::getCover($id_product);
-            if ($cover) {
-                $path = \Image::getImgFolderStatic($cover['id_image']);
-                $image_url = _PS_BASE_URL_.__PS_BASE_URI__.'img/p/'.$path.'/'.$cover['id_image'].'-small_default.jpg';
-            } else {
-                $image_url = _PS_BASE_URL_.__PS_BASE_URI__.'img/404.gif';
-            }
-
-            $items[] = [
-                'id' => json_encode([
-                    'img_url' => $image_url,
-                    'id_product' => $row['id_product'],
-                    'id_product_attribute' => $row['id_product_attribute'],
-                    'name' => $row['product_name'],
-                    'attribute_names' => $row['attribute_names'],
-                    'reference' => $row['attr_reference'] ?: $row['reference'],
-                    'ean13' => $row['attr_ean13'] ?: $row['ean13'],
-                    'upc' => $row['attr_upc'] ?: $row['upc'],
-                    'isbn' => $row['attr_isbn'] ?: $row['isbn'],
-                ]),
-                'text' => $label,
-                'img' => $image_url,
-                'name' => $row['product_name'],
-                'combination' => $row['attribute_names'],
-            ];
-        }
+        $idLang = (int) $this->context->getContext()->language->id;
+        // Usa il servizio centralizzato per la ricerca autocomplete
+        $service = new \MpSoft\MpStockAdv\Services\ProductAutocompleteService(
+            $this->getDoctrine()->getConnection()
+        );
+        $items = $service->search($q, $idLang, 20);
 
         return $this->json(['results' => $items]);
     }

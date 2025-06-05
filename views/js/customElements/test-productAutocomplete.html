@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>Test ProductAutocomplete</title>
+  <script type="module" src="./productAutocomplete.js"></script>
+  <style>
+    body { background: #f1f3fa; font-family: 'Segoe UI', Arial, sans-serif; }
+    .demo-section { margin: 40px auto; max-width: 700px; background: #fff; border-radius: 12px; box-shadow: 0 6px 32px rgba(0,0,0,0.08); padding: 40px 30px; }
+    h2 { margin-bottom: 18px; font-size: 1.4rem; }
+    label { font-weight: 500; margin-bottom: 7px; display: block; }
+    .log { margin-top: 16px; background: #f3f4f6; border-radius: 7px; padding: 10px 16px; font-size: 0.97rem; color: #374151; }
+  </style>
+</head>
+<body>
+  <div class="demo-section">
+    <h2>Demo ProductAutocomplete</h2>
+    <label for="auto1">Autocomplete singolo prodotto:</label>
+    <product-autocomplete id="auto1" placeholder="Cerca prodotto..." endpoint="/fake-endpoint" max-results="5"></product-autocomplete>
+    <div class="log" id="log1"></div>
+    <hr style="margin:32px 0;">
+    <label for="auto2">Autocomplete multiplo:</label>
+    <product-autocomplete id="auto2" placeholder="Aggiungi prodotti" endpoint="/fake-endpoint" multiple max-results="7"></product-autocomplete>
+    <div class="log" id="log2"></div>
+  </div>
+  <script type="module">
+    // Mock endpoint handler
+    const mockData = [
+      { id: 1, label: [ {type:'image', src:'https://dummyimage.com/42x42/4f8cff/fff&text=A'}, {value:'Giacca Softshell'}, {value:'Taglia L'}, {value:'29.99', type:'price'}, {type:'hidden', value:'SKU12345'} ] },
+      { id: 2, label: [ {type:'image', src:'https://dummyimage.com/42x42/22c55e/fff&text=B'}, {value:'Pantalone Cargo'}, {value:'Taglia 48'}, {value:'19.50', type:'price'}, {type:'hidden', value:'REF_XYZ'} ] },
+      { id: 3, label: [ {type:'image', src:'https://dummyimage.com/42x42/f59e42/fff&text=C'}, {value:'Felpa Zip'}, {value:'Taglia XL'}, {value:'15.00', type:'price'} ] },
+      { id: 4, label: [ {type:'image', src:'https://dummyimage.com/42x42/e53e3e/fff&text=D'}, {value:'Scarpe Antinfortunistiche'}, {value:'Numero 43'}, {value:'44.90', type:'price'} ] },
+      { id: 5, label: [ {type:'image', src:'https://dummyimage.com/42x42/8b5cf6/fff&text=E'}, {value:'T-shirt Lavoro'}, {value:'Taglia M'}, {value:'9.90', type:'price'} ] },
+      { id: 6, label: 'Guanti Protettivi (Semplice)' },
+      { id: 7, label: [ {type:'image', src:'https://dummyimage.com/42x42/3b82f6/fff&text=F'}, {value:'Elmetto Cantiere'}, {value:'Rosso'}, {value:'12.00', type:'price'} ] },
+      { id: 8, label: [ {type:'image', src:'https://dummyimage.com/42x42/10b981/fff&text=G'}, {value:'Gilet Alta Visibilità'}, {value:'Giallo Fluo'}, {value:'18.75', type:'price'} ] }
+    ];
+
+    // Override fetch for the test endpoint
+    const originalFetch = window.fetch;
+    window.fetch = (url, options) => {
+      if(url.includes('/fake-endpoint')) {
+        const q = decodeURIComponent(url.split('q=')[1]||'').toLowerCase();
+        const results = mockData.filter(item => {
+          if(typeof item.label === 'string') return item.label.toLowerCase().includes(q);
+          return item.label.some(l => (l.value||'').toLowerCase().includes(q));
+        });
+        return Promise.resolve({ json: () => Promise.resolve(results) });
+      }
+      return originalFetch.apply(this, arguments);
+    };
+
+    // Log selezione
+    const auto1 = document.getElementById('auto1');
+    const auto2 = document.getElementById('auto2');
+    const log1 = document.getElementById('log1');
+    const log2 = document.getElementById('log2');
+
+    auto1.addEventListener('selected', (e) => {
+      console.log('Auto1 selected:', e.detail);
+      log1.textContent = `Selezionato: ${JSON.stringify(e.detail, null, 2)}`;
+    });
+
+    auto2.addEventListener('selected', (e) => {
+      console.log('Auto2 selected:', e.detail);
+      log2.textContent = `Selezionati: ${JSON.stringify(e.detail, null, 2)}`;
+    });
+
+    auto2.addEventListener('deselected', (e) => {
+      console.log('Auto2 deselected:', e.detail);
+      const currentLog = log2.textContent.split('\nDeselezionato:')[0]; // Preserve previous selections if any
+      log2.textContent = `${currentLog}\nDeselezionato: ${JSON.stringify(e.detail, null, 2)}`;
+    });
+  </script>
+</body>
+</html>

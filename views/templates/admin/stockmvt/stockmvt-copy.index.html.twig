@@ -1,0 +1,79 @@
+{# Pagina Movimenti Magazzino - stock_mvt #}
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block head %}
+    <title>{% block title %}Movimenti Magazzino{% endblock %}</title>
+    <!-- Select2 CSS -->
+    <link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2-bootstrap4.min.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+	<div class="card">
+		<div class="card-header">
+			<h3 class="card-title mb-3">Movimenti Magazzino</h3>
+			<div id="stock-mvt-toolbar"></div>
+		</div>
+		<div class="card-body">
+			<div id="stock-mvt-table"><!-- Tabella JS --></div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{{ parent() }}
+	<script src="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.js') }}"></script>
+	<script src="{{ asset('../modules/mpstockadv/views/js/controllers/admin/stockmvt/stockmvt.script.js') }}"></script>
+	<script src="{{ asset('../modules/mpstockadv/views/js/controllers/admin/stockmvt/stockmvt.DomContentLoaded.js') }}"></script>
+
+	<script>
+		window.APP_ROUTES = {
+			img404: "{{ asset('/img/404.gif') }}",
+			postSaveMvt: "{{ path('mpstockadv_admin_stockmvt_save_mvt') }}",
+			fetchProductAutocompleteUrl: "{{ path('mpstockadv_admin_stockadv_product_search') }}",
+			fetchMvtReasonsUrl: "{{ path('mpstockadv_admin_stockadv_mvt_reasons') }}",
+			fetchDialogFormUrl: "{{ path('mpstockadv_admin_stockadv_render_form') }}",
+			backToMainMenu: "{{ path('mpstockadv_admin_stockadv') }}",
+			fetchOrdersUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_get_orders') }}",
+			fetchValidOrdersStateUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_get_valid_orders_state') }}",
+			importOrdersMvtUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_import_orders_mvt') }}",
+			initImporter: {
+				truncateUrl: "{{ path('mpstockadv_admin_stockmvt_truncate_tables') }}",
+				getJsonUrl: "{{ path('mpstockadv_admin_stockmvt_get_json_init_stock') }}",
+				importUrl: "{{ path('mpstockadv_admin_stockmvt_import_init_stock') }}"
+			}
+		};
+
+		window.idDialogMovement = "{{ id_dialog }}";
+		window.idFormMovement = "{{ id_dialog }}-form";
+	</script>
+
+	<script type="module">
+		const idDialogMovement = "{{ id_dialog }}";
+		const idFormMovement = "{{ id_dialog }}-form";
+
+		{% set jsPath = "../modules/mpstockadv/views/js/" %}
+		{% set jsControllerPath = jsPath ~ "controllers/admin/stockmvt/" %}
+		{% set jsComponentPath = jsPath ~ "components/" %}
+
+        import StockMvtPage from '{{ asset(jsControllerPath ~ 'stockmvt.Page.js') }}';
+		import ImportOrdersMvt from '{{ asset(jsControllerPath ~ 'stockmvt.ImportOrdersMvt.js') }}';
+		import Toolbar from '{{ asset(jsComponentPath ~ 'Toolbar.js') }}';
+		import ProductAutocomplete from '{{ asset(jsComponentPath ~ 'ProductAutocomplete.js') }}';
+		import StockMvtReasonsSelectOptions from '{{ asset(jsComponentPath ~ 'StockMvtReasonsSelectOptions.js') }}';
+		import ConfirmModal from '{{ asset(jsComponentPath ~ 'Confirm.js') }}';
+		import ModalProgress from '{{ asset(jsComponentPath ~ 'ModalProgress.js') }}';
+		import InitStockImporter from '{{ asset(jsControllerPath ~ 'stockmvt.InitStockImporter.js') }}';
+
+		window.ModuleClasses = {
+			toolBar: Toolbar,
+			stockMvtPage: StockMvtPage,
+			productAutocomplete: ProductAutocomplete,
+			stockMvtReasonsSelectOptions: StockMvtReasonsSelectOptions,
+			confirmModal: ConfirmModal,
+			importOrdersMvt: ImportOrdersMvt,
+			initStockImporter: InitStockImporter,
+			modalProgress: ModalProgress
+		};
+	</script>
+{% endblock %}

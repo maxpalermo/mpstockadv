@@ -8,3 +8,10 @@ services:
     resource: "../src/Controller/Admin"
     public: true
     tags: ["controller.service_arguments"]
+
+  # ImportService
+  MpSoft\MpStockAdv\Services\StockMvtInitStockImporterService:
+    arguments:
+      $connection: "@doctrine.dbal.default_connection"
+      $legacyContext: "@prestashop.adapter.legacy.context"
+      $twig: "@twig"

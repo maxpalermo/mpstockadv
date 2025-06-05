@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test Modern Table</title>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
+        <script type="module" src="./modernTable.js"></script>
+        <style>
+            body {
+                font-family: "Segoe UI", Arial, sans-serif;
+                margin: 20px;
+                background-color: #f4f7f6;
+                color: #333;
+            }
+            .container {
+                max-width: 1000px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #fff;
+                border-radius: 8px;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+            h1 {
+                color: #007bff;
+                text-align: center;
+                margin-bottom: 30px;
+            }
+            modern-table {
+                margin-bottom: 30px;
+            }
+            .controls {
+                margin-bottom: 20px;
+                padding: 15px;
+                background-color: #e9ecef;
+                border-radius: 5px;
+                display: flex;
+                gap: 15px;
+                align-items: center;
+            }
+            .controls label {
+                font-weight: 500;
+            }
+            .controls input[type="text"],
+            .controls input[type="number"],
+            .controls button {
+                padding: 8px 12px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                font-size: 0.95em;
+            }
+            .controls button {
+                background-color: #007bff;
+                color: white;
+                cursor: pointer;
+                transition: background-color 0.2s;
+            }
+            .controls button:hover {
+                background-color: #0056b3;
+            }
+            /* Example of a table defined in light DOM (will be parsed by the component) */
+            #tableFromDom modern-table table {
+                /* Basic styling for the light DOM table before component processing */
+                border-collapse: collapse;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            #tableFromDom modern-table th,
+            #tableFromDom modern-table td {
+                border: 1px solid #ddd;
+                padding: 8px;
+                text-align: left;
+            }
+            #tableFromDom modern-table th {
+                background-color: #f2f2f2;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Test del Componente Modern Table</h1>
+
+            <div class="controls">
+                <label for="rowsPerPageInput">Righe per Pagina:</label>
+                <input type="number" id="rowsPerPageInput" value="5" min="1" />
+                <button id="updateRowsPerPageBtn">Aggiorna Righe</button>
+                <label for="dataUrlInput">URL Dati (JSON):</label>
+                <input type="text" id="dataUrlInput" placeholder="Es. ./sample-data.json" size="25" />
+                <button id="loadDataUrlBtn">Carica da URL</button>
+                <button id="loadSampleDataBtn">Carica Dati Esempio (JS)</button>
+                <button id="clearDataBtn">Pulisci Dati</button>
+            </div>
+
+            <h2>Tabella Popolata via JavaScript (Header: Info, Border: Si)</h2>
+            <modern-table id="myModernTable1" data-header-style="info" data-border="1"></modern-table>
+
+            <h2>Tabella Popolata da URL (Header: Success, Border: Si)</h2>
+            <p>La tabella qui sotto tenterà di caricare <code>./sample-data.json</code> automaticamente. Assicurati che il file esista nella stessa directory.</p>
+            <modern-table id="myModernTable2" data-url="./sample-data.json" rows-per-page="3" data-header-style="success" data-border="1"></modern-table>
+
+            <h2>Tabella Popolata da Light DOM (Header: Warning, Border: No)</h2>
+            <div id="tableFromDom">
+                <modern-table id="myModernTable3" data-header-style="warning" data-border="0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-key="item_name">Articolo</th>
+                                <th data-key="quantity">Quantità</th>
+                                <th data-key="unit_price">Prezzo Unitario</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Libro "Web Components Avanzati"</td>
+                                <td>2</td>
+                                <td>25.00</td>
+                            </tr>
+                            <tr>
+                                <td>Corso "JavaScript Moderno"</td>
+                                <td>1</td>
+                                <td>99.50</td>
+                            </tr>
+                            <tr>
+                                <td>Penna Touch</td>
+                                <td>5</td>
+                                <td>3.20</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </modern-table>
+            </div>
+
+            <h2>Tabella Popolata via JavaScript (Header: Danger, Border: Si)</h2>
+            <modern-table id="myModernTable4" data-header-style="danger" data-border="1" rows-per-page="5"></modern-table>
+
+            <h2>Tabella Popolata da URL (Header: Black, Border: Si)</h2>
+            <modern-table id="myModernTable5" data-url="./sample-data.json" data-header-style="black" data-border="1" rows-per-page="4"></modern-table>
+
+            <h2>Tabella Popolata da Light DOM (Header: Light, Border: No)</h2>
+            <div id="tableFromDom6">
+                <modern-table id="myModernTable6" data-header-style="light" data-border="0">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th data-key="code">Codice</th>
+                                <th data-key="description">Descrizione</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>A100</td>
+                                <td>Oggetto Alpha Light</td>
+                            </tr>
+                            <tr>
+                                <td>B200</td>
+                                <td>Oggetto Beta Light</td>
+                            </tr>
+                            <tr>
+                                <td>C300</td>
+                                <td>Oggetto Gamma Light</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </modern-table>
+            </div>
+        </div>
+
+        <script>
+            customElements.whenDefined("modern-table").then(() => {
+                const table1 = document.getElementById("myModernTable1");
+                const table2 = document.getElementById("myModernTable2");
+                const table3 = document.getElementById("myModernTable3"); // Table from DOM
+                const table4 = document.getElementById("myModernTable4");
+                const table5 = document.getElementById("myModernTable5");
+                const table6 = document.getElementById("myModernTable6");
+
+                const sampleColumns = [
+                    { key: "firstName", label: "Nome" },
+                    { key: "lastName", label: "Cognome" },
+                    { key: "email", label: "Email Utente" },
+                    { key: "age", label: "Età" },
+                    { key: "city", label: "Città Residenza" }
+                ];
+
+                const sampleData = [
+                    { firstName: "Mario", lastName: "Rossi", email: "mario.rossi@example.com", age: 30, city: "Roma" },
+                    { firstName: "Luigi", lastName: "Verdi", email: "luigi.verdi@example.com", age: 25, city: "Milano" },
+                    { firstName: "Anna", lastName: "Bianchi", email: "anna.bianchi@example.com", age: 35, city: "Napoli" },
+                    { firstName: "Laura", lastName: "Neri", email: "laura.neri@example.com", age: 28, city: "Torino" },
+                    { firstName: "Paolo", lastName: "Gialli", email: "paolo.gialli@example.com", age: 42, city: "Firenze" },
+                    { firstName: "Sara", lastName: "Azzurri", email: "sara.azzurri@example.com", age: 22, city: "Bologna" },
+                    { firstName: "Marco", lastName: "Marroni", email: "marco.marroni@example.com", age: 38, city: "Venezia" },
+                    { firstName: "Elena", lastName: "Viola", email: "elena.viola@example.com", age: 31, city: "Genova" },
+                    { firstName: "Simone", lastName: "Arancioni", email: "simone.arancioni@example.com", age: 27, city: "Palermo" },
+                    { firstName: "Giulia", lastName: "Rosa", email: "giulia.rosa@example.com", age: 29, city: "Bari" }
+                ];
+
+                // Popola la prima e la quarta tabella con dati JavaScript
+                if (table1) table1.setData(sampleData, sampleColumns);
+                if (table4) {
+                    const sampleData4 = [
+                        { item: "Articolo X", price: 10.99, available: true },
+                        { item: "Articolo Y", price: 25.5, available: false },
+                        { item: "Articolo Z", price: 5.75, available: true },
+                        { item: "Articolo W", price: 150.0, available: true },
+                        { item: "Articolo V", price: 0.99, available: false }
+                    ];
+                    const sampleColumns4 = [
+                        { key: "item", label: "Oggetto" },
+                        { key: "price", label: "Costo" },
+                        { key: "available", label: "Disponibile" }
+                    ];
+                    table4.setData(sampleData4, sampleColumns4);
+                }
+
+                // Controlli
+                const updateRowsBtn = document.getElementById("updateRowsPerPageBtn");
+                if (updateRowsBtn) {
+                    updateRowsBtn.addEventListener("click", () => {
+                        const rowsInput = document.getElementById("rowsPerPageInput");
+                        if (!rowsInput) return;
+                        const rows = parseInt(rowsInput.value, 10);
+                        if (!isNaN(rows) && rows > 0) {
+                            if (table1) table1.setAttribute("rows-per-page", rows);
+                            if (table2) table2.setAttribute("rows-per-page", rows);
+                            if (table3) table3.setAttribute("rows-per-page", rows);
+                            if (table4) table4.setAttribute("rows-per-page", rows);
+                            if (table5) table5.setAttribute("rows-per-page", rows);
+                            if (table6) table6.setAttribute("rows-per-page", rows);
+                        }
+                    });
+                }
+
+                const loadUrlBtn = document.getElementById("loadDataUrlBtn");
+                if (loadUrlBtn) {
+                    loadUrlBtn.addEventListener("click", () => {
+                        const urlInput = document.getElementById("dataUrlInput");
+                        if (!urlInput) return;
+                        const url = urlInput.value.trim();
+                        if (url) {
+                            if (table2) table2.setAttribute("data-url", url);
+                        } else {
+                            alert("Inserisci un URL valido per i dati JSON.");
+                        }
+                    });
+                }
+
+                const loadSampleBtn = document.getElementById("loadSampleDataBtn");
+                if (loadSampleBtn) {
+                    loadSampleBtn.addEventListener("click", () => {
+                        if (table1) table1.setData(sampleData, sampleColumns);
+                        alert("Dati di esempio (JS) caricati nella prima tabella.");
+                    });
+                }
+
+                const clearBtn = document.getElementById("clearDataBtn");
+                if (clearBtn) {
+                    clearBtn.addEventListener("click", () => {
+                        if (table1) table1.setData([], []);
+                        if (table2) {
+                            table2.removeAttribute("data-url");
+                            table2.setData([], []);
+                        }
+                        if (table3 && typeof table3.setData === "function") table3.setData([], []);
+                        if (table4) table4.setData([], []);
+                        if (table5) {
+                            table5.removeAttribute("data-url");
+                            table5.setData([], []);
+                        }
+                        if (table6 && typeof table6.setData === "function") table6.setData([], []);
+                        alert("Dati rimossi da tutte le tabelle (internamente). La tabella 3 potrebbe ripopolarsi da DOM se non modificata.");
+                    });
+                }
+                // Nota: la tabella 3 (myModernTable3) viene popolata dal suo Light DOM
+                // al momento del connectedCallback del componente, se non ha già dati.
+                // Non è necessario chiamare esplicitamente populateFromDOM() qui a meno che
+                // il Light DOM non venga modificato dinamicamente dopo l'inizializzazione.
+            });
+        </script>
+    </body>
+</html>

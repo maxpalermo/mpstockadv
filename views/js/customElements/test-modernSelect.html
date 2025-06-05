@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Test ModernSelect Component</title>
+        <script type="module" src="./modernSelect.js"></script>
+        <style>
+            body {
+                font-family: sans-serif;
+                margin: 20px;
+                background-color: #f4f4f4;
+            }
+            .container {
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                margin-bottom: 20px;
+            }
+            h2 {
+                margin-top: 0;
+            }
+            modern-select {
+                margin-bottom: 15px;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h2>ModernSelect Component Test Page</h2>
+
+            <h3>Single Select (Local Data)</h3>
+            <modern-select id="single-select-local" placeholder="Select a color" data-display-type="colorpicker">
+                <option data-value="red" data-label="Red" data-color-code="#FF0000">Red</option>
+                <option data-value="green" data-label="Green" data-color-code="#00FF00">Green</option>
+                <option data-value="blue" data-label="Blue" data-color-code="#0000FF">Blue</option>
+                <option data-value="yellow" data-label="Yellow" data-color-code="#FFFF00">Yellow</option>
+                <option data-value="purple" data-label="Purple" data-color-code="#800080">Purple</option>
+            </modern-select>
+            <p>Selected: <span id="single-local-selected"></span></p>
+
+            <h3>Multiple Select (Local Data with Initial Values)</h3>
+            <modern-select id="multi-select-local" multiple placeholder="Select fruits">
+                <option data-value="apple" data-label="Apple">Apple</option>
+                <option data-value="banana" data-label="Banana">Banana</option>
+                <option data-value="orange" data-label="Orange">Orange</option>
+                <option data-value="grape" data-label="Grape">Grape</option>
+                <option data-value="mango" data-label="Mango">Mango</option>
+            </modern-select>
+            <p>Selected: <span id="multi-local-selected"></span></p>
+
+            <h3>Single Select (Remote Data - Placeholder)</h3>
+            <p>This example requires a valid endpoint. For now, it will show 'No results'.</p>
+            <modern-select id="single-select-remote" endpoint="/api/items" placeholder="Select remote item"> </modern-select>
+            <p>Selected: <span id="single-remote-selected"></span></p>
+
+            <h3>Multiple Select (Remote Data - Placeholder with Search)</h3>
+            <p>This example requires a valid endpoint. For now, it will show 'No results' or allow typing.</p>
+            <modern-select id="multi-select-remote" multiple endpoint="/api/users" placeholder="Search users" data-value-field="id" data-label-field="username"> </modern-select>
+            <p>Selected: <span id="multi-remote-selected"></span></p>
+
+            <h3>Disabled Select</h3>
+            <modern-select id="disabled-select" placeholder="Cannot select" disabled>
+                <div slot="option" data-value="1">Option 1 (disabled)</div>
+            </modern-select>
+        </div>
+
+        <div class="container">
+            <h3>Single Select Color Picker (Random Local Data)</h3>
+            <modern-select id="color-picker-random" data-display-type="colorpicker" placeholder="Select a random color">
+                <!-- Options will be populated by script -->
+            </modern-select>
+            <p>Selected: <span id="random-color-selected"></span></p>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const singleSelectLocal = document.getElementById("single-select-local");
+                const multiSelectLocal = document.getElementById("multi-select-local");
+                const singleSelectRemote = document.getElementById("single-select-remote");
+                const multiSelectRemote = document.getElementById("multi-select-remote");
+                // Mock data and setup for remote selects
+                const mockItemsData = [
+                    { value: "item1", label: "Remote Item 1 (Mock)" },
+                    { value: "item2", label: "Remote Item 2 (Mock)" },
+                    { value: "item3", label: "Remote Item 3 (Mock)" }
+                ];
+                const mockUsersData = [
+                    { id: "userA", username: "Alice R. (Mock)" },
+                    { id: "userB", username: "Bob R. (Mock)" },
+                    { id: "userC", username: "Charlie R. (Mock)" },
+                    { id: "userD", username: "Diana R. (Mock)" }
+                ];
+
+                const itemsDataUri = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mockItemsData));
+                const usersDataUri = "data:application/json;charset=utf-8," + encodeURIComponent(JSON.stringify(mockUsersData));
+
+                if (singleSelectRemote) {
+                    singleSelectRemote.setAttribute("endpoint", itemsDataUri);
+                    // Trigger re-load if component already processed endpoint, though DOMContentLoaded should be early enough
+                    if (typeof singleSelectRemote._loadRemoteOptions === "function" && singleSelectRemote._allOptions.length === 0) {
+                        // singleSelectRemote._loadRemoteOptions(); // Let connectedCallback handle it or a potential refresh method
+                    }
+                }
+                if (multiSelectRemote) {
+                    multiSelectRemote.setAttribute("endpoint", usersDataUri);
+                    if (typeof multiSelectRemote._loadRemoteOptions === "function" && multiSelectRemote._allOptions.length === 0) {
+                        // multiSelectRemote._loadRemoteOptions();
+                    }
+                }
+
+                const colorPickerRandom = document.getElementById("color-picker-random");
+
+                // Function to generate a random hex color
+                function generateRandomHexColor() {
+                    let hex = "#";
+                    const hexChars = "0123456789ABCDEF";
+                    for (let i = 0; i < 6; i++) {
+                        hex += hexChars[Math.floor(Math.random() * 16)];
+                    }
+                    return hex;
+                }
+
+                const colors = [
+                    { value: "red", label: "Red" },
+                    { value: "green", label: "Green" },
+                    { value: "blue", label: "Blue" },
+                    { value: "yellow", label: "Yellow" },
+                    { value: "purple", label: "Purple" }
+                ];
+
+                const fruits = [
+                    { id: "apple", name: "Apple" },
+                    { id: "banana", name: "Banana" },
+                    { id: "orange", name: "Orange" },
+                    { id: "grape", name: "Grape" },
+                    { id: "mango", name: "Mango" }
+                ];
+
+                // Populate multi-select-local
+                fruits.forEach((fruit) => {
+                    const option = document.createElement("div");
+                    option.setAttribute("data-value", fruit.id);
+                    option.textContent = fruit.name;
+                    multiSelectLocal.appendChild(option);
+                });
+                // Set initial value for multi-select-local
+                multiSelectLocal.setValue(["apple", "orange"]);
+
+                // Populate color-picker-random
+                const randomColors = [];
+                for (let i = 0; i < 5; i++) {
+                    const randomHex = generateRandomHexColor();
+                    randomColors.push({ value: randomHex, label: `Color ${randomHex}`, code: randomHex });
+                }
+
+                randomColors.forEach((color) => {
+                    const option = document.createElement("div");
+                    option.setAttribute("data-value", color.value);
+                    option.setAttribute("data-label", color.label);
+                    option.setAttribute("data-code", color.code);
+                    option.textContent = color.label;
+                    colorPickerRandom.appendChild(option);
+                });
+
+                // Event listeners to display selected values
+                singleSelectLocal.addEventListener("modern-select-change", (e) => {
+                    document.getElementById("single-local-selected").textContent = JSON.stringify(e.detail.selected);
+                });
+                multiSelectLocal.addEventListener("modern-select-change", (e) => {
+                    document.getElementById("multi-local-selected").textContent = JSON.stringify(e.detail.selected);
+                });
+                singleSelectRemote.addEventListener("modern-select-change", (e) => {
+                    document.getElementById("single-remote-selected").textContent = JSON.stringify(e.detail.selected);
+                });
+                multiSelectRemote.addEventListener("modern-select-change", (e) => {
+                    document.getElementById("multi-remote-selected").textContent = JSON.stringify(e.detail.selected);
+                });
+                colorPickerRandom.addEventListener("modern-select-change", (e) => {
+                    document.getElementById("random-color-selected").textContent = JSON.stringify(e.detail.selected);
+                });
+
+                // Example of programmatic control
+                // setTimeout(() => {
+                //     console.log('Setting singleSelectLocal to blue');
+                //     singleSelectLocal.setValue('blue');
+                //     console.log('Single select local value:', singleSelectLocal.getValue());
+
+                //     console.log('Clearing multiSelectLocal');
+                //     multiSelectLocal.clearSelection();
+                // }, 3000);
+            });
+        </script>
+    </body>
+</html>
