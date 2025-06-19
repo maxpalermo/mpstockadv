@@ -47,6 +47,13 @@ class StockMvtController extends FrameworkBundleAdminController
     // Pagina principale movimenti magazzino
     public function indexAction(Request $request): Response
     {
+        $stockMvtReasonService = new StockMvtReasonFormService(
+            $this->getDoctrine()->getConnection(),
+            $this->get('twig'),
+            $this->context
+        );
+        $form = $stockMvtReasonService->renderForm();
+
         return $this->render(
             '@Modules/mpstockadv/views/templates/admin/stockmvt/stockmvt.index.html.twig',
             [
@@ -54,6 +61,7 @@ class StockMvtController extends FrameworkBundleAdminController
                 'base_uri_site' => $this->context->getContext()->shop->getBaseUri(),
                 'logo_src' => \Configuration::get('PS_LOGO'),
                 'current_warehouse' => (int) \Configuration::get('MPSTOCKADV_DEFAULT_WAREHOUSE'),
+                'stockMvtFormHtml' => $form,
             ]
         );
     }
@@ -371,5 +379,28 @@ class StockMvtController extends FrameworkBundleAdminController
         return $this->json(
             $this->productAutocompleteService->search($search, $id_lang, 20)
         );
+    }
+
+    public function injectMenuData()
+    {
+        $menuDataService = new MenuDataService($this->router, $this->context);
+        $menuDataService->injectMenuData([
+            'icon' => 'home',
+            'label' => 'Movimenti',
+            'children' => [
+                [
+                    'icon' => 'add',
+                    'label' => 'Nuovo Movimento',
+                    'href' => 'javascript:void(0);',
+                    'action' => 'showNewMovement',
+                    'dialogId' => $idDialog ?? '',
+                ],
+                [
+                    'icon' => 'download',
+                    'label' => 'Importa',
+                    'href' => 'javascript:void(0);',
+                ],
+            ],
+        ]);
     }
 }

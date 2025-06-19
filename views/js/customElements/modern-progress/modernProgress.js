@@ -1,4 +1,4 @@
-export class ModalDialogProgress extends HTMLElement {
+export class ModernProgress extends HTMLElement {
     constructor() {
         super();
         this.attachShadow({ mode: "open" });
@@ -176,12 +176,12 @@ export class ModalDialogProgress extends HTMLElement {
     }
 }
 
-customElements.define("modal-dialog-progress", ModalDialogProgress);
+customElements.define("modern-progress", ModernProgress);
 
 // Classe di gestione esterna, per praticità
-export class ModalDialogProgressManager {
+export class ModernProgressManager {
     constructor({ title = "", description = "" } = {}) {
-        this.modal = document.createElement("modal-dialog-progress");
+        this.modal = document.createElement("modern-progress");
         document.body.appendChild(this.modal);
         this.modal.setTitle(title);
         this.modal.setDescription(description);

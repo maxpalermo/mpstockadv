@@ -8,6 +8,11 @@ mpstockadv_admin_stockadv_product_search:
   controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::productSearchAction
   methods: [GET]
 
+mpstockadv_admin_stockadv_get_states:
+  path: /admin/mpstockadv/get-states
+  controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::getStatesAction
+  methods: [GET]
+
 mpstockadv_admin_stockadv_mvt_reasons:
   path: /admin/mpstockadv/mvt-reasons
   controller: MpSoft\MpStockAdv\Controller\Admin\AdminStockAdvController::getMvtReasonsAction
@@ -203,7 +208,37 @@ mpstockadv_admin_stockmvt_import_init_stock:
   controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::importInitStockAction
   methods: [POST]
 
-mpstockadv_admin_stockmvt_product_autocomplete:
+mpstockadv_controller_stockmvt_index:
+  path: /admin/module/mpstockadv/stockmvt
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtController::indexAction
+  methods: [GET]
+
+mpstockadv_controller_stockmvt_refresh_table_data:
+  path: /admin/module/mpstockadv/stockmvt/refresh-table-data
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtController::refreshTableDataAction
+  methods: [GET]
+
+mpstockadv_controller_stockmvt_load_modal_dialog:
+  path: /admin/module/mpstockadv/stockmvt/load-modal-dialog
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtController::loadModalMovementsAction
+  methods: [GET]
+
+mpstockadv_controller_stockmvt_preferences:
+  path: /admin/module/mpstockadv/stockmvt/preferences
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtPreferences::indexAction
+  methods: [GET]
+
+mpstockadv_controller_stockmvt_load_modal_preferences:
+  path: /admin/module/mpstockadv/stockmvt/load-preferences
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtPreferences::loadModalPreferencesAction
+  methods: [GET]
+
+mpstockadv_controller_stockmvt_save_preferences:
+  path: /admin/module/mpstockadv/stockmvt/save-preferences
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtPreferences::savePreferencesAction
+  methods: [POST]
+
+mpstockadv_controller_stockmvt_product_autocomplete:
   path: /admin/module/mpstockadv/stockmvt/product-autocomplete
-  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::productAutocompleteAction
+  controller: MpSoft\MpStockAdv\Services\ProductAutocompleteService::searchAction
   methods: [GET, POST]

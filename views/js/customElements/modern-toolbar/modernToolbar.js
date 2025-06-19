@@ -204,8 +204,6 @@ class ModernToolbar extends HTMLElement {
                 .action-button[style*="background-color"]:hover {
                     filter: brightness(110%); /* Make custom colored buttons slightly brighter on hover */
                 }
-
-
                 .search-area {
                     display: flex;
                     align-items: center;
@@ -233,7 +231,7 @@ class ModernToolbar extends HTMLElement {
                     display: flex;
                     align-items: center;
                 }
-                 .search-area button .material-icons {
+                .search-area button .material-icons {
                     font-size: 18px;
                 }
                 .search-area button:hover {
@@ -285,8 +283,8 @@ class ModernToolbar extends HTMLElement {
             .map(
                 (button) => `
             <div class="action-button"
-                 style="${button.background ? `background-color:${button.background};` : ""} ${button.color ? `color:${button.color};` : ""}"
-                 data-button='${JSON.stringify(button)}'>
+                style="${button.background ? `background-color:${button.background};` : ""} ${button.color ? `color:${button.color};` : ""}"
+                data-button='${JSON.stringify(button)}'>
                 ${button.icon ? `<span class="material-icons">${button.icon}</span>` : ""}
                 ${button.label}
             </div>
@@ -298,17 +296,23 @@ class ModernToolbar extends HTMLElement {
     _attachEventListeners() {
         this.shadowRoot.querySelectorAll(".menu-item").forEach((menuItemElement) => {
             // Prevent click on parent if it's just a container for submenu and has no href/direct action
-            const itemData = JSON.parse(menuItemElement.dataset.item);
-            menuItemElement.addEventListener("click", (event) => {
-                event.stopPropagation(); // Prevent multiple events if nested
-                this.dispatchEvent(
-                    new CustomEvent("menu-item-click", {
-                        detail: itemData,
-                        bubbles: true,
-                        composed: true
-                    })
-                );
-            });
+            const dataStr = menuItemElement.dataset.item;
+            try {
+                if (!dataStr) throw new Error("data-item attribute vuoto o mancante");
+                const itemData = JSON.parse(dataStr);
+                menuItemElement.addEventListener("click", (event) => {
+                    event.stopPropagation(); // Prevent multiple events if nested
+                    this.dispatchEvent(
+                        new CustomEvent("menu-item-click", {
+                            detail: itemData,
+                            bubbles: true,
+                            composed: true
+                        })
+                    );
+                });
+            } catch (e) {
+                console.error("Errore parsing JSON in menu-item:", dataStr, e);
+            }
         });
 
         this.shadowRoot.querySelectorAll(".action-button").forEach((actionButtonElement) => {

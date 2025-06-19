@@ -1,0 +1,88 @@
+{# templates/components/menu.html.twig #}
+<nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm rounded mb-4 px-3 py-2 dashboard-navbar">
+	<a class="navbar-brand d-flex align-items-center" href="#">
+		<img src="{{ logo_src|default('/img/404.gif') }}" alt="Logo" style="width:120px;height:48px;border-radius: none;object-fit:contain;margin-right:12px;">
+		<span class="font-weight-bold ml-1" style="font-size:1.25rem;">Magazzino</span>
+	</a>
+	<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#dashboardMenu" aria-controls="dashboardMenu" aria-expanded="false" aria-label="Toggle navigation">
+		<span class="navbar-toggler-icon"></span>
+	</button>
+
+	<div class="collapse navbar-collapse" id="dashboardMenu">
+		<ul class="navbar-nav mr-auto">
+			{% for item in menuData %}
+				{% if item.children is defined and item.children|length > 0 %}
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="dropdown{{ loop.index }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+							<span class="material-icons mr-2">{{ item.icon }}</span>
+							{{ item.label }}
+						</a>
+						<div class="dropdown-menu" aria-labelledby="dropdown{{ loop.index }}">
+							{% for child in item.children %}
+								<a class="dropdown-item d-flex align-items-center" href="{{ child.href }}">
+									<span class="material-icons mr-2" style="font-size:20px;">{{ child.icon }}</span>
+									{{ child.label }}
+								</a>
+							{% endfor %}
+						</div>
+					</li>
+				{% else %}
+					<li class="nav-item">
+						<a class="nav-link d-flex align-items-center" href="{{ item.href }}">
+							<span class="material-icons mr-2">{{ item.icon }}</span>
+							{{ item.label }}
+						</a>
+					</li>
+				{% endif %}
+			{% endfor %}
+		</ul>
+		<form class="form-inline my-2 my-lg-0" method="get" action="#" id="form-search">
+			<input class="form-control mr-sm-2 rounded-pill" type="search" placeholder="Cerca..." aria-label="Cerca" name="q" style="min-width:170px;">
+			<button class="btn btn-primary my-2 my-sm-0 rounded-pill" type="submit">
+				<span class="material-icons" style="vertical-align:middle;">search</span>
+			</button>
+		</form>
+	</div>
+</nav>
+
+<script>
+	const formSearch = document.getElementById('form-search');
+	formSearch.addEventListener('submit', function (e) {
+		e.preventDefault();
+		e.stopPropagation();
+		e.stopImmediatePropagation();
+		const searchValue = document.querySelector('input[name="q"]').value;
+		doSearch(searchValue);
+	});
+</script>
+
+<style>
+	.dashboard-navbar {
+		border-radius: 1.5rem !important;
+		box-shadow: 0 2px 14px rgba(60, 60, 90, 0.08) !important;
+		background: #fff !important;
+	}
+	.dashboard-navbar .navbar-nav .nav-link,
+	.dashboard-navbar .dropdown-item {
+		font-size: 1.08rem;
+		border-radius: 1rem;
+		transition: background 0.13s, color 0.13s;
+	}
+	.dashboard-navbar .navbar-nav .nav-link:hover,
+	.dashboard-navbar .dropdown-item:hover {
+		background: #f8faff;
+		color: #3b82f6;
+	}
+	.dashboard-navbar .dropdown-menu {
+		border-radius: 1rem;
+		box-shadow: 0 2px 14px rgba(60, 60, 90, 0.08);
+	}
+	.dashboard-navbar .form-inline .form-control {
+		background: #f3f6fb;
+		border: none;
+	}
+	.dashboard-navbar .btn-primary {
+		background-color: var(--info);
+		border: none;
+	}
+</style>

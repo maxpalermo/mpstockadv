@@ -1,0 +1,82 @@
+{#
+    Componente menu dinamico Bootstrap 4
+    - menuData: array di sezioni e voci (passato dal controller)
+    - Ogni voce può avere: label, href, icon, children (array)
+#}
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light rounded shadow-sm mb-4">
+    <a class="navbar-brand font-weight-bold d-flex justify-content-start align-items-center"
+        href="#">
+        <i class="material-icons align-middle mr-2">{{ icon }}</i>
+        <span class="menu-title">{{ title }}</span>
+    </a>
+    <button class="navbar-toggler"
+        type="button"
+        data-toggle="collapse"
+        data-target="#mainMenu"
+        aria-controls="mainMenu"
+        aria-expanded="false"
+        aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainMenu">
+        <ul class="navbar-nav mr-auto">
+            {% for section in menuData %}
+                {% if
+                    section.children is defined
+                        and (section.children|length) > 0 %}
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle"
+                            href="#"
+                            id="menuDropdown{{ loop.index }}"
+                            role="button"
+                            data-toggle="dropdown"
+                            aria-haspopup="true"
+                            aria-expanded="false">
+                            {% if section.icon %}
+                                <i class="material-icons align-middle mr-1">
+                                    {{ section.icon }}
+                                </i>
+                            {% endif %}
+                            {{ section.label }}
+                        </a>
+                        <div class="dropdown-menu"
+                            aria-labelledby="menuDropdown{{ loop.index }}">
+                            {% for child in section.children %}
+                                <a class="dropdown-item d-flex align-items-center"
+                                    href="{{ child.href }}">
+                                    {% if child.icon %}
+                                        <i class="material-icons align-middle mr-2">
+                                            {{ child.icon }}
+                                        </i>
+                                    {% endif %}
+                                    {{ child.label }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </li>
+                {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link d-flex align-items-center"
+                            href="{{ section.href }}">
+                            {% if section.icon %}
+                                <i class="material-icons align-middle mr-1">
+                                    {{ section.icon }}
+                                </i>
+                            {% endif %}
+                            {{ section.label }}
+                        </a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+</nav>
+
+{#
+    Note:
+    - Richiede Bootstrap 4 e Material Icons nel layout principale.
+    - menuData può avere più sezioni e sotto-menu.
+    - Il menu è responsive e user-friendly.
+#}

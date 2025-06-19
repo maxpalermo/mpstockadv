@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="it">
+    <head>
+  <!-- Font moderno per demo -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .native-demo button, .modern-demo-font button {
+      font-family: 'Inter', 'Segoe UI', Roboto, Arial, sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      padding: 0.5em 1.3em;
+      border-radius: 0.5em;
+      border: 1.5px solid #e5e7eb;
+      background: linear-gradient(90deg, #f8fafc 60%, #e0e7ff 100%);
+      color: #222;
+      box-shadow: 0 1px 5px 0 rgba(30,41,59,0.04);
+      cursor: pointer;
+      transition: background 0.18s, box-shadow 0.18s, border 0.18s;
+      margin: 0.2em 0.3em 0.2em 0;
+      outline: none;
+      letter-spacing: 0.01em;
+    }
+    .native-demo button:hover, .modern-demo-font button:hover,
+    .native-demo button:focus, .modern-demo-font button:focus {
+      background: linear-gradient(90deg, #e0e7ff 60%, #c7d2fe 100%);
+      border-color: #6366f1;
+      box-shadow: 0 2px 10px 0 rgba(99,102,241,0.10);
+      color: #222;
+    }
+    .native-demo button:active, .modern-demo-font button:active {
+      background: #c7d2fe;
+      border-color: #2563eb;
+      color: #222;
+    }
+  </style>
+        <meta charset="UTF-8" />
+        <title>Test ModernDialog</title>
+
+        <style>
+            body {
+                background: #f1f3fa;
+                font-family: "Segoe UI", Arial, sans-serif;
+            }
+            .test-btns {
+                margin: 40px;
+                display: flex;
+                flex-wrap: wrap;
+                gap: 18px;
+            }
+            button {
+                padding: 12px 28px;
+                font-size: 1.08rem;
+                border-radius: 7px;
+                border: none;
+                cursor: pointer;
+                font-weight: 500;
+            }
+            .info {
+                background: #2563eb;
+                color: #fff;
+            }
+            .success {
+                background: #22c55e;
+                color: #fff;
+            }
+            .warning {
+                background: #f59e42;
+                color: #fff;
+            }
+            .error {
+                background: #e53e3e;
+                color: #fff;
+            }
+            /* --- Stile migliorato per la demo diretta --- */
+            .native-demo {
+                margin: 40px 0 0 40px;
+                max-width: 420px;
+                background: #fff;
+                border-radius: 13px;
+                box-shadow: 0 2px 14px #2563eb11;
+                padding: 28px 26px 18px 26px;
+                border: 1.5px solid #e0e7ff;
+            }
+            .native-demo h2 {
+                margin-top: 0;
+                color: #2563eb;
+                font-size: 1.15rem;
+            }
+            .native-demo label {
+                display: block;
+                margin: 11px 0 7px 0;
+                font-weight: 500;
+                color: #384055;
+            }
+            .native-demo input,
+            .native-demo select {
+                padding: 7px 13px;
+                border-radius: 7px;
+                border: 1.2px solid #b6c2e1;
+                font-size: 1.04rem;
+                margin-left: 5px;
+                margin-bottom: 3px;
+                transition: border-color 0.18s, box-shadow 0.18s;
+                outline: none;
+                background: #f6f8fd;
+                color: #222b45;
+                box-shadow: 0 1px 2px #2563eb08;
+            }
+            .native-demo select:focus,
+            .native-demo input:focus {
+                border-color: #2563eb;
+                box-shadow: 0 0 0 2px #2563eb22;
+            }
+            .native-demo button {
+                margin-top: 14px;
+                padding: 11px 20px;
+                border-radius: 7px;
+                border: none;
+                background: linear-gradient(90deg, #2563eb 60%, #22c55e 100%);
+                color: #fff;
+                font-weight: 600;
+                font-size: 1.08rem;
+                cursor: pointer;
+                transition: background 0.18s, box-shadow 0.18s;
+                box-shadow: 0 2px 8px #2563eb11;
+            }
+            .native-demo button:hover {
+                background: linear-gradient(90deg, #2563eb 80%, #22c55e 100%);
+                box-shadow: 0 4px 16px #2563eb22;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Demo ModernDialog</h1>
+        <div class="test-btns">
+            <button class="info" data-type="info">Mostra Info</button>
+<button class="success" data-type="success">Mostra Success</button>
+<button class="warning" data-type="warning">Mostra Warning</button>
+<button class="error" data-type="error">Mostra Errore</button>
+<button data-type="info-html">Mostra Info (HTML)</button>
+<button data-type="success-timer">Success con Timer</button>
+        </div>
+
+        <!-- Demo diretta -->
+        <div class="native-demo">
+            <h2>Demo uso diretto</h2>
+            <label
+                >Tipo:
+                <select id="native-type">
+                    <option value="info">Info</option>
+                    <option value="success">Success</option>
+                    <option value="warning">Warning</option>
+                    <option value="error">Error</option>
+                </select>
+            </label>
+            <label
+                >Animazione:
+                <select id="native-animation">
+                    <option value="fade-in">Fade (default)</option>
+                    <option value="scale-in">Scale</option>
+                    <option value="none">Nessuna</option>
+                </select>
+            </label>
+            <label>Titolo: <input id="native-title" value="Titolo Custom" style="width: 200px" /></label>
+            <label>Contenuto: <input id="native-content" value="Contenuto custom del dialog" style="width: 200px" /></label>
+            <label>Timer (ms, opzionale): <input id="native-timer" value="" style="width: 120px" /></label>
+            <button onclick="showNativeDialog()">Mostra ModernDialog (diretto)</button>
+        </div>
+        </div>
+
+<!-- Demo requester/confirm -->
+<div class="native-demo modern-demo-font" style="margin-top:32px;">
+  <h2>Demo requester/confirm</h2>
+  <label>Titolo: <input id="confirm-title" value="Sei sicuro?" style="width:220px;margin-bottom:4px;"></label><br>
+  <label>Testo richiesta: <input id="confirm-text" value="Sei sicuro di voler eseguire questa operazione?" style="width:320px"></label><br>
+  <button onclick="showConfirmDialog()">Mostra Dialog di Conferma (callback)</button>
+  <div id="confirm-result" style="margin-top:12px;color:#2563eb;font-weight:600;"></div>
+</div>
+<modern-dialog id="confirm-dialog"
+  style="display:none"
+  show-confirm-buttons
+  data-callback="onConfirmResult"
+  data-yes-label="Conferma"
+  data-no-label="Annulla"
+  data-animation="scale-in"
+  type="warning"
+  title="Sei sicuro?"
+>
+  Sei sicuro di voler eseguire questa operazione?
+</modern-dialog>
+
+<!-- Demo ModernDialogManager.showConfirm -->
+<div class="native-demo modern-demo-font" style="margin-top:14px;">
+  <h2>Demo ModernDialogManager.showConfirm</h2>
+  <label>Titolo: <input id="manager-confirm-title" value="Sei proprio sicuro?" style="width:220px;margin-bottom:4px;"></label><br>
+  <label>Testo richiesta: <input id="manager-confirm-text" value="Questa azione è irreversibile. Procedere?" style="width:320px"></label><br>
+  <button onclick="showManagerConfirmCallback()">Conferma con callback</button>
+  <button onclick="showManagerConfirmEvent()">Conferma con evento</button>
+  <button onclick="showManagerConfirmPromise()">Conferma con Promise/async</button>
+  <button onclick="showManagerConfirmCustom()">Conferma personalizzata</button>
+  <div id="manager-confirm-result" style="margin-top:12px;color:#f59e42;font-weight:600;"></div>
+</div>
+<script>
+function showManagerConfirmCallback() {
+  const title = document.getElementById('manager-confirm-title').value;
+  const text = document.getElementById('manager-confirm-text').value;
+  ModernDialogManager.showConfirm({
+    type: 'warning',
+    title,
+    content: text,
+    yesLabel: 'Procedi',
+    noLabel: 'Annulla',
+    animation: 'scale-in',
+    callback: function(result) {
+      const div = document.getElementById('manager-confirm-result');
+      if(result === 1) div.textContent = 'Confermato via callback!';
+      else div.textContent = 'Annullato via callback.';
+      setTimeout(()=>{div.textContent='';}, 2200);
+    }
+  });
+}
+function showManagerConfirmEvent() {
+  const title = document.getElementById('manager-confirm-title').value;
+  const text = document.getElementById('manager-confirm-text').value;
+  const mgr = ModernDialogManager.showConfirm({
+    type: 'warning',
+    title,
+    content: text,
+    yesLabel: 'Procedi',
+    noLabel: 'Annulla',
+    animation: 'scale-in'
+  });
+  mgr.modal.addEventListener('dialog-result', function(e) {
+    const div = document.getElementById('manager-confirm-result');
+    if(e.detail === 1) div.textContent = 'Confermato via evento!';
+    else div.textContent = 'Annullato via evento.';
+    setTimeout(()=>{div.textContent='';}, 2200);
+  });
+}
+// Esempio Promise/async
+function showManagerConfirmPromise() {
+  const title = document.getElementById('manager-confirm-title').value;
+  const text = document.getElementById('manager-confirm-text').value;
+  confirmDialogPromise({
+    type: 'info',
+    title,
+    content: text,
+    yesLabel: 'Sì, continua',
+    noLabel: 'No, annulla',
+    animation: 'fade-in'
+  }).then(result => {
+    const div = document.getElementById('manager-confirm-result');
+    if(result === 1) div.textContent = 'Confermato via Promise!';
+    else div.textContent = 'Annullato via Promise.';
+    setTimeout(()=>{div.textContent='';}, 2200);
+  });
+}
+// Helper Promise
+function confirmDialogPromise(opts) {
+  return new Promise(resolve => {
+    const mgr = ModernDialogManager.showConfirm(opts);
+    mgr.modal.addEventListener('dialog-result', e => resolve(e.detail), { once: true });
+  });
+}
+// Esempio personalizzazione
+function showManagerConfirmCustom() {
+  ModernDialogManager.showConfirm({
+    type: 'success',
+    title: 'Complimenti!',
+    content: '<b>Hai completato l\'operazione con successo!</b>',
+    yesLabel: 'Grande!',
+    noLabel: 'No, riprova',
+    animation: 'scale-in',
+    callback: function(result) {
+      const div = document.getElementById('manager-confirm-result');
+      if(result === 1) div.textContent = 'Risposta positiva personalizzata!';
+      else div.textContent = 'Risposta negativa personalizzata.';
+      setTimeout(()=>{div.textContent='';}, 2200);
+    }
+  });
+}
+</script>
+
+
+<!-- Demo requester/confirm senza callback -->
+<div class="native-demo modern-demo-font" style="margin-top:14px;">
+  <h2>Demo requester/confirm (evento)</h2>
+  <label>Titolo: <input id="confirm-title-event" value="Procedere?" style="width:220px;margin-bottom:4px;"></label><br>
+  <label>Testo richiesta: <input id="confirm-text-event" value="Vuoi davvero procedere con l'azione?" style="width:320px"></label><br>
+  <button onclick="showConfirmDialogEvent()">Mostra Dialog di Conferma (evento)</button>
+  <div id="confirm-event-result" style="margin-top:12px;color:#22c55e;font-weight:600;"></div>
+</div>
+<modern-dialog id="confirm-dialog-event"
+  style="display:none"
+  show-confirm-buttons
+  data-yes-label="SI, procedi"
+  data-no-label="NO, annulla"
+  data-animation="fade-in"
+  type="info"
+  title="Procedere?"
+>
+  Vuoi davvero procedere con l'azione?
+</modern-dialog>
+
+        <modern-dialog id="native-dialog" style="display: none"></modern-dialog>
+        <script>
+            // Funzioni globali per demo requester/confirm
+            function onConfirmResult(val) {
+              const div = document.getElementById('confirm-result');
+              if(val === 1) div.textContent = 'Hai confermato!';
+              else div.textContent = 'Hai annullato.';
+              setTimeout(()=>{div.textContent='';}, 2200);
+            }
+            function showConfirmDialog() {
+  const dlg = document.getElementById('confirm-dialog');
+  const title = document.getElementById('confirm-title').value;
+  const text = document.getElementById('confirm-text').value;
+  dlg.setAttribute('title', title);
+  if (typeof dlg.setContent === 'function') {
+    dlg.setContent(text);
+  } else {
+    dlg.innerHTML = text;
+  }
+  dlg.style.display = '';
+}
+            function showConfirmDialogEvent() {
+  const dlg = document.getElementById('confirm-dialog-event');
+  const title = document.getElementById('confirm-title-event').value;
+  const text = document.getElementById('confirm-text-event').value;
+  dlg.setAttribute('title', title);
+  if (typeof dlg.setContent === 'function') {
+    dlg.setContent(text);
+  } else {
+    dlg.innerHTML = text;
+  }
+  dlg.style.display = '';
+}
+            document.getElementById('confirm-dialog-event').addEventListener('dialog-result', function(e) {
+              const div = document.getElementById('confirm-event-result');
+              if(e.detail === 1) div.textContent = 'Confermato via evento!';
+              else div.textContent = 'Annullato via evento.';
+              setTimeout(()=>{div.textContent='';}, 2200);
+            });
+
+            // Permetti riutilizzo dei dialog requester/confirm
+            ["confirm-dialog", "confirm-dialog-event"].forEach(function(id) {
+                const dlg = document.getElementById(id);
+                const observer = new MutationObserver(() => {
+                    if (!document.body.contains(dlg)) {
+                        dlg.style.display = 'none';
+                        document.body.appendChild(dlg);
+                    }
+                });
+                observer.observe(document.body, { childList: true });
+            });
+        </script>
+        <script>
+            // Listener per chiusura del dialog custom diretto
+            const nativeDialog = document.getElementById("native-dialog");
+            nativeDialog.addEventListener("transitionend", function (e) {
+                if (nativeDialog.style.display === "none") return;
+                // fallback per chiusura animata (se aggiunta in futuro)
+            });
+            nativeDialog.close = function () {
+                nativeDialog.style.display = "none";
+            };
+            nativeDialog.$closeBtn = null;
+            nativeDialog.addEventListener("click", function (e) {
+                // fallback per chiusura da overlay (se mai implementato)
+            });
+            // Gestione chiusura: quando il dialog viene rimosso dal DOM, nascondilo per poterlo riutilizzare
+const observer = new MutationObserver(() => {
+  if (!document.body.contains(nativeDialog)) {
+    nativeDialog.style.display = 'none';
+    document.body.appendChild(nativeDialog); // re-inserisci per la prossima apertura
+  }
+});
+observer.observe(document.body, { childList: true });
+        </script>
+
+        <script type="module">
+// Demo ModernDialog compatibile sia come modulo sia come script classico.
+import { ModernDialogManager, ModernDialog } from "./modernDialog.js";
+
+// Collega i pulsanti demo con event listener moderno (evita onclick HTML, funziona sempre anche in module)
+document.querySelectorAll('.test-btns button').forEach(btn => {
+  btn.addEventListener('click', function() {
+    switch(btn.dataset.type) {
+      case 'info':
+        window.showMsg('info');
+        break;
+      case 'success':
+        window.showMsg('success');
+        break;
+      case 'warning':
+        window.showMsg('warning');
+        break;
+      case 'error':
+        window.showMsg('error');
+        break;
+      case 'info-html':
+        window.showMsg('info', true);
+        break;
+      case 'success-timer':
+        window.showMsg('success', false, 2000);
+        break;
+    }
+  });
+});
+// Funzioni demo globali per gli onclick
+window.showMsg = function (type, html = false, timer = null) {
+    let title = "";
+    let content = "";
+    switch (type) {
+        case "success":
+            title = "Operazione completata";
+            content = "I dati sono stati importati correttamente!";
+            break;
+        case "warning":
+            title = "Attenzione";
+            content = "Alcuni dati potrebbero non essere aggiornati.";
+            break;
+        case "error":
+            title = "Errore";
+            content = "Si è verificato un errore durante l’operazione.";
+            break;
+        case "info":
+        default:
+            title = "Informazione";
+            content = html ? `<b>Messaggio HTML</b><br><table style='margin:8px auto;border-collapse:collapse;'><tr><th>Colonna 1</th><th>Colonna 2</th></tr><tr><td>Valore 1</td><td><img src='https://upload.wikimedia.org/wikipedia/commons/4/48/Markdown-mark.svg' width='32'></td></tr></table>` : "Questa è una semplice informazione.";
+    }
+    new ModernDialogManager({
+        type,
+        title,
+        content,
+        timer
+    });
+};
+window.showNativeDialog = function () {
+    const el = document.getElementById("native-dialog");
+    el.style.display = "";
+    el.setType(document.getElementById("native-type").value);
+    el.setTitle(document.getElementById("native-title").value);
+    el.setContent(document.getElementById("native-content").value);
+    const timer = document.getElementById("native-timer").value;
+    if (timer && !isNaN(timer)) el.setTimer(timer);
+    else el.removeAttribute("timer");
+    const animation = document.getElementById("native-animation").value;
+    el.setAttribute("data-animation", animation);
+    // Forza la classe di animazione scelta
+    let modal = el.shadowRoot.querySelector('.modal');
+    modal.classList.remove('fade-in', 'fade-out', 'scale-in', 'scale-out');
+    if (animation === 'scale-in') {
+        modal.classList.add('scale-in');
+    } else if (animation === 'none') {
+        // nessuna animazione
+    } else {
+        modal.classList.add('fade-in');
+    }
+    el.$closeBtn.disabled = false;
+};
+// Funzioni demo confirm manager
+window.showManagerConfirmCallback = function () {
+    const title = document.getElementById('manager-confirm-title').value;
+    const text = document.getElementById('manager-confirm-text').value;
+    ModernDialogManager.showConfirm({
+        type: 'warning',
+        title,
+        content: text,
+        yesLabel: 'Procedi',
+        noLabel: 'Annulla',
+        animation: 'scale-in',
+        callback: function(result) {
+            const div = document.getElementById('manager-confirm-result');
+            if(result === 1) div.textContent = 'Confermato via callback!';
+            else div.textContent = 'Annullato via callback.';
+            setTimeout(()=>{div.textContent='';}, 2200);
+        }
+    });
+};
+window.showManagerConfirmEvent = function () {
+    const title = document.getElementById('manager-confirm-title').value;
+    const text = document.getElementById('manager-confirm-text').value;
+    const mgr = ModernDialogManager.showConfirm({
+        type: 'warning',
+        title,
+        content: text,
+        yesLabel: 'Procedi',
+        noLabel: 'Annulla',
+        animation: 'scale-in'
+    });
+    mgr.modal.addEventListener('dialog-result', function(e) {
+        const div = document.getElementById('manager-confirm-result');
+        if(e.detail === 1) div.textContent = 'Confermato via evento!';
+        else div.textContent = 'Annullato via evento.';
+        setTimeout(()=>{div.textContent='';}, 2200);
+    });
+};
+window.showManagerConfirmPromise = function () {
+    const title = document.getElementById('manager-confirm-title').value;
+    const text = document.getElementById('manager-confirm-text').value;
+    window.confirmDialogPromise({
+        type: 'info',
+        title,
+        content: text,
+        yesLabel: 'Sì, continua',
+        noLabel: 'No, annulla',
+        animation: 'fade-in'
+    }).then(result => {
+        const div = document.getElementById('manager-confirm-result');
+        if(result === 1) div.textContent = 'Confermato via Promise!';
+        else div.textContent = 'Annullato via Promise.';
+        setTimeout(()=>{div.textContent='';}, 2200);
+    });
+};
+window.confirmDialogPromise = function (opts) {
+    return new Promise(resolve => {
+        const mgr = ModernDialogManager.showConfirm(opts);
+        mgr.modal.addEventListener('dialog-result', e => resolve(e.detail), { once: true });
+    });
+};
+window.showManagerConfirmCustom = function () {
+    ModernDialogManager.showConfirm({
+        type: 'success',
+        title: 'Complimenti!',
+        content: '<b>Hai completato l\'operazione con successo!</b>',
+        yesLabel: 'Grande!',
+        noLabel: 'No, riprova',
+        animation: 'scale-in',
+        callback: function(result) {
+            const div = document.getElementById('manager-confirm-result');
+            if(result === 1) div.textContent = 'Risposta positiva personalizzata!';
+            else div.textContent = 'Risposta negativa personalizzata.';
+            setTimeout(()=>{div.textContent='';}, 2200);
+        }
+    });
+};
+</script>
+<!--
+  Se vuoi usare la demo senza module, puoi togliere type="module" e usare <script src="modernDialog.js"></script> + <script>...</script> classico.
+-->
+
+    </body>
+</html>

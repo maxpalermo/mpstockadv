@@ -2,8 +2,6 @@
 
 namespace MpSoft\MpStockAdv\Controller\Admin;
 
-use MpSoft\MpStockAdv\Services\ProductAutocompleteService;
-use MpSoft\MpStockAdv\Services\StockMvtReasonService;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -56,30 +54,5 @@ class AdminStockSettingsController extends FrameworkBundleAdminController
             'current_default_warehouse' => (int) \Configuration::get('MPSTOCKADV_DEFAULT_WAREHOUSE'),
             'current_default_stock_mvt' => (int) \Configuration::get('MPSTOCKADV_DEFAULT_STOCK_MVT'),
         ]);
-    }
-
-    public function productSearchAction(Request $request): Response
-    {
-        $idLang = $this->id_lang;
-        $q = $request->query->get('q', '');
-        $limit = $request->query->get('limit', 20);
-
-        // Usa il servizio centralizzato per la ricerca autocomplete
-        $service = new ProductAutocompleteService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->search($q, $idLang, $limit);
-
-        return $this->json(['results' => $items]);
-    }
-
-    public function getMvtReasonsAction()
-    {
-        $service = new StockMvtReasonService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->getMvtReasons();
-
-        return $this->json(['result' => $items]);
     }
 }

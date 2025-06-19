@@ -1,4 +1,6 @@
-# `<modal-dialog-progress>`
+# `<modern-progress>`
+
+Componente Web moderno per mostrare una barra di avanzamento (progress bar) in una modale personalizzabile. Incapsulamento tramite Shadow DOM, animazioni fluide, gestione abort e stato completato/errore.
 
 Componente custom element per mostrare una modale di avanzamento (progress bar) moderna e user friendly.
 
@@ -14,12 +16,12 @@ Componente custom element per mostrare una modale di avanzamento (progress bar) 
 
 ### 1. Importazione
 ```js
-import { ModalDialogProgressManager } from './modalDialogProgress.js';
+import { ModernProgressManager } from './modernProgress.js';
 ```
 
 ### 2. Creazione e gestione
 ```js
-const modal = new ModalDialogProgressManager({
+const modal = new ModernProgressManager({
     title: 'Importazione dati',
     description: 'Attendere il completamento dell’operazione...'
 });
@@ -55,7 +57,7 @@ const abortSignal = modal.abortController.signal;
 - `aborted` — true se annullato
 
 ## Esempio di test
-Vedi il file `test-modalDialogProgress.html` per un esempio pratico.
+Consulta il file [`test-modernProgress.html`](./test-modernProgress.html) per un esempio pratico e funzionante.
 
 ---
 

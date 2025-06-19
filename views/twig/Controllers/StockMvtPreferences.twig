@@ -1,0 +1,205 @@
+{% extends '@PrestaShop/Admin/layout.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.bs4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.bs4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/sweetalert/sweetalert2.min.css') }}">
+    <style>
+        .dt-layout-row {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .dt-paging {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .dt-paging nav.pagination {
+            margin-top: 2rem;
+            padding: 0;
+            border: none;
+            background-color: transparent;
+            box-shadow: none;
+            list-style: none;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* Stile moderno per i pulsanti di paginazione DataTables */
+        button.dt-paging-button {
+            margin: 4px !important;
+            padding: 8px !important;
+            border: none !important;
+            border-radius: 5px !important;
+            background: #1976d2 !important;
+            color: #fff !important;
+            font-weight: 600 !important;
+            font-size: 0.9rem !important;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10), 0 1.5px 4px rgba(66, 165, 245, 0.10) !important;
+            transition: background 0.25s, box-shadow 0.2s, transform 0.15s, color 0.2s !important;
+            outline: none !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            min-width: 48px;
+            min-height: 44px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        button.dt-paging-button:hover:not(.disabled),
+        button.dt-paging-button:focus:not(.disabled) {
+            background: linear-gradient(90deg, #1565c0 0%, #1e88e5 100%) !important;
+            color: #fff !important;
+            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18), 0 2px 8px rgba(66, 165, 245, 0.14) !important;
+            transform: translateY(-2px) scale(1.05);
+            cursor: pointer !important;
+        }
+
+        button.dt-paging-button.disabled,
+        button.dt-paging-button[aria-disabled="true"] {
+            background: #e0e0e0 !important;
+            color: #bdbdbd !important;
+            box-shadow: none !important;
+            cursor: not-allowed !important;
+            opacity: 0.7 !important;
+            pointer-events: none !important;
+            transform: none !important;
+        }
+
+        .dt-search {
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            justify-content: flex-end;
+            gap: 0;
+            margin-bottom: 1.2rem;
+            margin-right: 2rem;
+        }
+
+        .dt-search label {
+            background: #1976d2;
+            color: #fff;
+            font-weight: 600;
+            padding: 0 1rem 0 1.2rem;
+            border: 2px solid #1976d2;
+            border-right: none;
+            border-top-left-radius: 2rem;
+            border-bottom-left-radius: 2rem;
+            font-size: 1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            height: 44px;
+            box-shadow: none;
+            transition: border-color 0.2s;
+        }
+
+        .dt-search input[type="search"] {
+            padding: 0 1.2rem 0 0.8rem;
+            border: 2px solid #1976d2;
+            border-left: none;
+            border-top-right-radius: 2rem;
+            border-bottom-right-radius: 2rem;
+            font-size: 1rem;
+            outline: none;
+            background: #f5f7fa;
+            color: #222;
+            box-shadow: none;
+            transition: border-color 0.2s, background 0.2s;
+            height: 44px;
+            min-width: 220px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dt-search:focus-within label,
+        .dt-search:focus-within input[type="search"] {
+            border-color: #42a5f5;
+        }
+
+        .dt-search input[type="search"]:focus {
+            background: #fff;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            .dt-search label {
+                background: #263238;
+                color: #fff;
+                border-color: #263238;
+            }
+            .dt-search input[type="search"] {
+                background: #222e3a;
+                color: #fff;
+                border-color: #263238;
+            }
+            .dt-search:focus-within label,
+            .dt-search:focus-within input[type="search"] {
+                border-color: #42a5f5;
+            }
+            .dt-search input[type="search"]:focus {
+                background: #263238;
+            }
+            button.dt-paging-button {
+                background: linear-gradient(90deg, #263238 0%, #1976d2 100%) !important;
+                color: #fff !important;
+                box-shadow: 0 2px 8px rgba(25, 118, 210, 0.22), 0 1.5px 4px rgba(66, 165, 245, 0.18) !important;
+            }
+            button.dt-paging-button:hover:not(.disabled),
+            button.dt-paging-button:focus:not(.disabled) {
+                background: linear-gradient(90deg, #1565c0 0%, #42a5f5 100%) !important;
+                color: #fff !important;
+                box-shadow: 0 4px 16px rgba(25, 118, 210, 0.28), 0 2px 8px rgba(66, 165, 245, 0.20) !important;
+            }
+            button.dt-paging-button.disabled,
+            button.dt-paging-button[aria-disabled="true"] {
+                background: #37474f !important;
+                color: #bdbdbd !important;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        console.log("main script loaded");
+        const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
+        const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_refresh_table_data') }}";
+        const loadModalMovementsUrl = "{{ path('mpstockadv_controller_stockmvt_load_modal_dialog') }}";
+    </script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.min.js') }}"></script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.min.js') }}"></script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/components/sweetalert/sweetalert2.min.js') }}"></script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/components/sweetalert/swalConfirm.js') }}"></script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvt.js') }}"></script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/toolbar-menu/moveTop.js') }}"></script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="toolbar-menu">
+        {{ toolbarMenuHtml|raw }}
+    </div>
+    <div class="card">
+        <div class="card-header d-flex justify-content-start align-items-center">
+            <i class="material-icons">construction</i>
+            <span class="card-title">Preferenze</span>
+        </div>
+        <div class="card-body">
+            {% include '@Modules/mpstockadv/views/twig/Components/stockMvt.dialog.preferences.html.twig' with {
+                'warehouses': warehouses,
+                'default_warehouse': default_warehouse,
+            } %}
+        </div>
+    </div>
+{% endblock %}

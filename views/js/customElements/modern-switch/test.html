@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Switch Test</title>
+    <script src="modern-switch.js" type="module"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        .switch-container {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .description {
+            width: 200px;
+            text-align: right;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
+        <div class="switch-container">
+            <span class="description">Switch base:</span>
+            <modern-switch></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Label a destra (default):</span>
+            <modern-switch
+                data-label-on="Attivo"
+                data-label-off="Disattivo"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Label a sinistra:</span>
+            <modern-switch
+                data-label-position="left"
+                data-label-on="ON"
+                data-label-off="OFF"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Label sopra:</span>
+            <modern-switch
+                data-label-position="top"
+                data-label-on="ACCESO"
+                data-label-off="SPENTO"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Label sotto:</span>
+            <modern-switch
+                data-label-position="bottom"
+                data-label-on="ENABLED"
+                data-label-off="DISABLED"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Label con colori:</span>
+            <modern-switch
+                data-label-on="ONLINE"
+                data-label-off="OFFLINE"
+                data-color-on="#2196F3"
+                data-color-off="#666"
+            ></modern-switch>
+        </div>
+
+        <div class="switch-container">
+            <span class="description">Label con colori e stile:</span>
+            <modern-switch
+                data-label-on="RIGHT"
+                data-label-off="LEFT"
+                data-color-on="#902045"
+                data-color-off="#609022"
+                data-style="#609022"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Stile Success:</span>
+            <modern-switch
+                data-style="success"
+                data-label-on="ATTIVO"
+                data-label-off="DISATTIVO"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Stile Info:</span>
+            <modern-switch
+                data-style="info"
+                data-label-on="ON"
+                data-label-off="OFF"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Stile Warning:</span>
+            <modern-switch
+                data-style="warning"
+                data-label-on="ACCESO"
+                data-label-off="SPENTO"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Stile Error:</span>
+            <modern-switch
+                data-style="error"
+                data-label-on="SI"
+                data-label-off="NO"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Colore Personalizzato:</span>
+            <modern-switch
+                data-style="#F57022"
+                data-label-on="CUSTOM"
+                data-label-off="CUSTOM"
+            ></modern-switch>
+        </div>
+    
+        <div class="switch-container">
+            <span class="description">Switch disabilitato:</span>
+            <modern-switch
+                disabled
+                data-label-on="SI"
+                data-label-off="NO"
+            ></modern-switch>
+        </div>
+    </div>
+    <div style="text-align: center; margin-top: 2rem;">
+        <p>Test Controlli Switch Base</p>
+        <div style="margin-top: 1rem;">
+            <modern-switch id="testSwitch"></modern-switch>
+            <p>Valore: <span id="switchState">0</span></p>
+            <div style="margin-top: 1rem;">
+                <button onclick="testSwitch.setState(1)">Set ON</button>
+                <button onclick="testSwitch.setState(0)">Set OFF</button>
+                <button onclick="updateValue()">Get Value</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const testSwitch = document.getElementById('testSwitch');
+        
+        function updateValue(event) {
+            const value = testSwitch.getValue();
+            document.getElementById('switchState').textContent = value;
+            console.log('Valore aggiornato:', value, event ? 'da evento' : 'da chiamata diretta');
+        }
+
+        // Aggiorna lo stato iniziale
+        console.log('Inizializzazione switch...');
+        updateValue();
+
+        // Aggiorna quando lo stato cambia (click o setState)
+        console.log('Aggiunta listener change...');
+        testSwitch.addEventListener('change', (event) => {
+            console.log('Evento change ricevuto:', event.detail);
+            updateValue(event);
+        });
+    </script>
+</body>
+</html>

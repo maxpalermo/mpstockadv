@@ -2,11 +2,9 @@
 
 namespace MpSoft\MpStockAdv\Controller\Admin;
 
-use MpSoft\MpStockAdv\Services\ProductAutocompleteService;
-use MpSoft\MpStockAdv\Services\StockMvtReasonService;
+use MpSoft\MpStockAdv\Services\MenuDataService;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -17,12 +15,14 @@ class AdminStockAdvController extends FrameworkBundleAdminController
 {
     private LegacyContext $context;
     private int $id_lang;
+    private MenuDataService $menuDataService;
 
-    public function __construct(LegacyContext $context)
+    public function __construct(LegacyContext $context, MenuDataService $menuDataService)
     {
         /* @var LegacyContext $context */
         $this->context = $context;
         $this->id_lang = (int) $this->context->getContext()->language->id;
+        $this->menuDataService = $menuDataService;
     }
 
     /**
@@ -31,38 +31,10 @@ class AdminStockAdvController extends FrameworkBundleAdminController
     public function index(): Response
     {
         // Mostra la dashboard/menu del modulo
-        return $this->render('@Modules/mpstockadv/views/templates/admin/menu/menu.index.html.twig', [
-            'menu_links' => [
-                [
-                    'label' => 'Documenti di Carico',
-                    'url' => $this->generateUrl('mpstockadv_admin_supplyorders'),
-                ],
-            ],
+        $menuData = $this->menuDataService->getMenuData();
+
+        return $this->render('@Modules/mpstockadv/views/twig/Controllers/AdminStockAdvController.index.html.twig', [
+            'menu_data' => $menuData,
         ]);
-    }
-
-    public function productSearchAction(Request $request): Response
-    {
-        $idLang = $this->id_lang;
-        $q = $request->query->get('q', '');
-        $limit = $request->query->get('limit', 20);
-
-        // Usa il servizio centralizzato per la ricerca autocomplete
-        $service = new ProductAutocompleteService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->search($q, $idLang, $limit);
-
-        return $this->json(['results' => $items]);
-    }
-
-    public function getMvtReasonsAction()
-    {
-        $service = new StockMvtReasonService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->getMvtReasons();
-
-        return $this->json(['result' => $items]);
     }
 }

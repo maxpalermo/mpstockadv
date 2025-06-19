@@ -2,19 +2,30 @@
 
 namespace MpSoft\MpStockAdv\Controller\Admin;
 
+use MpSoft\MpStockAdv\Services\MenuDataService;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class WarehouseController extends FrameworkBundleAdminController
 {
+    private $menuDataService;
+
+    public function __construct(MenuDataService $menuDataService)
+    {
+        $this->menuDataService = $menuDataService;
+    }
+
     /**
      * @Route("/admin/mpstockadv/warehouse", name="mpstockadv_admin_warehouse", methods={"GET"})
      */
     public function index(): Response
     {
         // Recupera tutti i magazzini
+        $id_lang = (int) \Context::getContext()->language->id;
         $warehouses = [];
+        $countries = \Country::getCountries($id_lang);
+
         foreach (\Warehouse::getWarehouses(true) as $w) {
             $warehouseObj = new \Warehouse($w['id_warehouse']);
             $warehouses[] = [
@@ -24,12 +35,32 @@ class WarehouseController extends FrameworkBundleAdminController
                 'active' => !$warehouseObj->deleted,
             ];
         }
+        $this->menuDataService->injectMenuData([
+            'icon' => 'home',
+            'label' => 'Magazzini',
+            'children' => [
+                [
+                    'icon' => 'add',
+                    'label' => 'Nuovo Magazzino',
+                    'href' => 'javascript:void(0);',
+                    'action' => 'showNewWarehouse',
+                    'dialogId' => $idDialog ?? '',
+                ],
+                [
+                    'icon' => 'download',
+                    'label' => 'Importa',
+                    'href' => 'javascript:void(0);',
+                ],
+            ],
+        ]);
 
-        // Genera l'URL dinamico per AdminStockAdv
-        $adminStockAdvUrl = $this->generateUrl('mpstockadv_admin_stockadv_index');
-        return $this->render('@Modules/mpstockadv/views/PrestaShop/Admin/mpstockadv/warehouse.html.twig', [
+        $menuData = $this->menuDataService->getMenuData();
+
+        return $this->render('@Modules/mpstockadv/views/templates/admin/warehouses/warehouses.index.html.twig', [
+            'logo_src' => \Context::getContext()->shop->getBaseURL(true).'img/'.\Configuration::get('PS_LOGO'),
+            'menuData' => $menuData,
             'warehouses' => $warehouses,
-            'admin_stockadv_url' => $adminStockAdvUrl,
+            'countries' => $countries,
         ]);
     }
 
@@ -208,7 +239,7 @@ class WarehouseController extends FrameworkBundleAdminController
                                 'firstname' => '',
                                 'date_add' => date('Y-m-d H:i:s'),
                                 'date_upd' => date('Y-m-d H:i:s'),
-                                'deleted' => 0
+                                'deleted' => 0,
                             ]);
                         }
                     }

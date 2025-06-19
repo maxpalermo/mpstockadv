@@ -1,0 +1,26 @@
+<form id="stockMvtAdvPreferencesForm">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label for="stockMvtDefaultWarehouse">Magazzino di default</label>
+                <select id="stockMvtDefaultWarehouse" name="default_warehouse"class="form-control">
+                    <option value="">Seleziona</option>
+                    {% for warehouse in warehouses %}
+                        <option value="{{ warehouse.id_warehouse }}" {% if warehouse.id_warehouse == default_warehouse %} selected {% endif %}>{{ warehouse.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label for="stockMvtDefaultStockMvtReason">Tipo di movimento di default</label>
+                <select id="stockMvtDefaultStockMvtReason" name="default_stock_mvt_reason" class="form-control">
+                    <option value="">Seleziona</option>
+                    {% for stockMvtReason in stockMvtReasons %}
+                        <option data-select2-sign="{{ stockMvtReason.sign }}" value="{{ stockMvtReason.id_stock_mvt_reason}}" {% if stockMvtReason.id_stock_mvt_reason == default_stock_mvt_reason %} selected {% endif %}>{{ stockMvtReason.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+    </div>
+</form>

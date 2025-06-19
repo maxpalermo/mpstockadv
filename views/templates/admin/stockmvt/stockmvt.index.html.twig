@@ -2,195 +2,42 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block head %}
-    <title>{% block title %}Movimenti Magazzino{% endblock %}</title>
-    <!-- Select2 CSS -->
-    <link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2-bootstrap4.min.css') }}" rel="stylesheet">
-    <script src="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.js') }}" defer></script>
+	<title>
+		{% block title %}Movimenti Magazzino
+		{% endblock %}
+	</title>
+	<!-- Select2 CSS -->
+	<link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.css') }}" rel="stylesheet"/>
+	<link href="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2-bootstrap4.min.css') }}" rel="stylesheet">
+	<script src="{{ asset('../modules/mpstockadv/views/js/assets/select2/select2.min.js') }}" defer></script>
 {% endblock %}
 
 {% block javascripts %}
 	{{ parent() }}
-
-	<script type="module">
-		import { ModernToolbarManager } from "{{ asset('../modules/mpstockadv/views/js/customElements/modernToolbar.js') }}";
-		import { ModernTable } from "{{ asset('../modules/mpstockadv/views/js/customElements/modernTable.js') }}";
-        import { ModalDialogMessage } from "{{ asset('../modules/mpstockadv/views/js/customElements/modalDialogMessage.js') }}";
-        import { ModalDialogProgress } from "{{ asset('../modules/mpstockadv/views/js/customElements/modalDialogProgress.js') }}";
-        import { ProductAutocomplete } from "{{ asset('../modules/mpstockadv/views/js/components/ProductAutocomplete.js') }}";
-
-        
-        async function showMovementForm() {
-            const dialog = document.getElementById("{{ id_dialog }}");
-            if (dialog) {
-                dialog.showModal();
-            } else {
-                const response = await fetch("{{ path('mpstockadv_admin_stockadv_render_form') }}");
-                const json = await response.json();
-                const dialogHtml = json.formHtml || `<div class="alert alert-danger">Errore</div>`;
-                const element = document.createElement("template");
-                element.innerHTML = dialogHtml;
-                document.body.appendChild(element.content.cloneNode(true));
-                const dialog = document.getElementById("{{ id_dialog }}");
-                
-                const parentElement = dialog;
-                const selectElement = dialog.querySelector("#id_product");
-                const endpointSearchUrl = "{{ path('mpstockadv_admin_stockadv_product_search') }}";
-
-                console.log(parentElement);
-                console.log(selectElement);
-                console.log(endpointSearchUrl);
-
-                const productAutocomplete = new ProductAutocomplete(
-                    parentElement,
-                    selectElement,
-                    endpointSearchUrl
-                );
-
-                dialog.showModal();
-            }
-        }
-
-		const menuData = [
-                {
-                    icon: "home",
-                    label: "Home",
-                    href: "{{ path('mpstockadv_admin_stockmvt') }}"
-                },
-                {
-                    icon: "list",
-                    label: "Menu",
-                    children: [
-                        { 
-							label: "Magazzini",
-							href: "{{ path('mpstockadv_admin_warehouse') }}",
-							icon: "home" 
-						},
-						{
-							label: "Tipi di movimento",
-							href: "{{ path('mpstockadv_admin_mvtreasons_index') }}",
-							icon: "home" 
-						},
-						{ 
-							label: "Documenti di carico",
-							href: "{{ path('mpstockadv_admin_supplyorders') }}",
-							icon: "add" 
-						},
-						{ 
-							label: "Documenti di scarico",
-							href: "{{ path('mpstockadv_admin_stockexit') }}",
-							icon: "add" 
-						},
-						{ 
-							label: "Movimenti",
-							href: "{{ path('mpstockadv_admin_stockmvt') }}",
-							icon: "home" 
-						},
-                        { 
-							label: "Giacenze",
-							href: "{{ path('mpstockadv_admin_stockview') }}",
-							icon: "home" 
-						},
-						{ 
-							label: "Import/Export",
-							href: "{{ path('mpstockadv_admin_stockimportexport') }}",
-							icon: "home" 
-						},
-						{ 
-							label: "Impostazioni",
-							href: "{{ path('mpstockadv_admin_stocksettings') }}",
-							icon: "home" 
-						},
-                    ]
-                },
-				{
-					icon: "home",
-					label: "Movimenti",
-					children: [
-						{
-							icon: "add",
-							label: "Nuovo Movimento",
-							href: "javascript:void(0);",
-                            action: "showNewMovement",
-                            dialogId: "{{ id_dialog }}"
-						},
-						{
-							icon: "download",
-							label: "Importa",
-							href: "javascript:void(0);"
-						}
-					]
-				}
-            ];
-
-			const actionButtonsData = [];
-
-            /*
-			const actionButtonsData = [
-                {
-                    icon: "add_circle",
-                    label: "Nuovo",
-                    actionId: "createNew"
-                },
-                {
-                    icon: "save",
-                    label: "Salva",
-                    actionId: "saveDocument",
-                    background: "#ff9800",
-                    color: "white"
-                }
-            ];
-			*/
-
-            const toolbarManager = new ModernToolbarManager({
-                targetElement: "#toolbar-container",
-                logoSrc: "{{ base_uri_site }}img/{{ logo_src }}",
-                menuItems: menuData,
-                actionButtons: actionButtonsData
-            });
-
-            const toolbarInstance = toolbarManager.getToolbarInstance();
-
-            toolbarInstance.addEventListener("menu-item-click", (e) => {
-                const detail = e.detail;
-                if (detail.action) {
-                    switch (detail.action) {
-                        case "showNewMovement":
-                            showMovementForm();
-                            break;
-                        case "importOrders":
-                            // Import orders
-                            break;
-                        default:
-                            break;
-                    }
-                }
-            });
-
-            toolbarInstance.addEventListener("action-button-click", (e) => {
-                console.log(e.detail);
-            });
-
-            toolbarInstance.addEventListener("toolbar-search", (e) => {
-                console.log(e.detail);
-            });
-
-            document.addEventListener("productSelected", (e) => {
-                console.log(e.detail);
-                const product = JSON.parse(e.detail.id) || null;
-                if (!product) return;
-
-                const combination = product.attribute_names || "";
-                document.getElementById("id_product_attribute").value = product.id_product;
-                document.getElementById("id_combination").value = combination;
-            });
-        </script>
+    <script>
+        window.stockmvtMenuItems = {
+            warehouseURL: "{{ path('mpstockadv_admin_warehouse')|e('js') }}",
+			mvtReasonsURL: "{{ path('mpstockadv_admin_mvtreasons_index')|e('js') }}",
+			stockViewURL: "{{ path('mpstockadv_admin_stockview')|e('js') }}",
+			stockMvtURL: "{{ path('mpstockadv_admin_stockmvt')|e('js') }}",
+			stockImportExportURL: "{{ path('mpstockadv_admin_stockimportexport')|e('js') }}",
+			stockSettingsURL: "{{ path('mpstockadv_admin_stocksettings')|e('js') }}"
+		};
+		window.logoSrc = "{{ base_uri_site }}img/{{ logo_src }}";
+		window.idDialog = "{{ id_dialog }}";
+		window.stockAdvRenderFormUrl = "{{ path('mpstockadv_admin_stockadv_render_form')|e('js') }}";
+		window.endpointProductSearchUrl = "{{ path('mpstockadv_admin_stockadv_product_search')|e('js') }}";	
+    </script>
+    <script type="module" src="{{ asset('../modules/mpstockadv/views/js/controllers/admin/stockmvt/script-module.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
+	{{ stockMvtFormHtml |raw }}
+
+
 	<div class="bootstrap">
-        <section id="toolbar-container" class="toolbar-placeholder">
-			<!-- TOOLBAR -->
+		<section
+			id="toolbar-container" class="toolbar-placeholder"><!-- TOOLBAR -->
 		</section>
 
 
@@ -201,43 +48,43 @@
 			</div>
 			<div class="card-body">
 				<modern-table id="myModernTable3" data-header-style="info" data-border="1">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th data-key="id">ID</th>
-                                <th data-key="id_stock">Id Stock</th>
-                                <th data-key="id_order">Id Order</th>
-                                <th data-key="id_supply_order">Id Supply</th>
-                                <th data-key="id_stock_mvt_reason">Id Stock Mvt Reason</th>
-                                <th data-key="id_employee">Id Employee</th>
-                                <th data-key="sign">Sign</th>
-                                <th data-key="before_quantity" data-align="right" data-render-function="formatQuantity">Stock iniziale</th>
-                                <th data-key="physical_quantity" data-align="right" data-render-function="formatQuantity">Quantità</th>
-                                <th data-key="after_quantity" data-align="right" data-render-function="formatQuantity">Stock finale</th>
-                                <th data-key="price_te" data-align="right" data-render-function="formatPrice">Prezzo</th>
-                                <th data-key="price_ti" data-align="right" data-render-function="formatPrice">Prezzo</th>                                
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for i in 1..30 %}
-                                <tr>
-                                    <td>{{ 1000+i }}</td>
-                                    <td>{{ 2000+i }}</td>
-                                    <td>{{ random([null, 3000+i]) }}</td>
-                                    <td>{{ random([null, 4000+i]) }}</td>
-                                    <td>{{ random([1,2,3,4]) }}</td>
-                                    <td>{{ random([10,20,30]) }}</td>
-                                    <td>{{ random([-1,1]) }}</td>
-                                    <td>{{ random(50,500) }}</td>
-                                    <td>{{ random(1,20) }}</td>
-                                    <td>{{ random(51,520) }}</td>
-                                    <td>{{ (random(100,10000)/100)|number_format(2, '.', '') }}</td>
-                                    <td>{{ (random(120,12000)/100)|number_format(2, '.', '') }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </modern-table>
+					<table>
+						<thead>
+							<tr>
+								<th data-key="id">ID</th>
+								<th data-key="id_stock">Id Stock</th>
+								<th data-key="id_order">Id Order</th>
+								<th data-key="id_supply_order">Id Supply</th>
+								<th data-key="id_stock_mvt_reason">Id Stock Mvt Reason</th>
+								<th data-key="id_employee">Id Employee</th>
+								<th data-key="sign">Sign</th>
+								<th data-key="before_quantity" data-align="right" data-render-function="formatQuantity">Stock iniziale</th>
+								<th data-key="physical_quantity" data-align="right" data-render-function="formatQuantity">Quantità</th>
+								<th data-key="after_quantity" data-align="right" data-render-function="formatQuantity">Stock finale</th>
+								<th data-key="price_te" data-align="right" data-render-function="formatPrice">Prezzo</th>
+								<th data-key="price_ti" data-align="right" data-render-function="formatPrice">Prezzo</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% for i in 1..30 %}
+								<tr>
+									<td>{{ 1000+i }}</td>
+									<td>{{ 2000+i }}</td>
+									<td>{{ random([null, 3000+i]) }}</td>
+									<td>{{ random([null, 4000+i]) }}</td>
+									<td>{{ random([1,2,3,4]) }}</td>
+									<td>{{ random([10,20,30]) }}</td>
+									<td>{{ random([-1,1]) }}</td>
+									<td>{{ random(50,500) }}</td>
+									<td>{{ random(1,20) }}</td>
+									<td>{{ random(51,520) }}</td>
+									<td>{{ (random(100,10000)/100)|number_format(2, '.', '') }}</td>
+									<td>{{ (random(120,12000)/100)|number_format(2, '.', '') }}</td>
+								</tr>
+							{% endfor %}
+						</tbody>
+					</table>
+				</modern-table>
 			</div>
 		</div>
 	</div>
@@ -251,52 +98,52 @@
 
 	<script>
 		window.APP_ROUTES = {
-			img404: "{{ asset('/img/404.gif') }}",
-			postSaveMvt: "{{ path('mpstockadv_admin_stockmvt_save_mvt') }}",
-			fetchProductAutocompleteUrl: "{{ path('mpstockadv_admin_stockadv_product_search') }}",
-			fetchMvtReasonsUrl: "{{ path('mpstockadv_admin_stockadv_mvt_reasons') }}",
-			fetchDialogFormUrl: "{{ path('mpstockadv_admin_stockadv_render_form') }}",
-			backToMainMenu: "{{ path('mpstockadv_admin_stockadv') }}",
-			fetchOrdersUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_get_orders') }}",
-			fetchValidOrdersStateUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_get_valid_orders_state') }}",
-			importOrdersMvtUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_import_orders_mvt') }}",
-			initImporter: {
-				truncateUrl: "{{ path('mpstockadv_admin_stockmvt_truncate_tables') }}",
-				getJsonUrl: "{{ path('mpstockadv_admin_stockmvt_get_json_init_stock') }}",
-				importUrl: "{{ path('mpstockadv_admin_stockmvt_import_init_stock') }}"
-			}
-		};
+img404: "{{ asset('/img/404.gif') }}",
+postSaveMvt: "{{ path('mpstockadv_admin_stockmvt_save_mvt') }}",
+fetchProductAutocompleteUrl: "{{ path('mpstockadv_admin_stockadv_product_search') }}",
+fetchMvtReasonsUrl: "{{ path('mpstockadv_admin_stockadv_mvt_reasons') }}",
+fetchDialogFormUrl: "{{ path('mpstockadv_admin_stockadv_render_form') }}",
+backToMainMenu: "{{ path('mpstockadv_admin_stockadv') }}",
+fetchOrdersUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_get_orders') }}",
+fetchValidOrdersStateUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_get_valid_orders_state') }}",
+importOrdersMvtUrl: "{{ path('mpstockadv_admin_stockmvt_ajax_import_orders_mvt') }}",
+initImporter: {
+truncateUrl: "{{ path('mpstockadv_admin_stockmvt_truncate_tables') }}",
+getJsonUrl: "{{ path('mpstockadv_admin_stockmvt_get_json_init_stock') }}",
+importUrl: "{{ path('mpstockadv_admin_stockmvt_import_init_stock') }}"
+}
+};
 
-		window.idDialogMovement = "{{ id_dialog }}";
-		window.idFormMovement = "{{ id_dialog }}-form";
+window.idDialogMovement = "{{ id_dialog }}";
+window.idFormMovement = "{{ id_dialog }}-form";
 	</script>
 
 	<script type="module">
 		const idDialogMovement = "{{ id_dialog }}";
-		const idFormMovement = "{{ id_dialog }}-form";
+const idFormMovement = "{{ id_dialog }}-form";
 
-		{% set jsPath = "../modules/mpstockadv/views/js/" %}
-		{% set jsControllerPath = jsPath ~ "controllers/admin/stockmvt/" %}
-		{% set jsComponentPath = jsPath ~ "components/" %}
+{% set jsPath = "../modules/mpstockadv/views/js/" %}
+{% set jsControllerPath = jsPath ~ "controllers/admin/stockmvt/" %}
+{% set jsComponentPath = jsPath ~ "components/" %}
 
-        import StockMvtPage from '{{ asset(jsControllerPath ~ 'stockmvt.Page.js') }}';
-		import ImportOrdersMvt from '{{ asset(jsControllerPath ~ 'stockmvt.ImportOrdersMvt.js') }}';
-		import Toolbar from '{{ asset(jsComponentPath ~ 'Toolbar.js') }}';
-		import ProductAutocomplete from '{{ asset(jsComponentPath ~ 'ProductAutocomplete.js') }}';
-		import StockMvtReasonsSelectOptions from '{{ asset(jsComponentPath ~ 'StockMvtReasonsSelectOptions.js') }}';
-		import ConfirmModal from '{{ asset(jsComponentPath ~ 'Confirm.js') }}';
-		import ModalProgress from '{{ asset(jsComponentPath ~ 'ModalProgress.js') }}';
-		import InitStockImporter from '{{ asset(jsControllerPath ~ 'stockmvt.InitStockImporter.js') }}';
+import StockMvtPage from '{{ asset(jsControllerPath ~ 'stockmvt.Page.js') }}';
+import ImportOrdersMvt from '{{ asset(jsControllerPath ~ 'stockmvt.ImportOrdersMvt.js') }}';
+import Toolbar from '{{ asset(jsComponentPath ~ 'Toolbar.js') }}';
+import ProductAutocomplete from '{{ asset(jsComponentPath ~ 'ProductAutocomplete.js') }}';
+import StockMvtReasonsSelectOptions from '{{ asset(jsComponentPath ~ 'StockMvtReasonsSelectOptions.js') }}';
+import ConfirmModal from '{{ asset(jsComponentPath ~ 'Confirm.js') }}';
+import ModalProgress from '{{ asset(jsComponentPath ~ 'ModalProgress.js') }}';
+import InitStockImporter from '{{ asset(jsControllerPath ~ 'stockmvt.InitStockImporter.js') }}';
 
-		window.ModuleClasses = {
-			toolBar: Toolbar,
-			stockMvtPage: StockMvtPage,
-			productAutocomplete: ProductAutocomplete,
-			stockMvtReasonsSelectOptions: StockMvtReasonsSelectOptions,
-			confirmModal: ConfirmModal,
-			importOrdersMvt: ImportOrdersMvt,
-			initStockImporter: InitStockImporter,
-			modalProgress: ModalProgress
-		};
+window.ModuleClasses = {
+toolBar: Toolbar,
+stockMvtPage: StockMvtPage,
+productAutocomplete: ProductAutocomplete,
+stockMvtReasonsSelectOptions: StockMvtReasonsSelectOptions,
+confirmModal: ConfirmModal,
+importOrdersMvt: ImportOrdersMvt,
+initStockImporter: InitStockImporter,
+modalProgress: ModalProgress
+};
 	</script>
 {% endblock %}

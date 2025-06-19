@@ -1,17 +1,180 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
+{% block stylesheets %}
+	{{ parent() }}
+	<style>
+		.dashboard-action-buttons {
+			display: grid;
+			grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+		.dashboard-action-button {
+			background-color: var(--info);
+			color: var(--white) !important;
+			border: none;
+			border-radius: 1.5rem;
+			padding: 1rem 2rem;
+			font-size: 1.1rem;
+			font-weight: 600;
+			box-shadow: 0 2px 12px rgba(100, 100, 200, 0.09);
+			transition: transform 0.15s, box-shadow 0.15s;
+			display: flex;
+			align-items: center;
+			gap: 0.6rem;
+		}
+		.dashboard-action-button:hover {
+			transform: translateY(-3px) scale(1.03);
+			box-shadow: 0 4px 18px rgba(100, 100, 200, 0.16);
+			text-decoration: none;
+			color: #fff;
+		}
+		.dashboard-cards {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 2rem;
+			margin-bottom: 2.5rem;
+		}
+		.dashboard-card {
+			flex: 1 1 240px;
+			min-width: 220px;
+			background: #fff;
+			border-radius: 2rem;
+			box-shadow: 0 2px 14px rgba(60, 60, 90, 0.08);
+			padding: 2rem 1.5rem;
+			display: flex;
+			flex-direction: column;
+			align-items: flex-start;
+			justify-content: center;
+			margin-bottom: 0;
+			position: relative;
+			overflow: hidden;
+		}
+		.dashboard-card.card-movimenti {
+			border-left: 8px solid #6a82fb;
+			background: linear-gradient(90deg, #e0e7ff 0%, #fff 100%);
+		}
+		.dashboard-card.card-ultimo {
+			border-left: 8px solid #fc5c7d;
+			background: linear-gradient(90deg, #ffe0e9 0%, #fff 100%);
+		}
+		.dashboard-card.card-documenti {
+			border-left: 8px solid #43e97b;
+			background: linear-gradient(90deg, #e0ffe6 0%, #fff 100%);
+		}
+		.dashboard-card-title {
+			font-size: 1.2rem;
+			font-weight: 600;
+			margin-bottom: 0.3rem;
+		}
+		.dashboard-card-value {
+			font-size: 2.2rem;
+			font-weight: 700;
+			margin-bottom: 0.2rem;
+		}
+		.dashboard-card-desc {
+			font-size: 0.98rem;
+			color: #666;
+		}
+		.dashboard-graphs {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 2rem;
+		}
+		.dashboard-graph {
+			flex: 1 1 350px;
+			min-width: 300px;
+			background: #f8faff;
+			border-radius: 1.5rem;
+			box-shadow: 0 2px 10px rgba(60, 60, 90, 0.06);
+			padding: 1.2rem 1.5rem 1.5rem;
+			margin-bottom: 0;
+		}
+		.dashboard-graph-title {
+			font-size: 1.1rem;
+			font-weight: 600;
+			margin-bottom: 1rem;
+		}
+		.dashboard-graph-placeholder {
+			width: 100%;
+			height: 180px;
+			border-radius: 1rem;
+			background: repeating-linear-gradient(135deg, #e3e8ee, #e3e8ee 12px, #f8faff 12px, #f8faff 24px);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			color: #b3b3b3;
+			font-size: 1.1rem;
+			font-style: italic;
+		}
+	</style>
+{% endblock %}
+
 {% block content %}
 	<div class="container my-4">
 		<h1 class="mb-4">MP Magazzino Avanzato</h1>
-		<div class="list-group">
-			<a href="{{ path('mpstockadv_admin_warehouse') }}" class="list-group-item list-group-item-action">Gestione Magazzini</a>
-			<a href="{{ path('mpstockadv_admin_mvtreasons_index') }}" class="list-group-item list-group-item-action">Tipi di movimento</a>
-			<a href="{{ path('mpstockadv_admin_supplyorders') }}" class="list-group-item list-group-item-action">Documenti di Carico</a>
-			<a href="{{ path('mpstockadv_admin_stockexit') }}" class="list-group-item list-group-item-action">Documenti di Scarico</a>
-			<a href="{{ path('mpstockadv_admin_stockmvt') }}" class="list-group-item list-group-item-action">Movimenti</a>
-			<a href="{{ path('mpstockadv_admin_stockview') }}" class="list-group-item list-group-item-action">Giacenze</a>
-			<a href="{{ path('mpstockadv_admin_stockimportexport') }}" class="list-group-item list-group-item-action">Import/Export</a>
-			<a href="{{ path('mpstockadv_admin_stocksettings') }}" class="list-group-item list-group-item-action">Impostazioni</a>
+
+		<!-- Action Buttons -->
+		<div class="dashboard-action-buttons">
+			<a href="{{ path('mpstockadv_admin_warehouse') }}" class="dashboard-action-button">
+				<i class="material-icons">store</i>
+				Magazzini</a>
+			<a href="{{ path('mpstockadv_admin_mvtreasons_index') }}" class="dashboard-action-button">
+				<i class="material-icons">category</i>
+				Tipi movimento</a>
+			<a href="{{ path('mpstockadv_admin_supplyorders') }}" class="dashboard-action-button">
+				<i class="material-icons">file_upload</i>
+				Doc. Carico</a>
+			<a href="{{ path('mpstockadv_admin_stockexit') }}" class="dashboard-action-button">
+				<i class="material-icons">file_download</i>
+				Doc. Scarico</a>
+			<a href="{{ path('mpstockadv_admin_stockmvt') }}" class="dashboard-action-button">
+				<i class="material-icons">swap_horiz</i>
+				Movimenti</a>
+			<a href="{{ path('mpstockadv_admin_stockview') }}" class="dashboard-action-button">
+				<i class="material-icons">visibility</i>
+				Giacenze</a>
+			<a href="{{ path('mpstockadv_admin_stockimportexport') }}" class="dashboard-action-button">
+				<i class="material-icons">import_export</i>
+				Import/Export</a>
+			<a href="{{ path('mpstockadv_admin_stocksettings') }}" class="dashboard-action-button">
+				<i class="material-icons">settings</i>
+				Impostazioni</a>
+		</div>
+
+		<!-- Dashboard Cards -->
+		<div class="dashboard-cards">
+			<div class="dashboard-card card-movimenti">
+				<div class="dashboard-card-title">Totale Movimenti</div>
+				<div class="dashboard-card-value">{{ totale_movimenti|default('1234') }}</div>
+				<div class="dashboard-card-desc">Movimenti registrati in magazzino</div>
+			</div>
+			<div class="dashboard-card card-ultimo">
+				<div class="dashboard-card-title">Ultimo Movimento</div>
+				<div class="dashboard-card-value">{{ ultimo_movimento|default('Scarico 06/06/2025') }}</div>
+				<div class="dashboard-card-desc">Data e tipo dell'ultimo movimento</div>
+			</div>
+			<div class="dashboard-card card-documenti">
+				<div class="dashboard-card-title">Documenti in archivio</div>
+				<div class="dashboard-card-value">{{ totale_documenti|default('87') }}</div>
+				<div class="dashboard-card-desc">Documenti movimentazione archiviati</div>
+			</div>
+		</div>
+
+		<!-- Dashboard Graphs -->
+		<div class="dashboard-graphs">
+			<div class="dashboard-graph">
+				<div class="dashboard-graph-title">Movimenti per mese</div>
+				<div class="dashboard-graph-placeholder">
+					<span>Grafico placeholder (es: Barre)</span>
+				</div>
+			</div>
+			<div class="dashboard-graph">
+				<div class="dashboard-graph-title">Tipologia Movimenti</div>
+				<div class="dashboard-graph-placeholder">
+					<span>Grafico placeholder (es: Torta)</span>
+				</div>
+			</div>
 		</div>
 	</div>
 {% endblock %}

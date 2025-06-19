@@ -124,20 +124,4 @@ class StockSupplyOrderController extends FrameworkBundleAdminController
 
         return $this->json(['success' => true, 'message' => 'Documento creato']);
     }
-
-    /**
-     * @Route("/mpstockadv/supply-orders/product-search", name="mpstockadv_supply_orders_product_search", methods={"GET"})
-     */
-    public function productSearch(Request $request)
-    {
-        $q = $request->query->get('q', '');
-        $idLang = (int) $this->context->getContext()->language->id;
-        // Usa il servizio centralizzato per la ricerca autocomplete
-        $service = new \MpSoft\MpStockAdv\Services\ProductAutocompleteService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->search($q, $idLang, 20);
-
-        return $this->json(['results' => $items]);
-    }
 }

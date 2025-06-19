@@ -15,3 +15,26 @@ services:
       $connection: "@doctrine.dbal.default_connection"
       $legacyContext: "@prestashop.adapter.legacy.context"
       $twig: "@twig"
+
+  MpSoft\MpStockAdv\Services\MenuDataService:
+    arguments:
+      $router: "@router"
+      $context: "@prestashop.adapter.legacy.context"
+      $twig: "@twig"
+    public: true
+
+  MpSoft\MpStockAdv\Services\MpStockAdvConfiguration:
+    arguments:
+      $router: "@router"
+      $context: "@prestashop.adapter.legacy.context"
+      $connection: "@doctrine.dbal.default_connection"
+
+  MpSoft\MpStockAdv\Controllers\StockMvtPreferences:
+    tags: ["controller.service_arguments"]
+    public: true
+
+  MpSoft\MpStockAdv\Services\ProductAutocompleteService:
+    arguments:
+      $connection: "@doctrine.dbal.default_connection"
+      $context: "@prestashop.adapter.legacy.context"
+    public: true
