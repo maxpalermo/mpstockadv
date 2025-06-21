@@ -148,8 +148,52 @@
         }
 
         .select2-container--open {
-    z-index: 9999999
-}
+            z-index: 9999999
+        }
+
+        .dt-processing {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #dcdcdc;
+            padding: 1rem;
+            background-color: #fcfcfc;
+            border-radius: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1.5px 4px rgba(0, 0, 0, 0.10);
+            z-index: 9999999;
+        }
+
+        .dt-empty:before {
+            content: '';
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 0.6rem;
+        }
+        .dt-empty:before {
+            font-family: 'Material Icons';
+            content: 'report_problem';
+            font-size: 1.3rem;
+            color: #fff;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            padding: 2px 3px 2px 3px;
+            margin-right: 0.7rem;
+            background: transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+        }
+
+        .dt-empty {
+            width: 100%;
+            border: 1px solid #dcdcdc;
+            padding: 1rem;
+            background-color: var(--warning);
+            color: var(--light);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1.5px 4px rgba(0, 0, 0, 0.10);
+        }
 
         @media (prefers-color-scheme: dark) {
             .dt-search label {
@@ -194,11 +238,17 @@
     <script type="text/javascript">
         console.log("main script loaded");
         const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
-        const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_refresh_table_data') }}";
+        //const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_refresh_table_data') }}";
         const loadModalMovementsUrl = "{{ path('mpstockadv_controller_stockmvt_load_modal_dialog') }}";
         const loadModalPreferencesUrl = "{{ path('mpstockadv_controller_stockmvt_load_modal_preferences') }}"
         const savePreferencesUrl = "{{ path('mpstockadv_controller_stockmvt_save_preferences') }}";
         const productAutocompleteUrl = "{{ path('mpstockadv_controller_stockmvt_product_autocomplete') }}";
+        const productAutocompleteSaveUrl = "{{ path('mpstockadv_controller_stockmvt_product_autocomplete_save') }}";
+        const loadStockMvtPreferences = "{{ path('mpstockadv_controller_stockmvt_load_stock_mvt_preferences') }}"
+        const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_ajax_refresh_table') }}";
+        let defaultWarehouseId = 0;
+        let defaultStockMvtReasonLoadId = 0;
+        let defaultStockMvtReasonUnloadId = 0;
     </script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.min.js') }}"></script>
@@ -207,6 +257,7 @@
     <script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvt.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/toolbar-menu/moveTop.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/product-autocomplete/productAutocompleteClass.js') }}"></script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/product-autocomplete/stockMvtPreferencesClass.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -222,9 +273,10 @@
             <div class="row">
                 <div class="col-12">
                     <div class="table-responsive">
-                        <table id="stockMvtTable" class="table table-striped table-hover table-condensed">
+                        <table id="stockMvtTable" class="table table-bordered table-striped table-hover table-condensed">
                             <thead>
                                 <tr>
+                                    <th>IMG</th>
                                     <th>ID</th>
                                     <th>Data</th>
                                     <th>Tipo</th>
@@ -234,6 +286,7 @@
                                     <th>Prodotto</th>
                                     <th>Combinazione</th>
                                     <th>Magazzino</th>
+                                    <th>Stock Iniz.</th>
                                     <th>Movimento</th>
                                     <th>Giacenza</th>
                                     <th>Impiegato</th>

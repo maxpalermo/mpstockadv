@@ -14,7 +14,7 @@
 							<select name="id_stock_mvt_reason" id="id_stock_mvt_reason" class="form-control">
 								<option value="">Seleziona</option>
 								{% for stockMvtReason in stockMvtReasons %}
-									<option data-select2-sign="{{ stockMvtReason.sign }}" value="{{ stockMvtReason.id_stock_mvt_reason}}" {% if stockMvtReason.id_stock_mvt_reason == default_stock_mvt_reason %} selected {% endif %}>{{ stockMvtReason.name }}</option>
+									<option data-select2-sign="{{ stockMvtReason.sign }}" value="{{ stockMvtReason.id_stock_mvt_reason}}" {% if stockMvtReason.id_stock_mvt_reason == current_mvt_reason %} selected {% endif %}>{{ stockMvtReason.name }}</option>
 								{% endfor %}
 							</select>
 							<input type="hidden" name="sign" id="sign">
@@ -35,15 +35,16 @@
 					<div class="col-md-12">
 						<div class="d-flex justify-content-start">
 							<div class="img-container d-flex align-items-center">
-								<img src="{{ APP_IMG_URL }}" alt="" id="stock-mvt-product-image" class="img-fluid" style="width: 100px; height: 100px; object-fit: cover;">
+								<img src="{{ IMG_URL_404|default('/img/404.gif') }}" alt="" id="stock-mvt-product-image" class="img-fluid" style="width: 100px; height: 100px; object-fit: cover;">
 							</div>
 							<div class="form-group-container  ml-4 flex-grow-1">
 								<div class="form-group">
-									<label for="id_product">Prodotto</label>
-									<select name="id_product" id="id_product" class="form-control">
+									<label for="product_name">Prodotto</label>
+									<select name="product_name" id="product_name" class="form-control">
 										<option value="">Cerca un prodotto</option>
 									</select>
 
+									<input type="hidden" name="id_product" id="id_product">
 									<input type="hidden" name="reference" id="reference">
 									<input type="hidden" name="ean13" id="ean13">
 									<input type="hidden" name="upc" id="upc">
@@ -95,7 +96,18 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="col-md-6">
+					<div class="col-md-4">
+						<div class="form-group">
+							<label for="product_stock_before">Stock attuale</label>
+							<div class="input-group">
+								<input type="number" name="product_stock_before" id="product_stock_before" class="form-control text-right" min="0" step="0.01" data-max-digits="6" readonly>
+								<div class="input-group-append">
+									<span class="input-group-text">PZ</span>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
 						<div class="form-group">
 							<label for="last_wa">Ultimo costo medio</label>
 							<div class="input-group">
@@ -106,7 +118,7 @@
 							</div>
 						</div>
 					</div>
-					<div class="col-md-6">
+					<div class="col-md-4">
 						<div class="form-group">
 							<label for="current_wa">Costo medio corrente</label>
 							<div class="input-group">

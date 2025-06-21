@@ -37,6 +37,10 @@ class StockMvtController extends FrameworkBundleAdminController
     public function indexAction(Request $request): Response
     {
         $this->request = $request;
+
+        $data = $request->getContent();
+        $data = json_decode($data, true);
+
         $this->menuDataService = $this->get('MpSoft\MpStockAdv\Services\MenuDataService');
         $this->context = $this->get('PrestaShop\PrestaShop\Adapter\LegacyContext');
         $this->menuDataService->setTitle('Movimenti di magazzino');
@@ -86,44 +90,6 @@ class StockMvtController extends FrameworkBundleAdminController
         );
     }
 
-    public function refreshTableDataAction(): Response
-    {
-        $tableContent = [];
-        for ($i = 2; $i <= 51; ++$i) {
-            $movement = rand(1, 50);
-            $sign = rand(0, 1) ? '+' : '-';
-            $stock_before = rand(5, 300);
-            if ('+' === $sign) {
-                $stock_after = $stock_before + $movement;
-                $type = 'Entrata';
-            } else {
-                $stock_after = max(0, $stock_before - $movement);
-                $type = 'Uscita';
-            }
-            $tableContent[] = [
-                'id' => $i,
-                'date' => date('Y-m-d', strtotime('2025-06-18 -'.rand(0, 100).' days')),
-                'type' => $type,
-                'sign' => $sign,
-                'reference' => 'AB'.str_pad((string) rand(1000, 9999), 4, '0', STR_PAD_LEFT),
-                'ean13' => (string) rand(1000000000000, 9999999999999),
-                'product' => 'Prodotto '.$i,
-                'combination' => 'Comb '.rand(1, 10),
-                'warehouse' => 'Magazzino '.rand(1, 5),
-                'movement' => $movement,
-                'stock_before' => $stock_before,
-                'stock_after' => $stock_after,
-                'employee' => rand(0, 1) ? 'Massimiliano Palermo' : 'Mario Rossi',
-                'actions' => '...',
-            ];
-        }
-
-        return $this->json([
-            'data' => $tableContent,
-            'total' => count($tableContent),
-        ]);
-    }
-
     public function loadModalMovementsAction(): Response
     {
         $this->context = $this->get('PrestaShop\PrestaShop\Adapter\LegacyContext');
@@ -132,10 +98,10 @@ class StockMvtController extends FrameworkBundleAdminController
         $html = $this->render(
             '@Modules/mpstockadv/views/twig/Components/StockMvt.dialog.movements.html.twig',
             [
-                'APP_IMG_URL' => 'https://picsum.photos/100',
+                'IMG_URL_404' => '/img/404.gif',
                 'id_dialog' => 'stock-mvt-dialog',
                 'stockMvtReasons' => $conf->getStockMvtReasons(),
-                'default_stock_mvt_reason' => $conf->get('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON'),
+                'current_mvt_reason' => $conf->get('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON'),
                 'warehouses' => $conf->getWarehouses(),
                 'current_warehouse' => $conf->get('MPSTOCKADV_CURRENT_WAREHOUSE'),
             ]
@@ -144,74 +110,6 @@ class StockMvtController extends FrameworkBundleAdminController
         return $this->json([
             'success' => true,
             'html' => $html->getContent(),
-        ]);
-    }
-
-    // Endpoint AJAX per ricerca prodotto (autocomplete)
-    public function productSearchAction(Request $request): Response
-    {
-        $q = $request->query->get('q', '');
-        $idLang = (int) $this->context->getContext()->language->id;
-        // Usa il servizio centralizzato per la ricerca autocomplete
-        $service = new ProductAutocompleteService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->search($q, $idLang, 20);
-
-        return $this->json(['results' => $items]);
-    }
-
-    // Endpoint AJAX per tabella movimenti
-    public function ajaxListAction(Request $request): Response
-    {
-        $prefix = _DB_PREFIX_;
-        $page = max(1, (int) $request->query->get('page', 1));
-        $perPage = max(1, (int) $request->query->get('perPage', 20));
-        $search = trim($request->query->get('search', ''));
-
-        $offset = ($page - 1) * $perPage;
-        $conn = $this->getDoctrine()->getConnection();
-        $params = [];
-        $where = '';
-        if ($search) {
-            $where = 'WHERE sm.id_stock_mvt LIKE :search OR sm.id_product LIKE :search OR smr_lang.name LIKE :search';
-            $params['search'] = "%$search%";
-        }
-        // Recupera la lingua corrente
-        $idLang = (int) $this->context->getContext()->language->id;
-        $sql = "SELECT sm.*, smr_lang.name AS reason_name
-                FROM {$prefix}stock_mvt sm
-                LEFT JOIN {$prefix}stock_mvt_reason smr ON sm.id_stock_mvt_reason = smr.id_stock_mvt_reason
-                LEFT JOIN {$prefix}stock_mvt_reason_lang smr_lang ON smr_lang.id_stock_mvt_reason = smr.id_stock_mvt_reason AND smr_lang.id_lang = :id_lang
-                $where
-                ORDER BY sm.date_add DESC
-                LIMIT :offset, :limit";
-        $params['offset'] = $offset;
-        $params['limit'] = $perPage;
-        $params['id_lang'] = $idLang;
-
-        $stmt = $conn->prepare($sql);
-        foreach ($params as $k => $v) {
-            $type = ('offset' === $k || 'limit' === $k || 'id_lang' === $k) ? \PDO::PARAM_INT : \PDO::PARAM_STR;
-            $stmt->bindValue($k, $v, $type);
-        }
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
-
-        // Conta totale per paginazione (non serve join su _lang)
-        $countSql = "SELECT COUNT(*) FROM {$prefix}stock_mvt sm LEFT JOIN {$prefix}stock_mvt_reason smr ON sm.id_stock_mvt_reason = smr.id_stock_mvt_reason $where";
-        $countStmt = $conn->prepare($countSql);
-        if ($search) {
-            $countStmt->bindValue('search', "%$search%", \PDO::PARAM_STR);
-        }
-        $countStmt->execute();
-        $total = (int) $countStmt->fetchColumn();
-
-        return $this->json([
-            'data' => $rows,
-            'total' => $total,
-            'page' => $page,
-            'perPage' => $perPage,
         ]);
     }
 
@@ -273,45 +171,5 @@ class StockMvtController extends FrameworkBundleAdminController
         $validIdOrderStates = $this->getValidIdOrdersStates();
 
         return $this->json($validIdOrderStates);
-    }
-
-    public function productAutocompleteAction(Request $request)
-    {
-        $this->productAutocompleteService = new ProductAutocompleteService($this->getDoctrine()->getConnection());
-
-        $data = $request->request->all();
-        $search = $data['search'] ?? '';
-        $limit = $data['limit'] ?? 10;
-        $offset = $data['offset'] ?? 0;
-        $order = $data['order'] ?? 'ASC';
-        $order_by = $data['order_by'] ?? 'name';
-        $id_lang = (int) $this->context->getContext()->language->id;
-
-        return $this->json(
-            $this->productAutocompleteService->search($search, $id_lang, 20)
-        );
-    }
-
-    public function injectMenuData()
-    {
-        $menuDataService = new MenuDataService($this->router, $this->context);
-        $menuDataService->injectMenuData([
-            'icon' => 'home',
-            'label' => 'Movimenti',
-            'children' => [
-                [
-                    'icon' => 'add',
-                    'label' => 'Nuovo Movimento',
-                    'href' => 'javascript:void(0);',
-                    'action' => 'showNewMovement',
-                    'dialogId' => $idDialog ?? '',
-                ],
-                [
-                    'icon' => 'download',
-                    'label' => 'Importa',
-                    'href' => 'javascript:void(0);',
-                ],
-            ],
-        ]);
     }
 }

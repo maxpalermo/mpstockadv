@@ -22,6 +22,8 @@
 namespace MpSoft\MpStockAdv\Services;
 
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RouterInterface;
 
 class MpStockAdvConfiguration
@@ -118,9 +120,14 @@ class MpStockAdvConfiguration
         return $warehouses;
     }
 
-    public function getDefaultStockMvtReason()
+    public function getDefaultStockMvtReasonLoad()
     {
-        return $this->get('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON');
+        return $this->get('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON_LOAD');
+    }
+
+    public function getDefaultStockMvtReasonUnload()
+    {
+        return $this->get('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON_UNLOAD');
     }
 
     public function getStockMvtReasons()
@@ -147,13 +154,14 @@ class MpStockAdvConfiguration
     {
         $prefix = _DB_PREFIX_;
         $countryId = $request->query->get('countryId');
-        $conn = $this->getDoctrine()->getConnection();
+        $conn = $this->connection;
         $stmt = $conn->prepare("SELECT * FROM {$prefix}state WHERE id_country = :countryId ORDER BY name ASC");
-        $result = $stmt->execute(['countryId' => $countryId]);
+        $result = $stmt->executeQuery(['countryId' => $countryId]);
         if ($result) {
-            $items = $stmt->fetchAllAssociative();
+            $items = $result->fetchAllAssociative();
         }
+        $response = (new JsonResponse(['states' => $items]))->setStatusCode(200);
 
-        return $this->json(['states' => $items]);
+        return $response;
     }
 }

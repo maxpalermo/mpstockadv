@@ -13,11 +13,22 @@
         </div>
         <div class="col-12">
             <div class="form-group">
-                <label for="stockMvtDefaultStockMvtReason">Tipo di movimento di default</label>
-                <select id="stockMvtDefaultStockMvtReason" name="default_stock_mvt_reason" class="form-control">
+                <label for="stockMvtDefaultStockMvtReasonLoad">Tipo di movimento di default</label>
+                <select id="stockMvtDefaultStockMvtReasonLoad" name="default_stock_mvt_reason_load" class="form-control">
                     <option value="">Seleziona</option>
                     {% for stockMvtReason in stockMvtReasons %}
-                        <option data-select2-sign="{{ stockMvtReason.sign }}" value="{{ stockMvtReason.id_stock_mvt_reason}}" {% if stockMvtReason.id_stock_mvt_reason == default_stock_mvt_reason %} selected {% endif %}>{{ stockMvtReason.name }}</option>
+                        <option data-select2-sign="{{ stockMvtReason.sign }}" value="{{ stockMvtReason.id_stock_mvt_reason}}" {% if stockMvtReason.id_stock_mvt_reason == default_stock_mvt_reason_load %} selected {% endif %}>{{ stockMvtReason.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="form-group">
+                <label for="stockMvtDefaultStockMvtReasonUnload">Tipo di movimento di default</label>
+                <select id="stockMvtDefaultStockMvtReasonUnload" name="default_stock_mvt_reason_unload" class="form-control">
+                    <option value="">Seleziona</option>
+                    {% for stockMvtReason in stockMvtReasons %}
+                        <option data-select2-sign="{{ stockMvtReason.sign }}" value="{{ stockMvtReason.id_stock_mvt_reason}}" {% if stockMvtReason.id_stock_mvt_reason == default_stock_mvt_reason_unload %} selected {% endif %}>{{ stockMvtReason.name }}</option>
                     {% endfor %}
                 </select>
             </div>

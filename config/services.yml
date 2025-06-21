@@ -38,3 +38,15 @@ services:
       $connection: "@doctrine.dbal.default_connection"
       $context: "@prestashop.adapter.legacy.context"
     public: true
+
+  MpSoft\MpStockAdv\Services\StockProductsService:
+    arguments:
+      $connection: "@doctrine.dbal.default_connection"
+      $context: "@prestashop.adapter.legacy.context"
+    public: true
+
+  MpSoft\MpStockAdv\Services\StockMvtDatatableService:
+    arguments:
+      $connection: "@doctrine.dbal.default_connection"
+      $context: "@prestashop.adapter.legacy.context"
+    public: true

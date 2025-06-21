@@ -148,11 +148,6 @@ mpstockadv_admin_stockmvt:
   controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::indexAction
   methods: [GET]
 
-mpstockadv_admin_stockmvt_ajax_list:
-  path: /admin/mpstockadv/stock-mvt/ajax-list
-  controller: MpSoft\MpStockAdv\Controller\Admin\StockMvtController::ajaxListAction
-  methods: [GET, POST]
-
 mpstockadv_admin_stockmvt_ajax_save:
   path: /admin/module/mpstockadv/stockmvt/ajax-save
   methods: [POST]
@@ -242,3 +237,18 @@ mpstockadv_controller_stockmvt_product_autocomplete:
   path: /admin/module/mpstockadv/stockmvt/product-autocomplete
   controller: MpSoft\MpStockAdv\Services\ProductAutocompleteService::searchAction
   methods: [GET, POST]
+
+mpstockadv_controller_stockmvt_product_autocomplete_save:
+  path: /admin/module/mpstockadv/stockmvt/product-autocomplete-save
+  controller: MpSoft\MpStockAdv\Services\ProductAutocompleteService::saveAction
+  methods: [POST]
+
+mpstockadv_controller_stockmvt_load_stock_mvt_preferences:
+  path: /admin/module/mpstockadv/stockmvt/load-stock-mvt-preferences
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtPreferences::loadStockMvtPreferencesAction
+  methods: [GET]
+
+mpstockadv_controller_stockmvt_ajax_refresh_table:
+  path: /admin/module/mpstockadv/stockmvt/ajax-process-refresh-table
+  controller: MpSoft\MpStockAdv\Services\StockMvtDatatableService::getStockMvtDataAction
+  methods: [POST]

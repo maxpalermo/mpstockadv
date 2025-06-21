@@ -3,6 +3,7 @@ let table = null;
 let dialogMovements = null;
 let dialogPreferences = null;
 let productAutocomplete = null;
+let stockMvtPreferences = null;
 
 function newMovement() {
     if (!productAutocomplete) {
@@ -37,106 +38,17 @@ async function loadModalMovements() {
 
         productAutocomplete = new ProductAutocomplete(dialogMovements);
 
+        dialogMovements.addEventListener("stockMvtSaved", e => {
+            alert("Movimento salvato");
+            console.log(e.detail);
+            dialogMovements.close();
+            table.ajax.reload();
+        });
+
         return;
     }
 
     alert("Form movimenti non caricata.");
-}
-
-async function loadModalPreferences() {
-    let request = null;
-    try {
-        request = await fetch(loadModalPreferencesUrl, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json"
-            }
-        });
-    } catch (error) {
-        alert("Errore: " + error.message);
-        return;
-    }
-
-    const response = await request.json();
-    if (response.success) {
-        const template = document.createElement("template");
-        template.innerHTML = `
-            <dialog id="dialog-preferences" class="bootstrap">
-                <div class="card">
-                    <div class="card-body">
-                        ${response.html}
-                    </div>
-                </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-center align-items-center">
-                        <button class="btn btn-primary" id="preferences-save-btn">
-                            <span class="material-icons">save</span>
-                            <span>Salva</span>
-                        </button>
-                        <button class="btn btn-secondary" id="preferences-close-btn">
-                            <span class="material-icons">close</span>
-                            <span>Chiudi</span>
-                        </button>
-                    </div>
-                </div>
-            </dialog>
-        `;
-        const cloneNode = template.content.cloneNode(true);
-        dialogPreferences = cloneNode.querySelector("dialog");
-        document.body.appendChild(dialogPreferences);
-
-        const selectWarehouse = document.getElementById("stockMvtDefaultWarehouse");
-        const selectStockMvtReason = document.getElementById("stockMvtDefaultStockMvtReason");
-        const btnSavePreferences = document.getElementById("preferences-save-btn");
-        const btnClosePreferences = document.getElementById("preferences-close-btn");
-
-        btnSavePreferences.addEventListener("click", async e => {
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-
-            const form = document.getElementById("stockMvtAdvPreferencesForm");
-            const formData = new FormData(form);
-            const request = await fetch(savePreferencesUrl, {
-                method: "POST",
-                body: formData
-            });
-            const response = await request.json();
-            if (response.success) {
-                dialogPreferences.close();
-                alert("Preferenze salvate.");
-            } else {
-                alert(response.message);
-            }
-        });
-
-        btnClosePreferences.addEventListener("click", e => {
-            dialogPreferences.close();
-        });
-
-        $(selectWarehouse).select2({
-            dropdownParent: dialogPreferences
-        });
-        $(selectStockMvtReason).select2({
-            dropdownParent: dialogPreferences,
-            templateResult: renderMvtReasons,
-            templateSelection: renderMvtReasons,
-            escapeMarkup: function(markup) {
-                return markup;
-            }
-        });
-
-        $(selectStockMvtReason).on("select2:open", function(e) {
-            // Select2 4.x: il campo di ricerca ha classe .select2-search__field
-            setTimeout(function() {
-                document.querySelector(".select2-search__field").focus();
-            }, 0);
-        });
-
-        return;
-    }
-
-    alert("Form preferenze non caricata.");
 }
 
 function renderMvtReasons(data) {
@@ -155,9 +67,19 @@ function renderMvtReasons(data) {
     return $(`${icon} ${label}`);
 }
 
-async function showModalPreferences() {
+async function showModalPreferences2() {
     if (dialogPreferences) {
         dialogPreferences.showModal();
+
+        return;
+    }
+
+    alert("Form Preferenze non trovato.");
+}
+
+async function showModalPreferences() {
+    if (stockMvtPreferences) {
+        stockMvtPreferences.showModal();
 
         return;
     }
@@ -170,33 +92,153 @@ document.addEventListener("DOMContentLoaded", e => {
     const tableMvt = document.getElementById("stockMvtTable");
     if (tableMvt) {
         table = new DataTable(tableMvt, {
+            serverSide: true,
+            processing: true,
             language: {
                 url: tableDataLanguageItUrl
             },
             ajax: {
                 url: ajaxProcessRefreshTableData,
-                dataSrc: "data"
+                type: "POST"
             },
             columns: [
-                { data: "id", type: "numeric" },
-                { data: "date", type: "date" },
-                { data: "type", type: "string" },
-                { data: "sign", type: "numeric" },
-                { data: "reference", type: "string" },
-                { data: "ean13", type: "string" },
-                { data: "product", type: "string" },
-                { data: "combination", type: "string" },
-                { data: "stock_before", type: "numeric" },
-                { data: "movement", type: "numeric" },
-                { data: "stock_after", type: "numeric" },
-                { data: "employee", type: "string" },
-                { data: "actions", type: "string" }
+                {
+                    name: "img_url",
+                    data: "img_url",
+                    type: "string",
+                    className: "text-right",
+                    render: function(data) {
+                        return `<img src="${data}" alt="Product image" style="width: 72px; height: 72px; object-fit: cover; border: 1px solid #dcdcdc;border-radius: 0;">`;
+                    }
+                },
+                {
+                    name: "id",
+                    data: "id",
+                    type: "numeric"
+                },
+                {
+                    name: "date",
+                    data: "date",
+                    type: "date",
+                    className: "text-center",
+                    render: data => {
+                        const date = new Date(data);
+                        if (!isNaN(date.getTime())) {
+                            return date.toLocaleDateString("it-IT");
+                        } else {
+                            return "--";
+                        }
+                    }
+                },
+                {
+                    name: "type",
+                    data: "type",
+                    type: "string"
+                },
+                {
+                    name: "sign",
+                    data: "sign",
+                    type: "numeric",
+                    className: "text-center",
+                    render: function(data) {
+                        if (data == "+") {
+                            return `<span class="material-icons" style="color: var(--success);">add_circle</span>`;
+                        }
+
+                        return `<span class="material-icons" style="color: var(--danger);">do_not_disturb_on</span>`;
+                    }
+                },
+                {
+                    name: "reference",
+                    data: "reference",
+                    type: "string"
+                },
+                {
+                    name: "ean13",
+                    data: "ean13",
+                    type: "string"
+                },
+                {
+                    name: "product_name",
+                    data: "product_name",
+                    type: "string"
+                },
+                {
+                    name: "combination",
+                    data: "combination",
+                    type: "string"
+                },
+                {
+                    name: "warehouse",
+                    data: "warehouse",
+                    type: "string"
+                },
+                {
+                    name: "stock_before",
+                    data: "stock_before",
+                    type: "numeric",
+                    className: "text-right",
+                    render: (data, type, row) => {
+                        const stock_after = row.stock_after;
+                        const movement = row.movement;
+                        const sign = row.sign_value;
+                        data = stock_after - movement * sign;
+                        console.log({
+                            data: data,
+                            movement: movement,
+                            stock_after: stock_after,
+                            row: row
+                        });
+                        return setStockColor(data, "stock_before");
+                    }
+                },
+                {
+                    name: "movement",
+                    data: "movement",
+                    type: "numeric",
+                    className: "text-right",
+                    render: data => {
+                        return setStockColor(data, "movement");
+                    }
+                },
+                {
+                    name: "stock_after",
+                    data: "stock_after",
+                    type: "numeric",
+                    className: "text-right",
+                    render: data => {
+                        return setStockColor(data, "stock_after");
+                    }
+                },
+                {
+                    name: "employee",
+                    data: "employee",
+                    type: "string"
+                },
+                {
+                    name: "actions",
+                    render: function(data, type, row) {
+                        return `<button class="btn btn-primary btn-sm" onclick="editMovement(${row.id})">Edit</button>`;
+                    },
+                    type: "string"
+                }
             ]
         });
     }
 });
 
+function setStockColor(value) {
+    if (value < 0) {
+        return `<span class="text-danger">${value}</span>`;
+    } else if (value == 0) {
+        return `<span class="text-info">${value}</span>`;
+    } else {
+        return `<span class="text-success">${value}</span>`;
+    }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     await loadModalMovements();
-    await loadModalPreferences();
+    stockMvtPreferences = new StockMvtPreferences();
+    await stockMvtPreferences.init();
 });

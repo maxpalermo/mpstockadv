@@ -47,6 +47,8 @@ class StockMvtController extends FrameworkBundleAdminController
     // Pagina principale movimenti magazzino
     public function indexAction(Request $request): Response
     {
+        $stockProducts = $this->get('mpstockadv.stock_products')->getStockProducts();
+
         $stockMvtReasonService = new StockMvtReasonFormService(
             $this->getDoctrine()->getConnection(),
             $this->get('twig'),
@@ -62,6 +64,7 @@ class StockMvtController extends FrameworkBundleAdminController
                 'logo_src' => \Configuration::get('PS_LOGO'),
                 'current_warehouse' => (int) \Configuration::get('MPSTOCKADV_DEFAULT_WAREHOUSE'),
                 'stockMvtFormHtml' => $form,
+                'stockProducts' => $stockProducts,
             ]
         );
     }
@@ -85,84 +88,6 @@ class StockMvtController extends FrameworkBundleAdminController
         $this->stockMvtInitStockImporterService->importInitStock($data);
 
         return $this->json(['success' => true, 'message' => 'Movimento salvato (stub)']);
-    }
-
-    // Endpoint AJAX per ricerca prodotto (autocomplete)
-    public function productSearchAction(Request $request): Response
-    {
-        $q = $request->query->get('q', '');
-        $idLang = (int) $this->context->getContext()->language->id;
-        // Usa il servizio centralizzato per la ricerca autocomplete
-        $service = new ProductAutocompleteService(
-            $this->getDoctrine()->getConnection()
-        );
-        $items = $service->search($q, $idLang, 20);
-
-        return $this->json(['results' => $items]);
-    }
-
-    // Endpoint AJAX per motivi movimento
-    public function ajaxReasonsAction(Request $request): Response
-    {
-        // TODO: implementa la logica per restituire i motivi
-        return $this->json([
-            ['id' => 1, 'name' => 'Carico'],
-            ['id' => 2, 'name' => 'Scarico'],
-        ]);
-    }
-
-    // Endpoint AJAX per tabella movimenti
-    public function ajaxListAction(Request $request): Response
-    {
-        $prefix = _DB_PREFIX_;
-        $page = max(1, (int) $request->query->get('page', 1));
-        $perPage = max(1, (int) $request->query->get('perPage', 20));
-        $search = trim($request->query->get('search', ''));
-
-        $offset = ($page - 1) * $perPage;
-        $conn = $this->getDoctrine()->getConnection();
-        $params = [];
-        $where = '';
-        if ($search) {
-            $where = 'WHERE sm.id_stock_mvt LIKE :search OR sm.id_product LIKE :search OR smr_lang.name LIKE :search';
-            $params['search'] = "%$search%";
-        }
-        // Recupera la lingua corrente
-        $idLang = (int) $this->context->getContext()->language->id;
-        $sql = "SELECT sm.*, smr_lang.name AS reason_name
-                FROM {$prefix}stock_mvt sm
-                LEFT JOIN {$prefix}stock_mvt_reason smr ON sm.id_stock_mvt_reason = smr.id_stock_mvt_reason
-                LEFT JOIN {$prefix}stock_mvt_reason_lang smr_lang ON smr_lang.id_stock_mvt_reason = smr.id_stock_mvt_reason AND smr_lang.id_lang = :id_lang
-                $where
-                ORDER BY sm.date_add DESC
-                LIMIT :offset, :limit";
-        $params['offset'] = $offset;
-        $params['limit'] = $perPage;
-        $params['id_lang'] = $idLang;
-
-        $stmt = $conn->prepare($sql);
-        foreach ($params as $k => $v) {
-            $type = ('offset' === $k || 'limit' === $k || 'id_lang' === $k) ? \PDO::PARAM_INT : \PDO::PARAM_STR;
-            $stmt->bindValue($k, $v, $type);
-        }
-        $stmt->execute();
-        $rows = $stmt->fetchAll();
-
-        // Conta totale per paginazione (non serve join su _lang)
-        $countSql = "SELECT COUNT(*) FROM {$prefix}stock_mvt sm LEFT JOIN {$prefix}stock_mvt_reason smr ON sm.id_stock_mvt_reason = smr.id_stock_mvt_reason $where";
-        $countStmt = $conn->prepare($countSql);
-        if ($search) {
-            $countStmt->bindValue('search', "%$search%", \PDO::PARAM_STR);
-        }
-        $countStmt->execute();
-        $total = (int) $countStmt->fetchColumn();
-
-        return $this->json([
-            'data' => $rows,
-            'total' => $total,
-            'page' => $page,
-            'perPage' => $perPage,
-        ]);
     }
 
     public function getOrdersAction(Request $request): Response

@@ -72,9 +72,10 @@ class StockMvtReasonFormService
         $warehouses = $this->getWarehouses();
 
         return $this->twig->render($template, [
-            'APP_IMG_URL' => '/img/404.gif',
+            'IMG_URL_404' => '/img/404.gif',
             'id_dialog' => $this->getIdDialog(),
             'stockMvtReasons' => $stockMvtReasons,
+            'current_mvt_reason' => (int) \Configuration::get('MPSTOCKADV_DEFAULT_MVT_REASON'),
             'warehouses' => $warehouses,
             'current_warehouse' => (int) \Configuration::get('MPSTOCKADV_DEFAULT_WAREHOUSE'),
         ]);

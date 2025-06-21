@@ -1,5 +1,15 @@
 # mpstockadv
 
+## Modifica richiesta alla tabella stock_mvt
+
+Per il corretto funzionamento del modulo **mpstockadv**, è necessario aggiungere due nuovi campi alla tabella `stock_mvt` nel database:
+
+- `stock_before` INT NOT NULL DEFAULT 0
+- `stock_after` INT NOT NULL DEFAULT 0
+
+Questi campi sono utilizzati per tracciare la quantità di stock prima e dopo ogni movimento di magazzino. Se non presenti, alcune funzionalità del modulo potrebbero non funzionare correttamente.
+
+
 Gestione avanzata del magazzino di Prestashop v8
 
 ## Ricerca prodotto e struttura form movimento

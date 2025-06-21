@@ -173,4 +173,105 @@ class ProductAutocompleteService
 
         return (float) \Db::getInstance()->getValue($sql);
     }
+
+    public function saveAction(Request $request)
+    {
+        $data = $request->getContent();
+        $data = json_decode($data, true);
+
+        if (!is_array($data)) {
+            return new JsonResponse(['error' => 'Invalid data format', 'data' => $data], 400);
+        }
+
+        return new JsonResponse($this->stockManagerUpdate($data), 200);
+    }
+
+    public function stockManagerUpdate($data)
+    {
+        $id_warehouse = $data['warehouse_id'];
+        $id_product = $data['product_id'];
+        $id_product_attribute = $data['product_attribute_id'];
+        $id_stock_mvt_reason = $data['stock_mvt_reason_id'];
+        $quantity = $data['product_quantity'];
+        $price_te = (float) ($data['product_price_te'] ?? 0);
+
+        $stockMvtReason = new \StockMvtReason($id_stock_mvt_reason);
+        $sign = (int) $stockMvtReason->sign;
+
+        $stockManager = \StockManagerFactory::getManager();
+        $stockExists = \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
+
+        if ($stockExists) {
+            // Aggiorna la quantità esistente
+            \StockAvailable::updateQuantity($id_product, $id_product_attribute, $quantity * $sign);
+        } else {
+            // Crea una nuova riga in ps_stock_available (non in ps_stock)
+            \StockAvailable::setQuantity($id_product, $id_product_attribute, $quantity * $sign, null, false);
+        }
+
+        // Se Advanced Stock Management è attivo, aggiorna anche ps_stock
+        if (\Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
+            $warehouse = new \Warehouse($id_warehouse);
+            if (-1 == $sign) {
+                $result = $stockManager->removeProduct(
+                    $id_product,
+                    $id_product_attribute,
+                    $warehouse,
+                    $quantity,
+                    $id_stock_mvt_reason,
+                    true,
+                    0
+                );
+            } else {
+                $result = $stockManager->addProduct(
+                    $id_product,
+                    $id_product_attribute,
+                    $warehouse,
+                    $quantity,
+                    $id_stock_mvt_reason,
+                    $price_te,
+                    true,
+                    0
+                );
+            }
+
+            $stock_after = (int) \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
+            $pfx = _DB_PREFIX_;
+            $query = "
+                SELECT a.id_stock_mvt
+                FROM {$pfx}stock_mvt a
+                INNER JOIN {$pfx}stock b ON (a.id_stock=b.id_stock)
+                WHERE a.id_stock_mvt_reason = {$id_stock_mvt_reason}
+                AND b.id_product = {$id_product}
+                AND b.id_product_attribute = {$id_product_attribute}
+                AND b.id_warehouse = {$id_warehouse}
+                AND a.sign = {$sign}
+                ORDER BY a.id_stock_mvt DESC
+                ";
+
+            $id_stock_mvt = \Db::getInstance()->getValue($query);
+            if ($id_stock_mvt) {
+                \Db::getInstance()->update(
+                    'stock_mvt',
+                    [
+                        'stock_before' => (int) $stockExists,
+                        'stock_after' => (int) $stock_after,
+                    ],
+                    'id_stock_mvt = '.(int) $id_stock_mvt
+                );
+            }
+
+            return [
+                'success' => true,
+                'result' => $result,
+                'data' => $data,
+            ];
+        }
+
+        return [
+            'success' => true,
+            'result' => true,
+            'data' => $data,
+        ];
+    }
 }
