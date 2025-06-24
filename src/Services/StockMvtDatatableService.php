@@ -48,11 +48,11 @@ class StockMvtDatatableService
     {
         $term = $request->get('search', []);
         $draw = $request->get('draw', 1);
-        $limit = $request->get('length', 20);
-        $page = $request->get('page', 1);
         $orderBy = $request->get('order', []);
+        $start = $request->get('start', 0);
+        $length = $request->get('length', 20);
 
-        $stockMvt = $this->getStockMvt($term, $limit, $page, $orderBy);
+        $stockMvt = $this->getStockMvt($term, $start, $length, $orderBy);
 
         $result = json_encode([
             'draw' => ++$draw,
@@ -66,9 +66,9 @@ class StockMvtDatatableService
             ->setStatusCode(200);
     }
 
-    public function getStockMvt($term = [], $limit = 20, $page = 1, $orderBy = [])
+    public function getStockMvt($term = [], $start = 0, $length = 20, $orderBy = [])
     {
-        $list = $this->getList($term, $limit, $page, $orderBy);
+        $list = $this->getList($term, $start, $length, $orderBy);
 
         return [
             'recordsTotal' => $list['totalRows'],
@@ -77,7 +77,7 @@ class StockMvtDatatableService
         ];
     }
 
-    protected function getList($term, $limit, $page, $orderBy)
+    protected function getList($term, $start, $length, $orderBy)
     {
         $id_lang = (int) $this->context->getContext()->language->id;
         $pfx = _DB_PREFIX_;
@@ -147,10 +147,9 @@ class StockMvtDatatableService
         $list = $conn->executeQuery($query)->fetchAllAssociative();
         if ($list) {
             $totalRows = count($list);
-            $offset_start = ($page - 1) * $limit;
-            $list = array_slice($list, $offset_start, $limit);
-            $totalPages = ceil($totalRows / $limit);
-            $currentPage = $page;
+            $list = array_slice($list, $start, $length);
+            $totalPages = ceil($totalRows / $length);
+            $currentPage = 0 == $start ? 1 : ceil($length / $start);
 
             foreach ($list as &$item) {
                 $product = new \Product($item['product_id']);

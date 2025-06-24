@@ -172,7 +172,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script type="text/javascript">
-        console.log("main script loaded");
+        console.log("StockMvtPreferences.twig.html script loaded");
         const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
         const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_refresh_table_data') }}";
         const loadModalMovementsUrl = "{{ path('mpstockadv_controller_stockmvt_load_modal_dialog') }}";

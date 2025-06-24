@@ -1,8 +1,7 @@
 <?php
 
-namespace MpSoft\MpStockAdv\Controller\Admin;
+namespace MpSoft\MpStockAdv\Controllers;
 
-use MpSoft\MpStockAdv\Helpers\ParseCsv;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,7 +15,27 @@ class StockImportExportController extends FrameworkBundleAdminController
      */
     public function index(): Response
     {
-        return $this->render('@Modules/mpstockadv/views/PrestaShop/Admin/mpstockadv/stock_import_export.html.twig');
+        return $this->render('@Modules/mpstockadv/views/twig/Controllers/StockImportExportController.html.twig');
+    }
+
+    public function importXmlAction(Request $request): JsonResponse
+    {
+        $file = \Tools::fileAttachment('xml_file');
+        if ($file) {
+            $fileName = $file['name'];
+            $filePath = $file['tmp_name'];
+        }
+
+        /** @var \MpSoft\MpStockAdv\Services\StockMvtImportService */
+        $xmlParser = $this->get('MpSoft\MpStockAdv\Services\StockMvtImportService');
+
+        $parsed = $xmlParser->parseStockMovementFile($fileName, $filePath);
+
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Importazione movimenti da XML eseguita',
+            'content' => $parsed,
+        ]);
     }
 
     /**

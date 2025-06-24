@@ -32,20 +32,40 @@ class ProductAutocompleteService
     private $prefix;
     private $context;
     private $locale;
+    private $stockManager;
 
-    public function __construct(Connection $connection, LegacyContext $context)
+    public function __construct(Connection $connection, LegacyContext $context, StockManagerService $stockManager)
     {
         $this->prefix = _DB_PREFIX_;
         $this->connection = $connection;
         $this->context = $context;
+        $this->stockManager = $stockManager;
         $this->locale = \Tools::getContextLocale($this->context->getContext());
+    }
+
+    private function setJsonResponse(array $response, $statusCode = 200)
+    {
+        $headers = [
+            'Content-Type' => 'application/json',
+            'charset' => 'utf-8',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Methods' => 'GET, POST, OPTIONS',
+            'Access-Control-Allow-Headers' => 'Content-Type, Authorization',
+        ];
+
+        (new JsonResponse(
+            $response,
+            $statusCode
+        ))->send();
+
+        exit;
     }
 
     public function searchAction(Request $request)
     {
         $result = $this->search($request);
 
-        return new JsonResponse($result);
+        $this->setJsonResponse($result);
     }
 
     /**
@@ -141,6 +161,7 @@ class ProductAutocompleteService
                 p.reference LIKE '%$q%' OR pl.name LIKE '%$q%' OR p.ean13 LIKE '%$q%' OR p.upc LIKE '%$q%' OR p.isbn LIKE '%$q%' OR
                 pa.reference LIKE '%$q%' OR pa.ean13 LIKE '%$q%' OR pa.upc LIKE '%$q%' OR pa.isbn LIKE '%$q%'
             )
+                AND p.active=1
             GROUP BY p.id_product, pa.id_product_attribute
             ORDER BY pl.name ASC
             LIMIT {$limit};
@@ -201,12 +222,30 @@ class ProductAutocompleteService
         $stockManager = \StockManagerFactory::getManager();
         $stockExists = \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
 
+        $result = $this->stockManager->updateStock($id_product, $id_product_attribute, $id_stock_mvt_reason, $quantity, $id_warehouse, $price_te);
+        if ($result) {
+            $movement = $this->stockManager->addMovement($id_product, $id_product_attribute, $id_stock_mvt_reason, $quantity, $price_te, $id_warehouse);
+        }
+
+        $this->setJsonResponse([
+            'success' => $movement,
+            'updated' => $result,
+        ]);
+
         if ($stockExists) {
             // Aggiorna la quantità esistente
             \StockAvailable::updateQuantity($id_product, $id_product_attribute, $quantity * $sign);
         } else {
             // Crea una nuova riga in ps_stock_available (non in ps_stock)
             \StockAvailable::setQuantity($id_product, $id_product_attribute, $quantity * $sign, null, false);
+        }
+
+        $stock_after = \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
+        $sign = (int) $stockMvtReason->sign;
+        $movement = $quantity * $sign;
+
+        if ($stock_after < 0) {
+            $quantity = 0;
         }
 
         // Se Advanced Stock Management è attivo, aggiorna anche ps_stock

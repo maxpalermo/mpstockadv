@@ -13,7 +13,8 @@ class StockMvtPreferences {
 
     async _loadPreferences() {
         const instance = this;
-        const request = await fetch(loadStockMvtPreferences, {
+        const loadStockMvtPreferencesUrl = window.Routes.get("loadStockMvtPreferencesUrl");
+        const request = await fetch(loadStockMvtPreferencesUrl, {
             headers: {
                 "Content-Type": "application/json",
                 "X-Requested-With": "XMLHttpRequest"
@@ -127,6 +128,7 @@ class StockMvtPreferences {
 
             const form = document.getElementById("stockMvtAdvPreferencesForm");
             const formData = new FormData(form);
+            const savePreferencesUrl = window.Routes.get("savePreferencesUrl");
             const request = await fetch(savePreferencesUrl, {
                 method: "POST",
                 body: formData

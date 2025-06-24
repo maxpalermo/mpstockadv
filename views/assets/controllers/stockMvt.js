@@ -1,4 +1,3 @@
-console.log("StockMvt script loaded");
 let table = null;
 let dialogMovements = null;
 let dialogPreferences = null;
@@ -14,8 +13,7 @@ function newMovement() {
 }
 
 async function loadModalMovements() {
-    console.log("Loading dialog...");
-
+    const loadModalMovementsUrl = window.Routes.get("loadModalMovementsUrl");
     const request = await fetch(loadModalMovementsUrl, {
         method: "GET",
         headers: {
@@ -40,7 +38,6 @@ async function loadModalMovements() {
 
         dialogMovements.addEventListener("stockMvtSaved", e => {
             alert("Movimento salvato");
-            console.log(e.detail);
             dialogMovements.close();
             table.ajax.reload();
         });
@@ -49,6 +46,50 @@ async function loadModalMovements() {
     }
 
     alert("Form movimenti non caricata.");
+}
+
+async function importStockAvailable() {
+    if (confirm("Inizio importazione delle giacenze?") == false) {
+        return;
+    }
+    const ajaxProcessTruncateStockTablesUrl = window.Routes.get("ajaxProcessTruncateStockTablesUrl");
+    const requestTruncate = await fetch(ajaxProcessTruncateStockTablesUrl);
+    const responseTruncate = await requestTruncate.json();
+    console.log("Tabelle troncate", responseTruncate);
+
+    const ajaxProcessGetStockAvailableRowsUrl = window.Routes.get("ajaxProcessGetStockAvailableRowsUrl");
+    const request = await fetch(ajaxProcessGetStockAvailableRowsUrl);
+    const response = await request.json();
+    if ("rows" in response) {
+        const resultImport = await importChunk(response.rows);
+        if (resultImport.success) {
+            table.ajax.reload();
+        }
+    } else {
+        alert("Nessuna giacenza da importare");
+    }
+}
+
+async function importChunk(list) {
+    const chunk = list.splice(0, 200);
+    const ajaxProcessImportChunkUrl = window.Routes.get("ajaxProcessImportChunkUrl");
+    const request = await fetch(ajaxProcessImportChunkUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Requested-With": "XMLHttpRequest"
+        },
+        body: JSON.stringify({ chunk: chunk })
+    });
+    const response = await request.json();
+    if ("error" in response && response.error != false) {
+        alert("si è verificato un errore.\n" + response.error);
+    } else if (list.length == 0) {
+        alert("Importazione terminata");
+        return true;
+    } else {
+        return importChunk(list);
+    }
 }
 
 function renderMvtReasons(data) {
@@ -87,18 +128,28 @@ async function showModalPreferences() {
     alert("Form Preferenze non trovato.");
 }
 
-document.addEventListener("DOMContentLoaded", e => {
-    console.log("StockMvt DOMContentLoaded script loaded");
+function setStockColor(value) {
+    if (value < 0) {
+        return `<span class="text-danger">${value}</span>`;
+    } else if (value == 0) {
+        return `<span class="text-info">${value}</span>`;
+    } else {
+        return `<span class="text-success">${value}</span>`;
+    }
+}
+
+async function initStockMvt() {
+    const ajaxProcessRefreshTableDataUrl = window.Routes.get("ajaxProcessRefreshTableDataUrl");
     const tableMvt = document.getElementById("stockMvtTable");
     if (tableMvt) {
         table = new DataTable(tableMvt, {
             serverSide: true,
             processing: true,
             language: {
-                url: tableDataLanguageItUrl
+                url: window.TableDataLanguageItUrl
             },
             ajax: {
-                url: ajaxProcessRefreshTableData,
+                url: ajaxProcessRefreshTableDataUrl,
                 type: "POST"
             },
             columns: [
@@ -166,7 +217,14 @@ document.addEventListener("DOMContentLoaded", e => {
                 {
                     name: "combination",
                     data: "combination",
-                    type: "string"
+                    type: "string",
+                    render: function(data) {
+                        if (!data) {
+                            return "--";
+                        }
+
+                        return data;
+                    }
                 },
                 {
                     name: "warehouse",
@@ -178,18 +236,8 @@ document.addEventListener("DOMContentLoaded", e => {
                     data: "stock_before",
                     type: "numeric",
                     className: "text-right",
-                    render: (data, type, row) => {
-                        const stock_after = row.stock_after;
-                        const movement = row.movement;
-                        const sign = row.sign_value;
-                        data = stock_after - movement * sign;
-                        console.log({
-                            data: data,
-                            movement: movement,
-                            stock_after: stock_after,
-                            row: row
-                        });
-                        return setStockColor(data, "stock_before");
+                    render: data => {
+                        return setStockColor(data);
                     }
                 },
                 {
@@ -198,7 +246,7 @@ document.addEventListener("DOMContentLoaded", e => {
                     type: "numeric",
                     className: "text-right",
                     render: data => {
-                        return setStockColor(data, "movement");
+                        return setStockColor(data);
                     }
                 },
                 {
@@ -207,7 +255,7 @@ document.addEventListener("DOMContentLoaded", e => {
                     type: "numeric",
                     className: "text-right",
                     render: data => {
-                        return setStockColor(data, "stock_after");
+                        return setStockColor(data);
                     }
                 },
                 {
@@ -225,20 +273,10 @@ document.addEventListener("DOMContentLoaded", e => {
             ]
         });
     }
-});
 
-function setStockColor(value) {
-    if (value < 0) {
-        return `<span class="text-danger">${value}</span>`;
-    } else if (value == 0) {
-        return `<span class="text-info">${value}</span>`;
-    } else {
-        return `<span class="text-success">${value}</span>`;
-    }
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
     await loadModalMovements();
     stockMvtPreferences = new StockMvtPreferences();
     await stockMvtPreferences.init();
-});
+
+    console.log("StockMvt.js loaded.");
+}

@@ -83,6 +83,8 @@ class ProductAutocomplete {
             }, 0);
         });
 
+        const productAutocompleteUrl = window.Routes.get("productAutocompleteUrl");
+
         $(instance._product_name).select2({
             dropdownParent: instance._dialog,
             templateResult: instance.renderProduct,

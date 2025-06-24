@@ -164,4 +164,16 @@ class MpStockAdvConfiguration
 
         return $response;
     }
+
+    public function getCurrentEmployee()
+    {
+        $employee = $this->context->getContext()->employee;
+
+        return [
+            'id_employee' => $employee->id,
+            'firstname' => $employee->firstname,
+            'lastname' => $employee->lastname,
+            'email' => $employee->email,
+        ];
+    }
 }

@@ -235,27 +235,43 @@
 
 {% block javascripts %}
     {{ parent() }}
-    <script type="text/javascript">
-        console.log("main script loaded");
-        const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
-        //const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_refresh_table_data') }}";
-        const loadModalMovementsUrl = "{{ path('mpstockadv_controller_stockmvt_load_modal_dialog') }}";
-        const loadModalPreferencesUrl = "{{ path('mpstockadv_controller_stockmvt_load_modal_preferences') }}"
-        const savePreferencesUrl = "{{ path('mpstockadv_controller_stockmvt_save_preferences') }}";
-        const productAutocompleteUrl = "{{ path('mpstockadv_controller_stockmvt_product_autocomplete') }}";
-        const productAutocompleteSaveUrl = "{{ path('mpstockadv_controller_stockmvt_product_autocomplete_save') }}";
-        const loadStockMvtPreferences = "{{ path('mpstockadv_controller_stockmvt_load_stock_mvt_preferences') }}"
-        const ajaxProcessRefreshTableData = "{{ path('mpstockadv_controller_stockmvt_ajax_refresh_table') }}";
-        let defaultWarehouseId = 0;
-        let defaultStockMvtReasonLoadId = 0;
-        let defaultStockMvtReasonUnloadId = 0;
+    <script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvt.js') }}"></script>
+    <script type="module">
+        import RoutesSingletonInstance from "{{ asset('../modules/mpstockadv/views/assets/routes/routes.js') }}";
+
+        document.addEventListener("DOMContentLoaded", async e =>{
+            const PS_ROUTES = {
+                loadModalMovementsUrl: "{{ path('mpstockadv_controller_stockmvt_load_modal_dialog') }}",
+                loadModalPreferencesUrl: "{{ path('mpstockadv_controller_stockmvt_load_modal_preferences') }}",
+                savePreferencesUrl: "{{ path('mpstockadv_controller_stockmvt_save_preferences') }}",
+                productAutocompleteUrl: "{{ path('mpstockadv_controller_stockmvt_product_autocomplete') }}",
+                productAutocompleteSaveUrl: "{{ path('mpstockadv_controller_stockmvt_product_autocomplete_save') }}",
+                loadStockMvtPreferencesUrl: "{{ path('mpstockadv_controller_stockmvt_load_stock_mvt_preferences') }}",
+                ajaxProcessRefreshTableDataUrl: "{{ path('mpstockadv_controller_stockmvt_ajax_refresh_table') }}",
+                ajaxProcessTruncateStockTablesUrl: "{{ path('mpstockadv_controller_stockmvt_ajax_truncate_stock_tables_url') }}",
+                ajaxProcessGetStockAvailableRowsUrl: "{{ path('mpstockadv_controller_stockmvt_ajax_get_stock_available_rows') }}",
+                ajaxProcessImportChunkUrl: "{{ path('mpstockadv_controller_stockmvt_ajax_import_chunk_url') }}"
+            };
+            
+            RoutesSingletonInstance.setRoutes(PS_ROUTES);
+            console.log(RoutesSingletonInstance.getAllRoutes());
+
+            const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
+            const defaultWarehouseId = 0;
+            const defaultStockMvtReasonLoadId = 0;
+            const defaultStockMvtReasonUnloadId = 0;
+
+            window.Routes = RoutesSingletonInstance;
+            window.TableDataLanguageItUrl = tableDataLanguageItUrl;
+            await initStockMvt();
+        });
     </script>
+
+    <script src="{{ asset('../modules/mpstockadv/views/assets/toolbar-menu/moveTop.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.min.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/components/sweetalert/sweetalert2.min.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/components/sweetalert/swalConfirm.js') }}"></script>
-    <script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvt.js') }}"></script>
-    <script src="{{ asset('../modules/mpstockadv/views/assets/toolbar-menu/moveTop.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/product-autocomplete/productAutocompleteClass.js') }}"></script>
     <script src="{{ asset('../modules/mpstockadv/views/assets/product-autocomplete/stockMvtPreferencesClass.js') }}"></script>
 {% endblock %}

@@ -76,7 +76,7 @@ class MenuDataService
                     ],
                     [
                         'label' => 'Movimenti',
-                        'href' => $this->generateUrl('mpstockadv_admin_stockmvt'),
+                        'href' => $this->generateUrl('mpstockadv_controller_stockmvt_index'),
                         'icon' => 'swap_horiz',
                     ],
                     [

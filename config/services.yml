@@ -45,8 +45,31 @@ services:
       $context: "@prestashop.adapter.legacy.context"
     public: true
 
+  mpsoft.mpstockadv.services.stockproductsservice:
+    alias: 'MpSoft\MpStockAdv\Services\StockProductsService'
+    public: true
+
   MpSoft\MpStockAdv\Services\StockMvtDatatableService:
     arguments:
       $connection: "@doctrine.dbal.default_connection"
       $context: "@prestashop.adapter.legacy.context"
+    public: true
+
+  MpSoft\MpStockAdv\Services\StockManagerService:
+    arguments:
+      $connection: "@doctrine.dbal.default_connection"
+      $context: "@prestashop.adapter.legacy.context"
+    public: true
+
+  MpSoft\MpStockAdv\Services\ImportFromStockAvailableService:
+    arguments:
+      $router: "@router"
+      $connection: "@doctrine.dbal.default_connection"
+      $context: "@prestashop.adapter.legacy.context"
+    public: true
+
+  MpSoft\MpStockAdv\Services\StockMvtImportService:
+    arguments:
+      $entityManager: "@doctrine.orm.default_entity_manager"
+      $stockProductService: "@mpsoft.mpstockadv.services.stockproductsservice"
     public: true

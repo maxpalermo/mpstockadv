@@ -58,8 +58,8 @@ class StockMvtController extends FrameworkBundleAdminController
                         ],
                         [
                             'icon' => 'download',
-                            'label' => 'Importa',
-                            'href' => 'javascript:void(0);',
+                            'label' => 'Importa Giacenze',
+                            'href' => 'javascript:importStockAvailable();',
                         ],
                     ],
                 ],
