@@ -19,45 +19,23 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 
-namespace MpSoft\MpStockAdv\Services;
+namespace MpSoft\MpStockAdv\Helpers;
 
-use Doctrine\DBAL\Connection;
-use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterInterface;
 
-class ImportFromStockAvailableService
+class ImportFromStockAvailableHelper extends DependencyHelper
 {
-    /** @var RouterInterface */
-    private $router;
-
-    /** @var Connection */
-    private $connection;
-
-    /** @var LegacyContext */
-    private $context;
-
-    /** @var MpStockAdvConfiguration */
-    private $mpStockAdvConfiguration;
-
-    /** @var string */
-    private $pfx;
-
-    /** @var int */
-    private $id_lang;
-
     /** @var array */
     private $stockAvailableRows;
 
-    public function __construct(RouterInterface $router, Connection $connection, LegacyContext $context)
+    /** @var ConfigurationHelper */
+    private $configurationHelper;
+
+    public function __construct()
     {
-        $this->router = $router;
-        $this->connection = $connection;
-        $this->context = $context;
-        $this->pfx = _DB_PREFIX_;
-        $this->id_lang = (int) $context->getContext()->language->id;
-        $this->mpStockAdvConfiguration = new MpStockAdvConfiguration($router, $context, $connection);
+        parent::__construct();
+        $this->configurationHelper = new ConfigurationHelper();
     }
 
     public function truncateStockTables()
@@ -83,8 +61,12 @@ class ImportFromStockAvailableService
     public function getStockAvailableRows()
     {
         $query = "
-            SELECT * FROM {$this->pfx}stock_available
-            ORDER BY id_stock_available ASC
+            SELECT 
+                *
+            FROM
+                {$this->pfx}stock_available
+            ORDER BY
+                id_stock_available ASC
         ";
 
         $stmtStockAvailable = $this->connection->prepare($query);
@@ -100,7 +82,7 @@ class ImportFromStockAvailableService
 
     public function getDefaultLoadMvtReason()
     {
-        return $this->mpStockAdvConfiguration->getDefaultStockMvtReasonLoad();
+        return $this->configurationHelper->getDefaultStockMvtReasonLoad();
     }
 
     public function truncateStockTablesAction()
@@ -110,9 +92,9 @@ class ImportFromStockAvailableService
 
     public function InsertStock($rows)
     {
-        $id_warehouse = $this->mpStockAdvConfiguration->getDefaultWarehouse();
-        $id_stock_mvt_reason = $this->mpStockAdvConfiguration->getDefaultStockMvtReasonLoad();
-        $employee = $this->mpStockAdvConfiguration->getCurrentEmployee();
+        $id_warehouse = $this->configurationHelper->getDefaultWarehouse();
+        $id_stock_mvt_reason = $this->configurationHelper->getDefaultStockMvtReasonLoad();
+        $employee = $this->configurationHelper->getCurrentEmployee();
 
         $stockMvtReason = new \StockMvtReason($id_stock_mvt_reason, $this->id_lang);
         if (!\Validate::isLoadedObject($stockMvtReason)) {
@@ -174,21 +156,36 @@ class ImportFromStockAvailableService
                 )
                 VALUES
                 (
-                    {$id_warehouse},
-                    {$id_product},
-                    {$id_product_attribute},
-                    '{$reference}',
-                    '{$ean13}',
-                    '{$isbn}',
-                    '{$upc}',
-                    '{$mpn}',
-                    {$quantity},
-                    {$quantity},
-                    {$price_te}
+                    :id_warehouse,
+                    :id_product,
+                    :id_product_attribute,
+                    ':reference',
+                    ':ean13',
+                    ':isbn',
+                    ':upc',
+                    ':mpn',
+                    :physical_quantity,
+                    :usable_quantity,
+                    :price_te
                 )
             ";
+
             $stmtStock = $this->connection->prepare($query);
-            $resultStock = $stmtStock->executeQuery();
+            $resultStock = $stmtStock->executeQuery(
+                [
+                    'id_warehouse' => $id_warehouse,
+                    'id_product' => $id_product,
+                    'id_product_attribute' => $id_product_attribute,
+                    'reference' => $reference,
+                    'ean13' => $ean13,
+                    'isbn' => $isbn,
+                    'upc' => $upc,
+                    'mpn' => $mpn,
+                    'physical_quantity' => $quantity,
+                    'usable_quantity' => $quantity,
+                    'price_te' => $price_te,
+                ]
+            );
 
             if ($resultStock->rowCount()) {
                 ++$rowStockInserted;
@@ -229,27 +226,46 @@ class ImportFromStockAvailableService
                 )
                 VALUES
                 (
-                    {$id_stock},
-                    {$id_order},
-                    {$id_supply_order},
-                    {$id_stock_mvt_reason},
-                    {$employee->id},
-                    '{$employee->lastname}',
-                    '{$employee->firstname}',
-                    {$stock_before},
-                    {$quantity},
-                    {$stock_after},
-                    '{$date_add}',
-                    {$sign},
-                    {$price_te},
-                    {$last_wa},
-                    {$current_wa},
-                    {$referer}
+                    :id_stock,
+                    :id_order,
+                    :id_supply_order,
+                    :id_stock_mvt_reason,
+                    :id_employee,
+                    :employee_lastname,
+                    :employee_firstname,
+                    :stock_before,
+                    :physical_quantity,
+                    :stock_after,
+                    :date_add,
+                    :sign,
+                    :price_te,
+                    :last_wa,
+                    :current_wa,
+                    :referer
                 )
             ";
 
             $stmtStockMvt = $this->connection->prepare($queryStockMvt);
-            $resultStockMvt = $stmtStockMvt->executeQuery();
+            $resultStockMvt = $stmtStockMvt->executeQuery(
+                [
+                    'id_stock' => $id_stock,
+                    'id_order' => $id_order,
+                    'id_supply_order' => $id_supply_order,
+                    'id_stock_mvt_reason' => $id_stock_mvt_reason,
+                    'id_employee' => $employee->id,
+                    'employee_lastname' => $employee->lastname,
+                    'employee_firstname' => $employee->firstname,
+                    'stock_before' => $stock_before,
+                    'physical_quantity' => $quantity,
+                    'stock_after' => $stock_after,
+                    'date_add' => $date_add,
+                    'sign' => $sign,
+                    'price_te' => $price_te,
+                    'last_wa' => $last_wa,
+                    'current_wa' => $current_wa,
+                    'referer' => $referer
+                ]
+            );
 
             if ($resultStockMvt->rowCount()) {
                 ++$rowStockMvtInserted;

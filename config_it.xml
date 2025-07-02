@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>mpstockadv</name>
+    <displayName><![CDATA[MP Magazzino Avanzato]]></displayName>
+    <version><![CDATA[0.0.5]]></version>
+    <description><![CDATA[Gestione avanzata del magazzino, documenti di carico/scarico, multi-magazzino, import/export.]]></description>
+    <author><![CDATA[Massimiliano Palermo]]></author>
+    <tab><![CDATA[administration]]></tab>
+    <is_configurable>1</is_configurable>
+    <need_instance>0</need_instance>
+</module>

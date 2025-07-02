@@ -21,7 +21,10 @@
 
 namespace MpSoft\MpStockAdv\Controllers;
 
-use MpSoft\MpStockAdv\Services\MenuDataService;
+use MpSoft\MpStockAdv\Helpers\MenuDataHelper;
+use MpSoft\MpStockAdv\Helpers\ProductAutocompleteHelper;
+use MpSoft\MpStockAdv\Helpers\StockMovementHelper;
+use MpSoft\MpStockAdv\Helpers\StockMvtDatatableHelper;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -30,7 +33,7 @@ use Symfony\Component\HttpFoundation\Response;
 class StockMvtController extends FrameworkBundleAdminController
 {
     private LegacyContext $context;
-    private MenuDataService $menuDataService;
+    private MenuDataHelper $menuDataHelper;
     private Request $request;
 
     // Pagina principale movimenti magazzino
@@ -41,11 +44,11 @@ class StockMvtController extends FrameworkBundleAdminController
         $data = $request->getContent();
         $data = json_decode($data, true);
 
-        $this->menuDataService = $this->get('MpSoft\MpStockAdv\Services\MenuDataService');
         $this->context = $this->get('PrestaShop\PrestaShop\Adapter\LegacyContext');
-        $this->menuDataService->setTitle('Movimenti di magazzino');
-        $this->menuDataService->setIcon('inventory');
-        $this->menuDataService->injectMenuData(
+        $this->menuDataHelper = new MenuDataHelper();
+        $this->menuDataHelper->setTitle('Movimenti di magazzino');
+        $this->menuDataHelper->setIcon('inventory');
+        $this->menuDataHelper->injectMenuData(
             [
                 [
                     'icon' => 'inventory',
@@ -59,7 +62,7 @@ class StockMvtController extends FrameworkBundleAdminController
                         [
                             'icon' => 'download',
                             'label' => 'Importa Giacenze',
-                            'href' => 'javascript:importStockAvailable();',
+                            'href' => 'javascript:confirmImport();',
                         ],
                     ],
                 ],
@@ -85,7 +88,7 @@ class StockMvtController extends FrameworkBundleAdminController
         return $this->render(
             '@Modules/mpstockadv/views/twig/Controllers/StockMvtController.index.html.twig',
             [
-                'toolbarMenuHtml' => $this->menuDataService->renderMenu(),
+                'toolbarMenuHtml' => $this->menuDataHelper->renderMenu(),
             ]
         );
     }
@@ -93,7 +96,7 @@ class StockMvtController extends FrameworkBundleAdminController
     public function loadModalMovementsAction(): Response
     {
         $this->context = $this->get('PrestaShop\PrestaShop\Adapter\LegacyContext');
-        $conf = $this->get('MpSoft\MpStockAdv\Services\MpStockAdvConfiguration');
+        $conf = new \MpSoft\MpStockAdv\Helpers\ConfigurationHelper();
 
         $html = $this->render(
             '@Modules/mpstockadv/views/twig/Components/StockMvt.dialog.movements.html.twig',
@@ -118,7 +121,7 @@ class StockMvtController extends FrameworkBundleAdminController
         /** @var \Doctrine\DBAL\Connection $conn */
         $conn = $this->getDoctrine()->getConnection();
         $prefix = _DB_PREFIX_;
-        $table = $prefix.'orders';
+        $table = $prefix . 'orders';
         $validIdOrderStates = implode(',', $this->getValidIdOrdersStates());
         $sql = <<<QUERY
             SELECT * 
@@ -142,7 +145,7 @@ class StockMvtController extends FrameworkBundleAdminController
         /** @var \Doctrine\DBAL\Connection $conn */
         $conn = $this->getDoctrine()->getConnection();
         $id_lang = (int) $this->context->getContext()->language->id;
-        $table = _DB_PREFIX_.'order_state_lang';
+        $table = _DB_PREFIX_ . 'order_state_lang';
         $sql = <<<QUERY
             SELECT 
                 id_order_state
@@ -171,5 +174,47 @@ class StockMvtController extends FrameworkBundleAdminController
         $validIdOrderStates = $this->getValidIdOrdersStates();
 
         return $this->json($validIdOrderStates);
+    }
+
+    public function searchAction(Request $request)
+    {
+        $helper = new ProductAutocompleteHelper();
+        $result = $helper->search($request);
+
+        return $this->json($result);
+    }
+
+    public function updateStockManagerAction(Request $request)
+    {
+        $helper = new StockMovementHelper();
+        $data = $request->getContent();
+        $data = json_decode($data, true);
+
+        if (!is_array($data)) {
+            $this->json(['error' => 'Invalid data format', 'data' => $data], 400);
+        }
+
+        return $this->json($helper->stockManagerUpdate($data), 200);
+    }
+
+    public function ajaxProcessRefreshTableMovements(Request $request)
+    {
+        $term = $request->get('search', []);
+        $draw = $request->get('draw', 1);
+        $orderBy = $request->get('order', []);
+        $start = $request->get('start', 0);
+        $length = $request->get('length', 20);
+
+        $dataTableHelper = new StockMvtDatatableHelper();
+        $stockMvt = $dataTableHelper->getStockMvt($term, $start, $length, $orderBy);
+
+        $result = [
+            'draw' => ++$draw,
+            'recordsTotal' => $stockMvt['recordsTotal'],
+            'recordsFiltered' => $stockMvt['recordsFiltered'],
+            'data' => $stockMvt['data'],
+        ];
+
+        return $this->json($result, 200);
     }
 }

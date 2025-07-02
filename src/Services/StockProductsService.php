@@ -73,7 +73,7 @@ class StockProductsService
         ";
 
         if ($term) {
-            $term = '%'.pSQL($term).'%';
+            $term = '%' . pSQL($term) . '%';
             $query .= "
                 WHERE 
                     stk.reference LIKE '{$term}'
@@ -102,7 +102,7 @@ class StockProductsService
                 $comb = $product->getAttributeCombinationsById($item['product_attribute_id'], $id_lang);
                 if ($comb) {
                     $item['img_url'] = $this->getProductImageUrl($item['product_id']);
-                    $item['combination'] = implode(' ', array_map(fn ($attr) => $attr['attribute_name'], $comb));
+                    $item['combination'] = implode(' ', array_map(fn($attr) => $attr['attribute_name'], $comb));
                     $item['actions'] = '';
                 }
             }
@@ -121,7 +121,7 @@ class StockProductsService
         ];
     }
 
-    public function getProductImageUrl($id_product)
+    public function getProductImageUrl($id_product, $size = 'small')
     {
         $no_image = '/img/404.gif';
         $product = new \Product($id_product, false, $this->context->getContext()->language->id);
@@ -140,8 +140,8 @@ class StockProductsService
         }
         $dir_path = \Image::getImgFolderStatic($id_image);
         $format = $image->image_format;
-        $image_default = '/img/p/'.$dir_path.$id_image.'-small_default.'.$format;
-        if (!file_exists(_PS_ROOT_DIR_.$image_default)) {
+        $image_default = "/img/p/{$dir_path}{$id_image}-{$size}_default.{$format}";
+        if (!file_exists(_PS_ROOT_DIR_ . $image_default)) {
             $image_default = $no_image;
         }
 

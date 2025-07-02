@@ -2,235 +2,12 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.bs4.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.bs.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-pagination.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-processing.css') }}">
     <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.bs4.min.css') }}">
     <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/sweetalert/sweetalert2.min.css') }}">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
-        body {
-            font-family: 'Roboto', sans-serif;
-        }
-
-        dialog {
-            border: 1px solid #dcdcdc;
-            border-radius: 1rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1.5px 4px rgba(0, 0, 0, 0.10);
-            padding: 1rem;
-            min-width: 600px;
-            max-width: 100%;
-            background-color: #fcfcfc;
-            overflow: visible;
-        }
-
-        .dt-layout-row {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 2rem;
-        }
-
-        .dt-paging {
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .dt-paging nav.pagination {
-            margin-top: 2rem;
-            padding: 0;
-            border: none;
-            background-color: transparent;
-            box-shadow: none;
-            list-style: none;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        /* Stile moderno per i pulsanti di paginazione DataTables */
-        button.dt-paging-button {
-            margin: 4px !important;
-            padding: 8px !important;
-            border: none !important;
-            border-radius: 5px !important;
-            background: #1976d2 !important;
-            color: #fff !important;
-            font-weight: 600 !important;
-            font-size: 0.9rem !important;
-            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.10), 0 1.5px 4px rgba(66, 165, 245, 0.10) !important;
-            transition: background 0.25s, box-shadow 0.2s, transform 0.15s, color 0.2s !important;
-            outline: none !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
-            min-width: 48px;
-            min-height: 44px;
-            box-sizing: border-box;
-            user-select: none;
-        }
-
-        button.dt-paging-button:hover:not(.disabled),
-        button.dt-paging-button:focus:not(.disabled) {
-            background: linear-gradient(90deg, #1565c0 0%, #1e88e5 100%) !important;
-            color: #fff !important;
-            box-shadow: 0 4px 16px rgba(25, 118, 210, 0.18), 0 2px 8px rgba(66, 165, 245, 0.14) !important;
-            transform: translateY(-2px) scale(1.05);
-            cursor: pointer !important;
-        }
-
-        button.dt-paging-button.disabled,
-        button.dt-paging-button[aria-disabled="true"] {
-            background: #e0e0e0 !important;
-            color: #bdbdbd !important;
-            box-shadow: none !important;
-            cursor: not-allowed !important;
-            opacity: 0.7 !important;
-            pointer-events: none !important;
-            transform: none !important;
-        }
-
-        .dt-search {
-            display: flex;
-            flex-direction: row;
-            align-items: stretch;
-            justify-content: flex-end;
-            gap: 0;
-            margin-bottom: 1.2rem;
-            margin-right: 2rem;
-        }
-
-        .dt-search label {
-            background: #1976d2;
-            color: #fff;
-            font-weight: 600;
-            padding: 0 1rem 0 1.2rem;
-            border: 2px solid #1976d2;
-            border-right: none;
-            border-top-left-radius: 2rem;
-            border-bottom-left-radius: 2rem;
-            font-size: 1rem;
-            margin: 0;
-            display: flex;
-            align-items: center;
-            height: 44px;
-            box-shadow: none;
-            transition: border-color 0.2s;
-        }
-
-        .dt-search input[type="search"] {
-            padding: 0 1.2rem 0 0.8rem;
-            border: 2px solid #1976d2;
-            border-left: none;
-            border-top-right-radius: 2rem;
-            border-bottom-right-radius: 2rem;
-            font-size: 1rem;
-            outline: none;
-            background: #f5f7fa;
-            color: #222;
-            box-shadow: none;
-            transition: border-color 0.2s, background 0.2s;
-            height: 44px;
-            min-width: 220px;
-            display: flex;
-            align-items: center;
-        }
-
-        .dt-search:focus-within label,
-        .dt-search:focus-within input[type="search"] {
-            border-color: #42a5f5;
-        }
-
-        .dt-search input[type="search"]:focus {
-            background: #fff;
-        }
-
-        .select2-container--open {
-            z-index: 9999999
-        }
-
-        .dt-processing {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid #dcdcdc;
-            padding: 1rem;
-            background-color: #fcfcfc;
-            border-radius: 1rem;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1.5px 4px rgba(0, 0, 0, 0.10);
-            z-index: 9999999;
-        }
-
-        .dt-empty:before {
-            content: '';
-            display: inline-block;
-            vertical-align: middle;
-            margin-right: 0.6rem;
-        }
-        .dt-empty:before {
-            font-family: 'Material Icons';
-            content: 'report_problem';
-            font-size: 1.3rem;
-            color: #fff;
-            border: 2px solid #fff;
-            border-radius: 50%;
-            padding: 2px 3px 2px 3px;
-            margin-right: 0.7rem;
-            background: transparent;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px;
-            height: 40px;
-        }
-
-        .dt-empty {
-            width: 100%;
-            border: 1px solid #dcdcdc;
-            padding: 1rem;
-            background-color: var(--warning);
-            color: var(--light);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1.5px 4px rgba(0, 0, 0, 0.10);
-        }
-
-        @media (prefers-color-scheme: dark) {
-            .dt-search label {
-                background: #263238;
-                color: #fff;
-                border-color: #263238;
-            }
-            .dt-search input[type="search"] {
-                background: #222e3a;
-                color: #fff;
-                border-color: #263238;
-            }
-            .dt-search:focus-within label,
-            .dt-search:focus-within input[type="search"] {
-                border-color: #42a5f5;
-            }
-            .dt-search input[type="search"]:focus {
-                background: #263238;
-            }
-            button.dt-paging-button {
-                background: linear-gradient(90deg, #263238 0%, #1976d2 100%) !important;
-                color: #fff !important;
-                box-shadow: 0 2px 8px rgba(25, 118, 210, 0.22), 0 1.5px 4px rgba(66, 165, 245, 0.18) !important;
-            }
-            button.dt-paging-button:hover:not(.disabled),
-            button.dt-paging-button:focus:not(.disabled) {
-                background: linear-gradient(90deg, #1565c0 0%, #42a5f5 100%) !important;
-                color: #fff !important;
-                box-shadow: 0 4px 16px rgba(25, 118, 210, 0.28), 0 2px 8px rgba(66, 165, 245, 0.20) !important;
-            }
-            button.dt-paging-button.disabled,
-            button.dt-paging-button[aria-disabled="true"] {
-                background: #37474f !important;
-                color: #bdbdbd !important;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/css/style.css') }}">
 {% endblock %}
 
 {% block javascripts %}
@@ -263,6 +40,9 @@
 
             window.Routes = RoutesSingletonInstance;
             window.TableDataLanguageItUrl = tableDataLanguageItUrl;
+            window.defaultWarehouseId = defaultWarehouseId;
+            window.defaultStockMvtReasonLoadId = defaultStockMvtReasonLoadId;
+            window.defaultStockMvtReasonUnloadId = defaultStockMvtReasonUnloadId;
             await initStockMvt();
         });
     </script>
@@ -288,32 +68,32 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12">
-                    <div class="table-responsive">
-                        <table id="stockMvtTable" class="table table-bordered table-striped table-hover table-condensed">
-                            <thead>
-                                <tr>
-                                    <th>IMG</th>
-                                    <th>ID</th>
-                                    <th>Data</th>
-                                    <th>Tipo</th>
-                                    <th>Segno</th>
-                                    <th>Riferimento</th>
-                                    <th>Ean13</th>
-                                    <th>Prodotto</th>
-                                    <th>Combinazione</th>
-                                    <th>Magazzino</th>
-                                    <th>Stock Iniz.</th>
-                                    <th>Movimento</th>
-                                    <th>Giacenza</th>
-                                    <th>Impiegato</th>
-                                    <th>Azioni</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- I dati verranno caricati dinamicamente attraverso JavaScript -->
-                            </tbody>
-                        </table>
-                    </div>
+                    <table id="stockMvtTable" class="table table-bordered table-striped table-hover" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>IMG</th>
+                                <th>ID</th>
+                                <th>Rif Doc</th>
+                                <th>Data Doc</th>
+                                <th>Tipo</th>
+                                <th>Segno</th>
+                                <th>Riferimento</th>
+                                <th>Ean13</th>
+                                <th>Prodotto</th>
+                                <th>Combinazione</th>
+                                <th>Magazzino</th>
+                                <th>Stock Iniz.</th>
+                                <th>Movimento</th>
+                                <th>Giacenza</th>
+                                <th>Data</th>
+                                <th>Impiegato</th>
+                                <th>Azioni</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- I dati verranno caricati dinamicamente attraverso JavaScript -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

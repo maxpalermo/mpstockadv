@@ -2,7 +2,7 @@
 
 namespace MpSoft\MpStockAdv\Controller\Admin;
 
-use MpSoft\MpStockAdv\Services\MenuDataService;
+use MpSoft\MpStockAdv\Helpers\MenuDataHelper;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Response;
@@ -15,14 +15,14 @@ class AdminStockAdvController extends FrameworkBundleAdminController
 {
     private LegacyContext $context;
     private int $id_lang;
-    private MenuDataService $menuDataService;
+    private MenuDataHelper $MenuDataHelper;
 
-    public function __construct(LegacyContext $context, MenuDataService $menuDataService)
+    public function __construct(LegacyContext $context)
     {
         /* @var LegacyContext $context */
         $this->context = $context;
         $this->id_lang = (int) $this->context->getContext()->language->id;
-        $this->menuDataService = $menuDataService;
+        $this->MenuDataHelper = new MenuDataHelper();
     }
 
     /**
@@ -31,7 +31,7 @@ class AdminStockAdvController extends FrameworkBundleAdminController
     public function index(): Response
     {
         // Mostra la dashboard/menu del modulo
-        $menuData = $this->menuDataService->getMenuData();
+        $menuData = $this->MenuDataHelper->getMenuData();
 
         return $this->render('@Modules/mpstockadv/views/twig/Controllers/AdminStockAdvController.index.html.twig', [
             'menu_data' => $menuData,

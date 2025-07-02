@@ -19,30 +19,13 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 
-namespace MpSoft\MpStockAdv\Services;
+namespace MpSoft\MpStockAdv\Helpers;
 
-use PrestaShop\PrestaShop\Adapter\LegacyContext;
-use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\RouterInterface;
-
-class MpStockAdvConfiguration
+class ConfigurationHelper extends DependencyHelper
 {
-    private $router;
-    private $context;
-    private $id_lang;
-    private $id_shop;
-    private $id_currency;
-    private $connection;
-
-    public function __construct(RouterInterface $router, LegacyContext $context, \Doctrine\DBAL\Connection $connection)
+    public function __construct()
     {
-        $this->router = $router;
-        $this->context = $context;
-        $this->id_lang = (int) $context->getContext()->language->id;
-        $this->id_shop = (int) $context->getContext()->shop->id;
-        $this->id_currency = (int) $context->getContext()->currency->id;
-        $this->connection = $connection;
+        parent::__construct();
     }
 
     public function isJson($value): bool
@@ -84,7 +67,7 @@ class MpStockAdvConfiguration
         return \Configuration::deleteByName($key);
     }
 
-    public function getDefaultWarehouse()
+    public function getDefaultWarehouse(): int
     {
         return $this->get('MPSTOCKADV_DEFAULT_WAREHOUSE');
     }
@@ -165,15 +148,50 @@ class MpStockAdvConfiguration
         return $response;
     }
 
-    public function getCurrentEmployee()
+    public function getProductImageUrl($id_product, $size = 'small')
     {
-        $employee = $this->context->getContext()->employee;
+        $no_image = '/img/404.gif';
+        $product = new \Product($id_product, false, $this->context->getContext()->language->id);
+        if (!\Validate::isLoadedObject($product)) {
+            return $no_image;
+        }
 
-        return [
-            'id_employee' => $employee->id,
-            'firstname' => $employee->firstname,
-            'lastname' => $employee->lastname,
-            'email' => $employee->email,
-        ];
+        $cover = \Product::getCover($id_product);
+        if (!$cover) {
+            return $no_image;
+        }
+        $id_image = $cover['id_image'];
+        $image = new \Image($id_image);
+        if (!\Validate::isLoadedObject($image)) {
+            return $no_image;
+        }
+        $dir_path = \Image::getImgFolderStatic($id_image);
+        $format = $image->image_format;
+        $image_default = "/img/p/{$dir_path}{$id_image}-{$size}_default.{$format}";
+        if (!file_exists(_PS_ROOT_DIR_ . $image_default)) {
+            $image_default = $no_image;
+        }
+
+        return $image_default;
+    }
+
+    public function getCurrentLanguage(): \Language
+    {
+        return $this->context->getCOntext()->language;
+    }
+
+    public function getCurrentShop(): \Shop
+    {
+        return $this->context->getContext()->shop;
+    }
+
+    public function getCurrentCurrency(): \Currency
+    {
+        return $this->context->getContext()->currency;
+    }
+
+    public function getCurrentEmployee(): \Employee
+    {
+        return $this->context->getContext()->employee;
     }
 }

@@ -107,9 +107,9 @@ class StockMvtPreferences {
             </dialog>
         `;
 
-        if (typeof defaultWarehouseId !== "undefined") {
+        if (typeof window.defaultWarehouseId !== "undefined") {
             //imposto la variabile globale
-            defaultWarehouseId = instance._id_warehouse;
+            window.defaultWarehouseId = instance._id_warehouse;
         }
 
         const template = document.createElement("template");
@@ -140,10 +140,10 @@ class StockMvtPreferences {
                 instance._id_stock_mvt_reason_load = formValues.default_stock_mvt_reason_load;
                 instance._id_stock_mvt_reason_unload = formValues.default_stock_mvt_reason_unload;
 
-                if (typeof defaultWarehouseId !== "undefined") {
+                if (typeof window.defaultWarehouseId !== "undefined") {
                     //imposto la variabile globale
                     console.log("SET GLOBAL defaultWarehouseId", instance._id_warehouse);
-                    defaultWarehouseId = instance._id_warehouse;
+                    window.defaultWarehouseId = instance._id_warehouse;
                 }
 
                 this._dialog.close();

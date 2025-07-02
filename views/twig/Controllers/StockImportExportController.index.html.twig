@@ -1,92 +1,32 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block stylesheets %}
-    <style>
-        dialog.dialog-bootstrap {
-        border: none;
-        border-radius: 1rem;
-        box-shadow: 0 0.5rem 1.5rem rgba(0,0,0,.2);
-        max-width: 500px;
-        width: 90%;
-        padding: 0;
-        background: #fff;
-        animation: dialog-in .3s cubic-bezier(.4,0,.2,1);
-        }
-
-        @keyframes dialog-in {
-        from { transform: translateY(-30px) scale(.95); opacity: 0; }
-        to { transform: translateY(0) scale(1); opacity: 1; }
-        }
-
-        dialog::backdrop {
-        background: rgba(0,0,0,0.25);
-        backdrop-filter: blur(2px);
-        }
-    </style>
+    {{ parent() }}
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.bs.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-pagination.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-processing.css') }}">
+    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/css/style.css') }}">
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
+    <script src="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.min.js') }}"></script>
     <script type="text/javascript">
-        document.addEventListener('DOMContentLoaded', () => {
-            const importXmlForm = document.getElementById('import-xml-form');
-            importXmlForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const xmlForm = document.getElementById("import-xml-form");
-                const formData = new FormData(xmlForm);
-                try {
-                    const request = await fetch("{{ path('mpstockadv_controller_stockimportexport_import_xml') }}", {
-                        method: 'POST',
-                        body: formData
-                    });
-                    const data = await request.json();
-    
-                    if (data.success) {
-                        const importStatusDialog = document.getElementById('import-status-dialog');
-                        importStatusDialog.showModal();
-                        importStatusDialog.querySelector('#import-status-title').textContent = 'Importazione avvenuta con successo!';
-                        importStatusDialog.querySelector('#import-status-content').textContent = 'Importazione avvenuta con successo!';
-                        importStatusDialog.querySelector('#close-dialog').addEventListener('click', () => {
-                            importStatusDialog.close();
-                        });
-                        const tableImportXml = document.getElementById('table-import-xml');
-                        const tbody = tableImportXml.querySelector("tbody");
-                        const tableData = data.content.rows;
-                        console.log("TABLE DATA", tableData);
-                        
-                        tbody.innerHTML = "";
-                        tableData.forEach(element => {
-                            const row = `
-                                <tr>
-                                    <td><input type="checkbox" name="check-row-xml[]"></td>
-                                    <td>
-                                        <img src="${element.img}" class="img-thumbnail">
-                                    </td>
-                                    <td>--</td>
-                                    <td>${element.reference}</td>
-                                    <td>${element.ean13}</td>
-                                    <td>${element.product}</td>
-                                    <td>${element.combination}</td>
-                                    <td>${element.supplier}</td>
-                                    <td class="text-right">${element.qty_signed}</td>
-                                    <td>${element.warehouse}</td>
-                                </tr>
-                            `
-                            tbody.innerHTML += row;
-                        });
-                    } else {
-                        alert('Si è verificato un errore durante l\'importazione.');
-                    }
-                } catch (error) {
-                    console.error('Si è verificato un errore:', error);
-                    alert('Si è verificato un errore durante l\'importazione.');
-                }
-            });
-        });
+        const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
+        const parseXmlFileUrl = "{{ path('mpstockadv_controller_stockimportexport_parse_xml') }}"
+        const importXmlStockUrl = "{{ path('mpstockadv_controller_stockimportexport_import_xml') }}";
+
+        window.tableDataLanguageItUrl = tableDataLanguageItUrl;
+        window.parseXmlFileUrl = parseXmlFileUrl;
+        window.importXmlStockUrl = importXmlStockUrl;
     </script>
+    <script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvtImport.js') }}"></script>
 {% endblock %}
 
 {% block content %}
+    <div class="toolbar-menu">
+        {{ toolbarMenuHtml|raw }}
+    </div>
     <div class="bootstrap mt-4">
         <h2 class="mb-4">Importazione Movimenti Magazzino</h2>
 
@@ -107,7 +47,7 @@
                 <!-- Sezione 1: Importa da XML -->
                 <section class="card mb-4">
                     <div class="card-body">
-                        <form id="import-xml-form">
+                        <form id="import-xml-form" enctype="multipart/form-data">
                             <div class="form-group mb-3">
                                 <label for="xml-file" class="form-label">Seleziona file XML</label>
                                 <div class="custom-file">
@@ -116,20 +56,70 @@
                                 </div>
                                 <small class="form-text text-muted">Carica un file <strong>.xml</strong> per importare i movimenti di magazzino.</small>
                             </div>
+                            <div class="d-flex justify-content-start align-items-center gap-2">
+                                <button type="button" class="btn btn-warning mt-2" id="btn-parse-xml-file">
+                                    <span class="material-icons">preview</span>
+                                    <span>Anteprima file</span>
+                                </button>
 
-                            <button type="submit" class="btn btn-warning mt-2">
-                                <span class="material-icons">preview</span>
-                                <span>Anteprima file</span>
-                            </button>
+                                <button type="button" class="btn btn-success mt-2" id="btn-import-selected" style="display: none;">
+                                    <span class="material-icons">upload</span>
+                                    <span>Importa Selezionati</span>
+                                </button>
+
+                                <button type="button" class="btn btn-info mt-2" id="btn-import-all" style="display: none;">
+                                    <span class="material-icons">upload</span>
+                                    <span>Importa Tutto</span>
+                                </button>
+                            </div>
                         </form>
                     </div>
-                    <div class="card-body">
+                    <div class="card-body document-info">
+                        <div class="d-flex align-items-center justify-content-start gap-2">
+                            <div class="form-group">
+                                <label for="document-number">Numero</label>
+                                <input type="text" class="form-control" id="document-number" value="" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="document-date">Data</label>
+                                <input type="text" class="form-control" id="document-date" value="" readonly>
+                                <input type="hidden" id="document-date-iso" value="">
+                            </div>
+                            <div class="form-group grow-1">
+                                <label for="document-supplie-namer">Fornitore</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="document-supplier-id-span">--</span>
+                                    </div>
+                                    <input type="text" class="form-control" id="document-supplier-name" value="" readonly>
+                                    <input type="hidden" name="document-supplier-id" id="document-supplier-id">
+                                </div>
+                            </div>
+                            <div class="form-group grow-1">
+                                <label for="document-movement-name">Movimento</label>
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" id="document-movement-id-span" title="Id tipo di movimento" onhover="this.style.cursor='pointer'">--</span>
+                                    </div>
+                                    <input type="text" class="form-control" id="document-movement-name" value="" readonly>
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="document-movement-alias-span" title="Id alias movimento" onhover="this.style.cursor='pointer'">--</span>
+                                    </div>
+                                    <input type="hidden" name="document-movement-id" id="document-movement-id">
+                                    <input type="hidden" name="document-movement-alias" id="document-movement-alias">
+                                    <input type="hidden" name="document-movement-sign" id="document-movement-sign">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body table-container">
                         <table class="table table-condensed table-striped table-hover" id="table-import-xml">
                             <thead>
                                 <tr>
                                     <th>
                                         <input type="checkbox" class="input-checkbox" id="check-all-import">
                                     </th>
+                                    <th>#</th>
                                     <th>Img</th>
                                     <th>Fornitore</th>
                                     <th>Riferimento</th>
@@ -202,20 +192,24 @@
             </section>
         </div>
     </div>
-    <!-- Bootstrap 4 JS (necessario per i tab) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 
     <!-- Dialog per stato importazione e errori -->
-    <dialog id="import-status-dialog" class="dialog-bootstrap">
-        <form method="dialog">
-            <h4 id="import-status-title">Stato Importazione</h4>
-            <div id="import-status-content">
-                <p>In attesa di avviare un'importazione...</p>
+    <dialog id="import-status-dialog" class="bootstrap">
+        <div class="card">
+            <div class="card-body">
+                <form method="dialog">
+                    <h4 id="import-status-title">Stato Importazione</h4>
+                    <div id="import-status-content">
+                        <p>In attesa di avviare un'importazione...</p>
+                    </div>
+                </form>
             </div>
-            <menu>
-                <button id="close-dialog" class="btn btn-secondary">Chiudi</button>
-            </menu>
-        </form>
+            <div class="card-footer d-flex justify-content-center align-items-center gap-2">
+                <button id="close-dialog" class="bootstrap btn btn-primary">
+                    <span class="material-icons">close</span>
+                    <span class="bold ml-2">Chiudi</span>
+                </button>
+            </div>
+        </div>
     </dialog>
 {% endblock %}

@@ -19,28 +19,19 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 
-namespace MpSoft\MpStockAdv\Services;
+namespace MpSoft\MpStockAdv\Helpers;
 
-use Doctrine\DBAL\Connection;
-use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class StockMvtDatatableService
+class StockMvtDatatableHelper extends DependencyHelper
 {
-    /** @var LegacyContext */
-    private $context;
-
     /** @var JsonResponse */
     private $response;
 
-    /** @var Connection */
-    private $connection;
-
-    public function __construct(Connection $connection, LegacyContext $context)
+    public function __construct()
     {
-        $this->connection = $connection;
-        $this->context = $context;
+        parent::__construct();
         $this->response = new JsonResponse();
     }
 
@@ -86,8 +77,7 @@ class StockMvtDatatableService
             SELECT 
                 stkmvt.id_stock_mvt as `id`,
                 stkmvt.date_add as `date`,
-                IF (stkmvtrsn.sign = 1, '+', '-') as `sign`,
-                stkmvtrsn.sign as `sign_value`,
+                stkmvtrsn.sign,
                 stkmvtrsnlang.name as `type`,
                 stkmvt.id_order,
                 stkmvt.id_supply_order,
@@ -106,14 +96,22 @@ class StockMvtDatatableService
                 COALESCE(CONCAT(e.firstname, ' ', e.lastname), '--') as `employee`
             FROM
                 {$pfx}stock_mvt as stkmvt
-            INNER JOIN {$pfx}stock as stk ON (stkmvt.id_stock=stk.id_stock)
-            INNER JOIN {$pfx}stock_mvt_reason as stkmvtrsn ON (stkmvt.id_stock_mvt_reason=stkmvtrsn.id_stock_mvt_reason)
-            INNER JOIN {$pfx}stock_mvt_reason_lang as stkmvtrsnlang ON (stkmvtrsn.id_stock_mvt_reason=stkmvtrsnlang.id_stock_mvt_reason AND stkmvtrsnlang.id_lang={$id_lang})
-            INNER JOIN {$pfx}product_lang as pl ON (stk.id_product=pl.id_product AND pl.id_lang={$id_lang})
-            LEFT JOIN {$pfx}warehouse w ON (stk.id_warehouse = w.id_warehouse)
-            LEFT JOIN {$pfx}employee as e ON (stkmvt.id_employee=e.id_employee)
-            LEFT JOIN {$pfx}orders o ON (stkmvt.id_order=o.id_order)
-            LEFT JOIN {$pfx}supply_order so ON (stkmvt.id_supply_order=so.id_supply_order)
+            LEFT JOIN
+                {$pfx}stock as stk ON (stkmvt.id_stock=stk.id_stock)
+            LEFT JOIN
+                {$pfx}stock_mvt_reason as stkmvtrsn ON (stkmvt.id_stock_mvt_reason=stkmvtrsn.id_stock_mvt_reason)
+            LEFT JOIN
+                {$pfx}stock_mvt_reason_lang as stkmvtrsnlang ON (stkmvtrsn.id_stock_mvt_reason=stkmvtrsnlang.id_stock_mvt_reason AND stkmvtrsnlang.id_lang={$id_lang})
+            LEFT JOIN
+                {$pfx}product_lang as pl ON (stk.id_product=pl.id_product AND pl.id_lang={$id_lang})
+            LEFT JOIN
+                {$pfx}warehouse w ON (stk.id_warehouse = w.id_warehouse)
+            LEFT JOIN
+                {$pfx}employee as e ON (stkmvt.id_employee=e.id_employee)
+            LEFT JOIN
+                {$pfx}orders o ON (stkmvt.id_order=o.id_order)
+            LEFT JOIN
+                {$pfx}supply_order so ON (stkmvt.id_supply_order=so.id_supply_order)
         ";
 
         if ($term && $term['value']) {
@@ -134,10 +132,6 @@ class StockMvtDatatableService
             foreach ($orderBy as $orderStat) {
                 $orderColumn = $orderStat['name'] ?? 'id';
                 $orderType = $orderStat['dir'] ?? 'desc';
-
-                if ('img_url' == $orderColumn) {
-                    $orderColumn = 'id';
-                }
 
                 $orderColumns[] = "{$orderColumn} {$orderType}";
             }

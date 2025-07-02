@@ -2,18 +2,18 @@
 
 namespace MpSoft\MpStockAdv\Controller\Admin;
 
-use MpSoft\MpStockAdv\Services\MenuDataService;
+use MpSoft\MpStockAdv\Helpers\MenuDataHelper;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class WarehouseController extends FrameworkBundleAdminController
 {
-    private $menuDataService;
+    private $MenuDataHelper;
 
-    public function __construct(MenuDataService $menuDataService)
+    public function __construct()
     {
-        $this->menuDataService = $menuDataService;
+        $this->MenuDataHelper = new MenuDataHelper();
     }
 
     /**
@@ -35,7 +35,7 @@ class WarehouseController extends FrameworkBundleAdminController
                 'active' => !$warehouseObj->deleted,
             ];
         }
-        $this->menuDataService->injectMenuData([
+        $this->MenuDataHelper->injectMenuData([
             'icon' => 'home',
             'label' => 'Magazzini',
             'children' => [
@@ -54,10 +54,10 @@ class WarehouseController extends FrameworkBundleAdminController
             ],
         ]);
 
-        $menuData = $this->menuDataService->getMenuData();
+        $menuData = $this->MenuDataHelper->getMenuData();
 
         return $this->render('@Modules/mpstockadv/views/templates/admin/warehouses/warehouses.index.html.twig', [
-            'logo_src' => \Context::getContext()->shop->getBaseURL(true).'img/'.\Configuration::get('PS_LOGO'),
+            'logo_src' => \Context::getContext()->shop->getBaseURL(true) . 'img/' . \Configuration::get('PS_LOGO'),
             'menuData' => $menuData,
             'warehouses' => $warehouses,
             'countries' => $countries,
@@ -107,12 +107,16 @@ class WarehouseController extends FrameworkBundleAdminController
                 'id_shop' => $id_shop,
             ]);
 
-            return $this->json(['success' => true, 'message' => 'Magazzino creato', 'warehouse' => [
-                'id' => (int) $warehouse->id,
-                'name' => $warehouse->name,
-                'location' => $warehouse->reference,
-                'active' => true,
-            ]]);
+            return $this->json([
+                'success' => true,
+                'message' => 'Magazzino creato',
+                'warehouse' => [
+                    'id' => (int) $warehouse->id,
+                    'name' => $warehouse->name,
+                    'location' => $warehouse->reference,
+                    'active' => true,
+                ]
+            ]);
         } else {
             return $this->json(['success' => false, 'message' => 'Errore creazione magazzino']);
         }
@@ -131,12 +135,16 @@ class WarehouseController extends FrameworkBundleAdminController
         $warehouse->name = $data['name'] ?? $warehouse->name;
         $warehouse->reference = $data['location'] ?? $warehouse->reference;
         if ($warehouse->update()) {
-            return $this->json(['success' => true, 'message' => 'Magazzino aggiornato', 'warehouse' => [
-                'id' => (int) $warehouse->id,
-                'name' => $warehouse->name,
-                'location' => $warehouse->reference,
-                'active' => !$warehouse->deleted,
-            ]]);
+            return $this->json([
+                'success' => true,
+                'message' => 'Magazzino aggiornato',
+                'warehouse' => [
+                    'id' => (int) $warehouse->id,
+                    'name' => $warehouse->name,
+                    'location' => $warehouse->reference,
+                    'active' => !$warehouse->deleted,
+                ]
+            ]);
         } else {
             return $this->json(['success' => false, 'message' => 'Errore aggiornamento magazzino']);
         }
@@ -164,7 +172,7 @@ class WarehouseController extends FrameworkBundleAdminController
      */
     public function edit(\Symfony\Component\HttpFoundation\Request $request, $id)
     {
-        $warehouse = \Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'warehouse` WHERE id_warehouse = '.(int) $id);
+        $warehouse = \Db::getInstance()->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'warehouse` WHERE id_warehouse = ' . (int) $id);
         if (!$warehouse) {
             throw $this->createNotFoundException('Magazzino non trovato');
         }
@@ -173,17 +181,17 @@ class WarehouseController extends FrameworkBundleAdminController
         $message_type = null;
 
         // Recupera indirizzo associato (se esiste)
-        $address = \Db::getInstance()->getRow('SELECT * FROM `'._DB_PREFIX_.'address` WHERE id_warehouse = '.(int) $id.' AND deleted = 0');
+        $address = \Db::getInstance()->getRow('SELECT * FROM `' . _DB_PREFIX_ . 'address` WHERE id_warehouse = ' . (int) $id . ' AND deleted = 0');
 
         // Recupera lista paesi
         $countries = [];
-        $countryRes = \Db::getInstance()->executeS('SELECT id_country, name FROM `'._DB_PREFIX_.'country_lang` WHERE id_lang = 1 ORDER BY name');
+        $countryRes = \Db::getInstance()->executeS('SELECT id_country, name FROM `' . _DB_PREFIX_ . 'country_lang` WHERE id_lang = 1 ORDER BY name');
         foreach ($countryRes as $row) {
             $countries[] = $row;
         }
         // Recupera lista stati
         $states = [];
-        $stateRes = \Db::getInstance()->executeS('SELECT id_state, name, id_country FROM `'._DB_PREFIX_.'state` ORDER BY name');
+        $stateRes = \Db::getInstance()->executeS('SELECT id_state, name, id_country FROM `' . _DB_PREFIX_ . 'state` ORDER BY name');
         foreach ($stateRes as $row) {
             $states[] = $row;
         }
@@ -211,7 +219,7 @@ class WarehouseController extends FrameworkBundleAdminController
                         'reference' => pSQL($location), // salva in reference
                         'deleted' => (int) $deleted,
                     ],
-                    'id_warehouse = '.(int) $id
+                    'id_warehouse = ' . (int) $id
                 );
                 if ($result) {
                     // Gestione indirizzo (solo se almeno uno dei campi indirizzo è compilato)
@@ -224,7 +232,7 @@ class WarehouseController extends FrameworkBundleAdminController
                                 'city' => pSQL($city),
                                 'id_country' => (int) $id_country,
                                 'id_state' => (int) $id_state,
-                            ], 'id_address = '.(int) $address['id_address']);
+                            ], 'id_address = ' . (int) $address['id_address']);
                         } else {
                             // Insert
                             \Db::getInstance()->insert('address', [

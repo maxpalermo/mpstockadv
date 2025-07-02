@@ -19,28 +19,24 @@
  * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
  */
 
-namespace MpSoft\MpStockAdv\Services;
+namespace MpSoft\MpStockAdv\Helpers;
 
-use Doctrine\DBAL\Connection;
-use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class ProductAutocompleteService
+class ProductAutocompleteHelper extends DependencyHelper
 {
-    private $connection;
-    private $prefix;
-    private $context;
-    private $locale;
+    /** @var StockManagerHelper */
     private $stockManager;
 
-    public function __construct(Connection $connection, LegacyContext $context, StockManagerService $stockManager)
+    /** @var ConfigurationHelper */
+    private $configurationHelper;
+
+    public function __construct()
     {
-        $this->prefix = _DB_PREFIX_;
-        $this->connection = $connection;
-        $this->context = $context;
-        $this->stockManager = $stockManager;
-        $this->locale = \Tools::getContextLocale($this->context->getContext());
+        parent::__construct();
+        $this->stockManager = new StockManagerHelper();
+        $this->configurationHelper = new ConfigurationHelper();
     }
 
     private function setJsonResponse(array $response, $statusCode = 200)
@@ -59,13 +55,6 @@ class ProductAutocompleteService
         ))->send();
 
         exit;
-    }
-
-    public function searchAction(Request $request)
-    {
-        $result = $this->search($request);
-
-        $this->setJsonResponse($result);
     }
 
     /**
@@ -94,9 +83,9 @@ class ProductAutocompleteService
             $cover = \Product::getCover($id_product);
             if ($cover) {
                 $path = \Image::getImgFolderStatic($cover['id_image']);
-                $image_url = _PS_BASE_URL_.__PS_BASE_URI__.'img/p/'.$path.'/'.$cover['id_image'].'-small_default.jpg';
+                $image_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'img/p/' . $path . '/' . $cover['id_image'] . '-small_default.jpg';
             } else {
-                $image_url = _PS_BASE_URL_.__PS_BASE_URI__.'img/404.gif';
+                $image_url = _PS_BASE_URL_ . __PS_BASE_URI__ . 'img/404.gif';
             }
 
             $price_ti = $row['price_te'] * (1 + $row['tax_rate'] / 100);
@@ -137,7 +126,7 @@ class ProductAutocompleteService
 
     public function getProductsList($q, $idLang = 0, $limit = 20)
     {
-        $table = _DB_PREFIX_.'product';
+        $table = _DB_PREFIX_ . 'product';
         $pfx = _DB_PREFIX_;
         $q = pSQL($q);
         if (!$idLang) {
@@ -182,9 +171,9 @@ class ProductAutocompleteService
 
     public function getLastWeightedAveragePrice($id_product, $id_product_attribute = 0)
     {
-        $table = _DB_PREFIX_.'stock';
+        $table = _DB_PREFIX_ . 'stock';
         $sql =
-        <<<QUERY
+            <<<QUERY
             SELECT price_te
             FROM $table
             WHERE id_product = $id_product
@@ -195,122 +184,59 @@ class ProductAutocompleteService
         return (float) \Db::getInstance()->getValue($sql);
     }
 
-    public function saveAction(Request $request)
-    {
-        $data = $request->getContent();
-        $data = json_decode($data, true);
-
-        if (!is_array($data)) {
-            return new JsonResponse(['error' => 'Invalid data format', 'data' => $data], 400);
-        }
-
-        return new JsonResponse($this->stockManagerUpdate($data), 200);
-    }
-
     public function stockManagerUpdate($data)
     {
-        $id_warehouse = $data['warehouse_id'];
-        $id_product = $data['product_id'];
-        $id_product_attribute = $data['product_attribute_id'];
-        $id_stock_mvt_reason = $data['stock_mvt_reason_id'];
-        $quantity = $data['product_quantity'];
-        $price_te = (float) ($data['product_price_te'] ?? 0);
-
+        $movementHelper = new MovementHelper();
+        $id_warehouse = (int) $this->id_warehouse;
+        $id_order = (int) ($data['id_order'] ?? 0);
+        $id_order_supply = (int) ($data['id_order_supply'] ?? 0);
+        $id_currency = (int) $this->id_currency;
+        $id_product = (int) $data['product_id'];
+        $id_product_attribute = (int) $data['product_attribute_id'];
+        $product = new \Product($id_product, false, $this->id_lang);
+        $id_stock_mvt_reason = (int) $data['stock_mvt_reason_id'];
         $stockMvtReason = new \StockMvtReason($id_stock_mvt_reason);
         $sign = (int) $stockMvtReason->sign;
+        $employee = $this->context->getContext()->employee;
+        $ean13 = $data['ean13'] ?? '';
+        $reference = $data['product_reference'] ?? '';
+        $isbn = $data['isbn'] ?? '';
+        $mpn = $data['mpn'] ?? '';
+        $upc = $data['upc'] ?? '';
+        $quantity = (int) $data['product_quantity'];
+        $price_te = (float) ($data['product_price_te'] ?? 0);
 
-        $stockManager = \StockManagerFactory::getManager();
-        $stockExists = \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
+        $movement = [
+            'id_warehouse' => $id_warehouse,
+            'id_order' => $id_order,
+            'id_supply_order' => $id_order_supply,
+            'id_currency' => $id_currency,
+            'id_stock_mvt_reason' => $id_stock_mvt_reason,
+            'sign' => $sign,
+            'id_employee' => $employee->id,
+            'employee_lastname' => $employee->lastname,
+            'employee_firstname' => $employee->firstname,
+            'id_product' => $id_product,
+            'id_product_attribute' => $id_product_attribute,
+            'reference' => $reference,
+            'supplier_reference' => $product->supplier_reference,
+            'name' => $product->name,
+            'ean13' => $ean13,
+            'isbn' => $isbn,
+            'upc' => $upc,
+            'mpn' => $mpn,
+            'exchange_rate' => 1,
+            'quantity_expected' => (int) $quantity * (int) $sign,
+            'quantity_received' => (int) $quantity * (int) $sign,
+            'price_te' => $price_te,
+        ];
+        $movementHelper->hydrate($movement);
 
-        $result = $this->stockManager->updateStock($id_product, $id_product_attribute, $id_stock_mvt_reason, $quantity, $id_warehouse, $price_te);
-        if ($result) {
-            $movement = $this->stockManager->addMovement($id_product, $id_product_attribute, $id_stock_mvt_reason, $quantity, $price_te, $id_warehouse);
-        }
+        $result = $this->stockManager->addMovement($movementHelper->toArray());
 
         $this->setJsonResponse([
-            'success' => $movement,
-            'updated' => $result,
+            'success' => $result,
+            'movement' => $movementHelper->toArray(),
         ]);
-
-        if ($stockExists) {
-            // Aggiorna la quantità esistente
-            \StockAvailable::updateQuantity($id_product, $id_product_attribute, $quantity * $sign);
-        } else {
-            // Crea una nuova riga in ps_stock_available (non in ps_stock)
-            \StockAvailable::setQuantity($id_product, $id_product_attribute, $quantity * $sign, null, false);
-        }
-
-        $stock_after = \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
-        $sign = (int) $stockMvtReason->sign;
-        $movement = $quantity * $sign;
-
-        if ($stock_after < 0) {
-            $quantity = 0;
-        }
-
-        // Se Advanced Stock Management è attivo, aggiorna anche ps_stock
-        if (\Configuration::get('PS_ADVANCED_STOCK_MANAGEMENT')) {
-            $warehouse = new \Warehouse($id_warehouse);
-            if (-1 == $sign) {
-                $result = $stockManager->removeProduct(
-                    $id_product,
-                    $id_product_attribute,
-                    $warehouse,
-                    $quantity,
-                    $id_stock_mvt_reason,
-                    true,
-                    0
-                );
-            } else {
-                $result = $stockManager->addProduct(
-                    $id_product,
-                    $id_product_attribute,
-                    $warehouse,
-                    $quantity,
-                    $id_stock_mvt_reason,
-                    $price_te,
-                    true,
-                    0
-                );
-            }
-
-            $stock_after = (int) \StockAvailable::getQuantityAvailableByProduct($id_product, $id_product_attribute);
-            $pfx = _DB_PREFIX_;
-            $query = "
-                SELECT a.id_stock_mvt
-                FROM {$pfx}stock_mvt a
-                INNER JOIN {$pfx}stock b ON (a.id_stock=b.id_stock)
-                WHERE a.id_stock_mvt_reason = {$id_stock_mvt_reason}
-                AND b.id_product = {$id_product}
-                AND b.id_product_attribute = {$id_product_attribute}
-                AND b.id_warehouse = {$id_warehouse}
-                AND a.sign = {$sign}
-                ORDER BY a.id_stock_mvt DESC
-                ";
-
-            $id_stock_mvt = \Db::getInstance()->getValue($query);
-            if ($id_stock_mvt) {
-                \Db::getInstance()->update(
-                    'stock_mvt',
-                    [
-                        'stock_before' => (int) $stockExists,
-                        'stock_after' => (int) $stock_after,
-                    ],
-                    'id_stock_mvt = '.(int) $id_stock_mvt
-                );
-            }
-
-            return [
-                'success' => true,
-                'result' => $result,
-                'data' => $data,
-            ];
-        }
-
-        return [
-            'success' => true,
-            'result' => true,
-            'data' => $data,
-        ];
     }
 }

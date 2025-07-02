@@ -123,10 +123,14 @@ class ProductAutocomplete {
         $(instance._product_name).on("select2:select", function(e) {
             // Select2 4.x: il campo di ricerca ha classe .select2-search__field
             setTimeout(function() {
-                document
-                    .querySelector("#physical_quantity")
-                    .select()
-                    .focus();
+                try {
+                    document
+                        .querySelector("#physical_quantity")
+                        .select()
+                        .focus();
+                } catch (error) {
+                    console.log(error);
+                }
             }, 0);
         });
 
@@ -160,6 +164,7 @@ class ProductAutocomplete {
             product_current_wa: instance._product_current_wa.value
         };
 
+        const productAutocompleteSaveUrl = window.Routes.get("productAutocompleteSaveUrl");
         const response = await fetch(productAutocompleteSaveUrl, {
             headers: {
                 "Content-Type": "application/json"
@@ -282,7 +287,7 @@ class ProductAutocomplete {
     };
 
     clearProduct = () => {
-        this._warehouse_id.value = defaultWarehouseId || 0;
+        this._warehouse_id.value = window.defaultWarehouseId || 0;
         this._product_id.value = 0;
         this._product_name.value = "";
         this._product_attribute_id.value = 0;

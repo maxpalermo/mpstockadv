@@ -21,8 +21,8 @@
 
 namespace MpSoft\MpStockAdv\Controllers;
 
+use MpSoft\MpStockAdv\Helpers\ConfigurationHelper;
 use MpSoft\MpStockAdv\Services\MenuDataService;
-use MpSoft\MpStockAdv\Services\MpStockAdvConfiguration;
 use PrestaShop\PrestaShop\Adapter\LegacyContext;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\Request;
@@ -32,10 +32,11 @@ class StockMvtPreferences extends FrameworkBundleAdminController
 {
     private LegacyContext $context;
     private MenuDataService $menuDataService;
-    private MpStockAdvConfiguration $mpStockAdvConfiguration;
+    private ConfigurationHelper $configurationHelper;
 
-    public function indexAction(Request $request, LegacyContext $context, MenuDataService $menuDataService, MpStockAdvConfiguration $mpStockAdvConfiguration): Response
+    public function indexAction(Request $request, LegacyContext $context, MenuDataService $menuDataService): Response
     {
+        $this->configurationHelper = new ConfigurationHelper();
         $this->menuDataService = $menuDataService;
         $this->context = $context;
         $this->menuDataService->setTitle('Movimenti di magazzino');
@@ -65,11 +66,11 @@ class StockMvtPreferences extends FrameworkBundleAdminController
             '@Modules/mpstockadv/views/twig/Controllers/StockMvtPreferences.index.html.twig',
             [
                 'toolbarMenuHtml' => $this->menuDataService->renderMenu(),
-                'warehouses' => $this->mpStockAdvConfiguration->getWarehouses(),
-                'default_warehouse' => $this->mpStockAdvConfiguration->getDefaultWarehouse(),
-                'stock_mvt_reasons' => $this->mpStockAdvConfiguration->getStockMvtReasons(),
-                'default_stock_mvt_reason_load' => $this->mpStockAdvConfiguration->getDefaultStockMvtReasonLoad(),
-                'default_stock_mvt_reason_unload' => $this->mpStockAdvConfiguration->getDefaultStockMvtReasonUnload(),
+                'warehouses' => $this->configurationHelper->getWarehouses(),
+                'default_warehouse' => $this->configurationHelper->getDefaultWarehouse(),
+                'stock_mvt_reasons' => $this->configurationHelper->getStockMvtReasons(),
+                'default_stock_mvt_reason_load' => $this->configurationHelper->getDefaultStockMvtReasonLoad(),
+                'default_stock_mvt_reason_unload' => $this->configurationHelper->getDefaultStockMvtReasonUnload(),
             ]
         );
     }
@@ -77,21 +78,21 @@ class StockMvtPreferences extends FrameworkBundleAdminController
     /**
      * Carica la modale delle preferenze (dependency injection via argomenti).
      */
-    public function loadModalPreferencesAction(LegacyContext $context, MenuDataService $menuDataService, MpStockAdvConfiguration $mpStockAdvConfiguration)
+    public function loadModalPreferencesAction(LegacyContext $context, MenuDataService $menuDataService)
     {
+        $this->configurationHelper = new ConfigurationHelper();
         $this->context = $context;
         $this->menuDataService = $menuDataService;
-        $this->mpStockAdvConfiguration = $mpStockAdvConfiguration;
 
         $html = $this->renderView(
             '@Modules/mpstockadv/views/twig/Components/StockMvt.dialog.preferences.html.twig',
             [
                 'toolbarMenuHtml' => $this->menuDataService->renderMenu(),
-                'warehouses' => $this->mpStockAdvConfiguration->getWarehouses(),
-                'stockMvtReasons' => $this->mpStockAdvConfiguration->getStockMvtReasons(),
-                'default_warehouse' => $this->mpStockAdvConfiguration->getDefaultWarehouse(),
-                'default_stock_mvt_reason_load' => $this->mpStockAdvConfiguration->getDefaultStockMvtReasonLoad(),
-                'default_stock_mvt_reason_unload' => $this->mpStockAdvConfiguration->getDefaultStockMvtReasonUnload(),
+                'warehouses' => $this->configurationHelper->getWarehouses(),
+                'stockMvtReasons' => $this->configurationHelper->getStockMvtReasons(),
+                'default_warehouse' => $this->configurationHelper->getDefaultWarehouse(),
+                'default_stock_mvt_reason_load' => $this->configurationHelper->getDefaultStockMvtReasonLoad(),
+                'default_stock_mvt_reason_unload' => $this->configurationHelper->getDefaultStockMvtReasonUnload(),
             ]
         );
 
@@ -101,37 +102,41 @@ class StockMvtPreferences extends FrameworkBundleAdminController
         ]);
     }
 
-    public function savePreferencesAction(Request $request, MpStockAdvConfiguration $mpStockAdvConfiguration)
+    public function savePreferencesAction(Request $request)
     {
+        $this->configurationHelper = new ConfigurationHelper();
+
         $default_warehouse = (int) $request->get('default_warehouse', 0);
         $default_stock_mvt_reason_load = (int) $request->get('default_stock_mvt_reason_load', 0);
         $default_stock_mvt_reason_unload = (int) $request->get('default_stock_mvt_reason_unload', 0);
 
-        $mpStockAdvConfiguration->set('MPSTOCKADV_DEFAULT_WAREHOUSE', $default_warehouse);
-        $mpStockAdvConfiguration->set('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON_LOAD', $default_stock_mvt_reason_load);
-        $mpStockAdvConfiguration->set('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON_UNLOAD', $default_stock_mvt_reason_unload);
+        $this->configurationHelper->set('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON_LOAD', $default_stock_mvt_reason_load);
+        $this->configurationHelper->set('MPSTOCKADV_DEFAULT_STOCK_MVT_REASON_UNLOAD', $default_stock_mvt_reason_unload);
+        $this->configurationHelper->set('MPSTOCKADV_DEFAULT_WAREHOUSE', $default_warehouse);
 
         return $this->json([
             'success' => true,
         ]);
     }
 
-    public function loadStockMvtPreferencesAction(MpStockAdvConfiguration $mpStockAdvConfiguration)
+    public function loadStockMvtPreferencesAction()
     {
+        $this->configurationHelper = new ConfigurationHelper();
+
         return $this->json([
             'success' => true,
-            'preferences' => $this->loadStockMvtPreferences($mpStockAdvConfiguration),
+            'preferences' => $this->loadStockMvtPreferences(),
         ]);
     }
 
-    public function loadStockMvtPreferences(MpStockAdvConfiguration $mpStockAdvConfiguration)
+    public function loadStockMvtPreferences()
     {
         $preferences = [
-            'id_warehouse' => $mpStockAdvConfiguration->getDefaultWarehouse(),
-            'id_stock_mvt_reason_load' => $mpStockAdvConfiguration->getDefaultStockMvtReasonLoad(),
-            'id_stock_mvt_reason_unload' => $mpStockAdvConfiguration->getDefaultStockMvtReasonUnload(),
-            'warehouses' => $mpStockAdvConfiguration->getWarehouses(),
-            'stock_mvt_reasons' => $mpStockAdvConfiguration->getStockMvtReasons(),
+            'id_warehouse' => $this->configurationHelper->getDefaultWarehouse(),
+            'id_stock_mvt_reason_load' => $this->configurationHelper->getDefaultStockMvtReasonLoad(),
+            'id_stock_mvt_reason_unload' => $this->configurationHelper->getDefaultStockMvtReasonUnload(),
+            'warehouses' => $this->configurationHelper->getWarehouses(),
+            'stock_mvt_reasons' => $this->configurationHelper->getStockMvtReasons(),
         ];
 
         return $preferences;

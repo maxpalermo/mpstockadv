@@ -71,7 +71,6 @@
 *.hot-update.js
 *.hot-update.json
 
-
 /admin-dev/autoupgrade/*
 !/admin-dev/autoupgrade/index.php
 !/admin-dev/autoupgrade/backup/index.php
@@ -171,3 +170,12 @@ themes/default-bootstrap/modules/*/mails/*
 /vendor/
 /web/bundles/
 
+/* windsurf ignore */
+/app/*
+/cache/*
+/vendor/*
+/var/*
+/img/*
+/download/*
+/upload/*
+/mails/*

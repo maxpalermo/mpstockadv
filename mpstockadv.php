@@ -22,6 +22,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use MpSoft\MpStockAdv\Helpers\UpdateTablesHelper;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 class MpStockAdv extends Module
@@ -30,7 +31,7 @@ class MpStockAdv extends Module
     {
         $this->name = 'mpstockadv';
         $this->tab = 'administration';
-        $this->version = '0.0.5';
+        $this->version = '0.1.5.8087';
         $this->author = 'Massimiliano Palermo';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
@@ -63,6 +64,9 @@ class MpStockAdv extends Module
         if (!$tab->add()) {
             return false;
         }
+
+        // Aggiornamento tabelle
+        $this->updateTables();
 
         // Registrazione hook
         return $this->registerHook('actionAdminControllerSetMedia')
@@ -102,14 +106,37 @@ class MpStockAdv extends Module
         return parent::uninstall();
     }
 
+    protected function updateTables()
+    {
+        $updateTablesHelper = new UpdateTablesHelper();
+        $updateTablesHelper->updateTableStock();
+        $updateTablesHelper->updateTableStockMvt();
+    }
+
     public function getContent()
     {
-        Tools::redirectAdmin($this->getAdminLink('warehouse'));
+        $twig = SymfonyContainer::getInstance()->get('twig');
+        $updateTablesHelper = new UpdateTablesHelper();
+        $struct = [
+            'stock' => [
+                'name' => 'stock',
+                'fields' => $updateTablesHelper->getTableStructure('stock')
+            ],
+            'stock_mvt' => [
+                'name' => 'stock_mvt',
+                'fields' => $updateTablesHelper->getTableStructure('stock_mvt'),
+            ]
+        ];
+
+        //exit(Tools::dieObject($tableStructures));
+        return $twig->render('@Modules/mpstockadv/views/twig/MpStockAdv/GetContent.html.twig', [
+            'tables' => $struct
+        ]);
     }
 
     public function getAdminLink($controller)
     {
-        return SymfonyContainer::getInstance()->get('router')->generate('mpstockadv_admin_'.$controller);
+        return SymfonyContainer::getInstance()->get('router')->generate('mpstockadv_admin_' . $controller);
     }
 
     // --- HOOKS ---
@@ -119,6 +146,8 @@ class MpStockAdv extends Module
      */
     public function hookActionAdminControllerSetMedia($params)
     {
+        $hideMenu = $this->getLocalPath() . 'views/assets/css/hideMenu.css';
+        $this->context->controller->addCSS($hideMenu);
     }
 
     /**
@@ -164,6 +193,17 @@ class MpStockAdv extends Module
 
     public function hookActionOrderDetailAddAfter($params)
     {
+        /** @var OrderDetail */
+        $orderDetail = $params['object'];
+
+        $id_order = $orderDetail->id_order;
+        $order = new Order($id_order);
+        if (!Validate::isLoadedObject($order)) {
+            return false;
+        }
+
+
+
     }
 
     public function hookActionOrderDetailUpdateBefore($params)

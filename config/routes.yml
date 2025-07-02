@@ -230,12 +230,12 @@ mpstockadv_controller_stockmvt_save_preferences:
 
 mpstockadv_controller_stockmvt_product_autocomplete:
   path: /admin/module/mpstockadv/stockmvt/product-autocomplete
-  controller: MpSoft\MpStockAdv\Services\ProductAutocompleteService::searchAction
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtController::searchAction
   methods: [GET, POST]
 
 mpstockadv_controller_stockmvt_product_autocomplete_save:
   path: /admin/module/mpstockadv/stockmvt/product-autocomplete-save
-  controller: MpSoft\MpStockAdv\Services\ProductAutocompleteService::saveAction
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtController::updateStockManagerAction
   methods: [POST]
 
 mpstockadv_controller_stockmvt_load_stock_mvt_preferences:
@@ -245,22 +245,22 @@ mpstockadv_controller_stockmvt_load_stock_mvt_preferences:
 
 mpstockadv_controller_stockmvt_ajax_refresh_table:
   path: /admin/module/mpstockadv/stockmvt/ajax-process-refresh-table
-  controller: MpSoft\MpStockAdv\Services\StockMvtDatatableService::getStockMvtDataAction
+  controller: MpSoft\MpStockAdv\Controllers\StockMvtController::ajaxProcessRefreshTableMovements
   methods: [POST]
 
 mpstockadv_controller_stockmvt_ajax_truncate_stock_tables_url:
   path: /admin/module/mpstockadv/stockmvt/ajax-truncate-stock-tables
-  controller: MpSoft\MpStockAdv\Services\ImportFromStockAvailableService::truncateStockTablesAction
+  controller: MpSoft\MpStockAdv\Helpers\ImportFromStockAvailableHelper::truncateStockTablesAction
   methods: [GET]
 
 mpstockadv_controller_stockmvt_ajax_get_stock_available_rows:
   path: /admin/module/mpstockadv/stockmvt/ajax-get-stock-available-rows
-  controller: MpSoft\MpStockAdv\Services\ImportFromStockAvailableService::getStockAvailableRowsAction
+  controller: MpSoft\MpStockAdv\Helpers\ImportFromStockAvailableHelper::getStockAvailableRowsAction
   methods: [GET]
 
 mpstockadv_controller_stockmvt_ajax_import_chunk_url:
   path: /admin/module/mpstockadv/stockmvt/ajax-import-chunk
-  controller: MpSoft\MpStockAdv\Services\ImportFromStockAvailableService::importChunkAction
+  controller: MpSoft\MpStockAdv\Helpers\ImportFromStockAvailableHelper::importChunkAction
   methods: [POST]
 
 mpstockadv_admin_stockimportexport:
@@ -268,7 +268,12 @@ mpstockadv_admin_stockimportexport:
   controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::index
   methods: [GET]
 
+mpstockadv_controller_stockimportexport_parse_xml:
+  path: /admin/mpstockadv/stock-import-export/parse-xml
+  controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::parseXmlAction
+  methods: [POST]
+
 mpstockadv_controller_stockimportexport_import_xml:
   path: /admin/mpstockadv/stock-import-export/import-xml
-  controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::importXmlAction
+  controller: MpSoft\MpStockAdv\Helpers\StockMvtImportHelper::importXmlAction
   methods: [POST]

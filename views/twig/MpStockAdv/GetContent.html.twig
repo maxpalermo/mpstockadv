@@ -1,0 +1,44 @@
+
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/css/style.css') }}">
+
+<div class="bootstrap card">
+    <div class="card-header">
+        <h3 class="title">Struttura tabelle</h3>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-center align-items-top gap-2">
+            {% for table in tables %}
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="title">{{ table.name }}</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table-condensed table striped table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>Campo</th>
+                                <th>Tipo</th>
+                                <th>Dimensione</th>
+                                <th>Null</th>
+                                <th>Unsigned</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in table.fields %}
+                            <tr>
+                                <td>{{ item.Field }}</td>
+                                <td>{{ item.Type }}</td>
+                                <td>{{ item.Size }}</td>
+                                <td>{{ item.Null }}</td>
+                                <td>{{ item.Unsigned }}</td>
+                            </tr>    
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+

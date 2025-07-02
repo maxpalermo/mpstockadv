@@ -1,30 +1,42 @@
 <?php
+/**
+ * Copyright since 2007 PrestaShop SA and Contributors
+ * PrestaShop is an International Registered Trademark & Property of PrestaShop SA
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License version 3.0
+ * that is bundled with this package in the file LICENSE.md.
+ * It is also available through the world-wide-web at this URL:
+ * https://opensource.org/licenses/AFL-3.0
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@prestashop.com so we can send you a copy immediately.
+ *
+ * @author    Massimiliano Palermo <maxx.palermo@gmail.com>
+ * @copyright Since 2016 Massimiliano Palermo
+ * @license   https://opensource.org/licenses/AFL-3.0 Academic Free License version 3.0
+ */
 
-namespace MpSoft\MpStockAdv\Services;
+namespace MpSoft\MpStockAdv\Helpers;
 
 use Doctrine\DBAL\ParameterType;
 use Doctrine\ORM\EntityManagerInterface;
+use MpSoft\MpStockAdv\Helpers\ConfigurationHelper;
+use MpSoft\MpStockAdv\Services\StockProductsService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 
-class StockMvtImportService
+class StockMvtImportHelper extends DependencyHelper
 {
     const SUPPLIER_ORDER_STATE_RECEIVED = 5;
-    private EntityManagerInterface $entityManager;
-    private StockProductsService $stockProductService;
-    private int $id_lang;
-    private int $id_warehouse;
-    private $id_currency;
-    private $mpStockAdvConfiguration;
+    private StockProductsService $stockProductsService;
+    private $configurationHelper;
 
-    public function __construct(EntityManagerInterface $entityManager, StockProductsService $stockProductService, MpStockAdvConfiguration $mpStockAdvConfiguration)
+    public function __construct()
     {
-        $this->entityManager = $entityManager;
-        $this->stockProductService = $stockProductService;
-        $this->mpStockAdvConfiguration = $mpStockAdvConfiguration;
-        $this->id_lang = $mpStockAdvConfiguration->getCurrentLanguage()->id;
-        $this->id_warehouse = $mpStockAdvConfiguration->getDefaultWarehouse();
-        $this->id_currency = $mpStockAdvConfiguration->getCurrentCurrency()->id;
+        parent::__construct();
+        $this->stockProductsService = $this->container->get("MpSoft\MpStockAdv\Services\StockProductsService");
     }
 
     protected function formatDateIso($value)
@@ -205,15 +217,17 @@ class StockMvtImportService
                 'doc_time' => $docTime,
                 'supplier_id' => $supplier_data['supplier_id'],
                 'supplier_name' => $supplier_data['supplier_name'],
+                'movement_id' => $rowMvtReason['id_stock_mvt_reason'],
                 'movement_alias' => $rowMvtReason['alias'],
                 'movement_name' => $rowMvtReason['name'],
+                'movement_sign' => $rowMvtReason['sign'],
             ],
             'movement' => [
-                'id' => $rowMvtReason['alias'],
+                'id' => $rowMvtReason['id_stock_mvt_reason'],
                 'name' => $rowMvtReason['name'],
-                'type_alias' => $movementTypeAlias,
+                'type_alias' => $rowMvtReason['alias'],
                 'date' => $movementDate,
-                'sign' => $sign,
+                'sign' => $rowMvtReason['sign'],
             ],
             'rows' => $rows,
         ];
@@ -249,10 +263,12 @@ class StockMvtImportService
             );
         }
 
+        $employee = $this->context->getContext()->employee;
         $supplier_id = (int) $document['document_supplier_id'];
         $supplier = new \Supplier($supplier_id, $this->id_lang);
         $document_number = $document['document_number'];
         $document_date = $document['document_date_iso'];
+        $stockManagerHelper = new StockManagerHelper();
 
         //Creo il documento in supply_order
         $supply_order = new \SupplyOrder();
@@ -290,17 +306,51 @@ class StockMvtImportService
             $quantity = $row['qty_signed'];
 
             $product_ids = $this->getProductIdByEan13($ean13);
-            $id_product = $product_ids['id_product'];
-            $id_product_attribute = $product_ids['id_product_attribute'];
+            $id_product = $product_ids['id_product'] ?? 0;
+            $id_product_attribute = $product_ids['id_product_attribute'] ?? 0;
 
             $product = new \Product($id_product, false, $this->id_lang);
             if (!\Validate::isLoadedObject($product)) {
                 continue;
             }
 
-            $data = [
+            /*
+            $movement = [
+                'id_warehouse' => $id_warehouse,
+                'id_order' => $id_order,
                 'id_supply_order' => $id_supply_order,
                 'id_currency' => $this->id_currency,
+                'id_stock_mvt_reason' => $id_stock_mvt_reason,
+                'sign' => $sign,
+                'id_employee => $employee->id,
+                'employee_lastname' => $employee->lastname,
+                'employee_firstname' => $employee_firstname,
+                'id_product' => $id_product,
+                'id_product_attribute' => $id_product_attribute,
+                'reference' => $product->reference,
+                'supplier_reference' => $product->supplier_reference,
+                'name' => $product->name,
+                'ean13' => $product->ean13,
+                'isbn' => $product->isbn,
+                'upc' => $product->upc,
+                'mpn' => $product->mpn,
+                'exchange_rate' => 1,
+                'quantity_expected' => $quantity,
+                'quantity_received' => $quantity,
+                'price_te' => $price,
+            ];
+            */
+
+            $data = [
+                'id_warehouse' => (new ConfigurationHelper())->getDefaultWarehouse(),
+                'id_order' => '0',
+                'id_supply_order' => $id_supply_order,
+                'id_currency' => $this->id_currency,
+                'id_stock_mvt_reason' => $document['document_movement_id'],
+                'sign' => $document['document_movement_sign'],
+                'id_employee' => $employee->id,
+                'employee_lastname' => $employee->lastname,
+                'employee_firstname' => $employee->firstname,
                 'id_product' => $id_product,
                 'id_product_attribute' => $id_product_attribute,
                 'reference' => $product->reference,
@@ -316,13 +366,7 @@ class StockMvtImportService
                 'price_te' => $price,
             ];
 
-            $supplyOrderDetail = new \SupplyOrderDetail();
-            $supplyOrderDetail->hydrate($data);
-            try {
-                $result = $supplyOrderDetail->add();
-            } catch (\Throwable $th) {
-                continue;
-            }
+            $stockManagerHelper->addMovement($data);
         }
 
         return new JsonResponse([
@@ -400,7 +444,7 @@ class StockMvtImportService
     {
         $idList = $this->getProductId($ean13);
         if ($idList) {
-            $img_path = $this->stockProductService->getProductImageUrl($idList['id_product']);
+            $img_path = $this->stockProductsService->getProductImageUrl($idList['id_product']);
 
             return $img_path;
         }
