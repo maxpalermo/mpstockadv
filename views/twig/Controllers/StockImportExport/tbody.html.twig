@@ -1,0 +1,25 @@
+{% for row in rows %}
+<tr>
+    <td class="text-center fixed-width-sm">
+        <input type="checkbox" class="form-control" style="width: 24px;">
+    </td>
+    <td class="text-right fixed-width-md">
+        <strong>{{ row.id_order }}</strong>
+    </td>
+    <td class="fixed-width-md">
+        {{ row.reference|upper }}
+    </td>
+    <td class="text-center fixed-width-md">
+        {{ row.date_add|date('d/m/Y') }}
+    </td>
+    <td>
+        {{ row.current_state|upper }}
+    </td>
+    <td>
+        {{ row.customer_name|upper }}
+    </td>
+    <td class="text-right fixed-width-md">
+        <strong>{{ row.total_order|price_format }}</strong>
+    </td>
+</tr>
+{% endfor %}

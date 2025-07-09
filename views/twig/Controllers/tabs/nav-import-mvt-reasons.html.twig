@@ -1,0 +1,53 @@
+<section class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            Importa Tipi di Movimento
+        </h5>
+    </div>
+    <div class="card-body">
+        <p>
+            Carica un file
+            <strong>
+                CSV
+            </strong>
+            o
+            <strong>
+                JSON
+            </strong>
+            per importare i tipi di movimento magazzino dalle versioni precedenti del modulo.
+        </p>
+        <form id="import-mvt-reason-form" enctype="multipart/form-data">
+            <div class="form-group mb-2">
+                <label for="mvt-reason-type">
+                    Tipo di file da importare:
+                </label>
+                <select name="mvt_reason_type" id="mvt-reason-type" class="form-control" required>
+                    <option value="all">
+                        File completo
+                    </option>
+                    <option value="reasons">
+                        File dei tipi di movimento senza nome
+                    </option>
+                    <option value="lang">
+                        File lingua dei tipi di movimento
+                    </option>
+                </select>
+            </div>
+            <div class="form-group mb-2">
+                <label for="mvt-reason-file" class="form-label">
+                    Seleziona file
+                </label>
+                <div class="input-group">
+                    <input type="file" name="mvt_reason_file" id="mvt-reason-file" accept=".csv,.json" class="form-control" required/>
+                    <label class="input-group-text" for="mvt-reason-file">
+                        Scegli...
+                    </label>
+                </div>
+                <small id="mvt-reason-file-name" class="form-text text-muted"></small>
+            </div>
+            <button type="submit" class="btn btn-success mt-2">
+                Importa Tipi Movimento
+            </button>
+        </form>
+    </div>
+</section>

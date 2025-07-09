@@ -2,7 +2,7 @@
 <module>
     <name>mpstockadv</name>
     <displayName><![CDATA[MP Magazzino Avanzato]]></displayName>
-    <version><![CDATA[0.0.5]]></version>
+    <version><![CDATA[0.1.5.8087]]></version>
     <description><![CDATA[Gestione avanzata del magazzino, documenti di carico/scarico, multi-magazzino, import/export.]]></description>
     <author><![CDATA[Massimiliano Palermo]]></author>
     <tab><![CDATA[administration]]></tab>

@@ -1,0 +1,363 @@
+<div class="card bootstrap">
+    <div class="card-header">
+        <h2>
+            Esporta Documenti
+        </h2>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start gap-3">
+            <div class="form-wrapper grow-1">
+                <div class="align-items-start gap-2" style="max-width: 600px;">
+                    <div class="form-group">
+                        <h3>
+                            Seleziona Stati
+                        </h3>
+                        <select name="id_order_states[]" id="id_order_states" class="form-control" multiple>
+                            {% for state in order_states %}
+                            <option value="{{ state.id_order_state }}">
+                                {{ state.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <script type="text/javascript">
+                            document.addEventListener("DOMContentLoaded", () => {
+                                $("#id_order_states").select2();
+                            });
+                        </script>
+                    </div>
+                    <div class="form-group">
+                        <h3>
+                            Tipo di documento
+                        </h3>
+                        <select name="id_type_document" id="id_type_document" class="form-control">
+                            {% for type in document_types %}
+                            <option value="{{ type.id }}">
+                                {{ type.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <script type="text/javascript">
+                            document.addEventListener("DOMContentLoaded", () => {
+                                $("#id_type_document").select2();
+                            });
+                        </script>
+                    </div>
+                    <div class="d-flex justify-content-end align-items-conter">
+                        <button type="button" class="btn btn-primary" id="btn-search-documents">
+                            <span class="material-icons mr-2">search</span>
+                            <span class="label">Trova ordini</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body mt-4">
+                    <table class="table table-bordered table-striped table-hover" id="table-search-documents">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th class="text-center fixed-width-sm">
+                                    <input type="checkbox" class="form-control" id="check_all_found_documents" style="width: 24px;">
+                                </th>
+                                <th class="fixed-width-sm">ID</th>
+                                <th class="fixed-width-md">Riferimento</th>
+                                <th class="fixed-width-md">Data</th>
+                                <th>Stato</th>
+                                <th>Cliente</th>
+                                <th class="fixed-width-md">Importo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Contenuto dinamico -->
+                        </tbody>
+                        <tfoot>
+                            <div class="pagination-section">
+                                <!-- Contenuto dinamico-->
+                                <!-- File ./pagination.html.twig -->
+                            </div>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+            <div class="form-wrapper">
+                <div class="form-group">
+                    <h3>
+                        Tipi di documento
+                    </h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Ordine</span>
+                                    </div>
+                                    <input type="text" id="type-doc-ordine" class="form-control type-doc text-right fixed-width-sm">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Fattura</span>
+                                </div>
+                                <input type="text" id="type-doc-invoice" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Nota d'ordine</span>
+                                </div>
+                                <input type="text" id="type-doc-delivery" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Reso</span>
+                                </div>
+                                <input type="text" id="type-doc-return" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Nota credito</span>
+                                </div>
+                                <input type="text" id="type-doc-credit-slip" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="d-flex justify-content-end align-items-center mt-4">
+                        <button type="button" class="btn btn-primary" id="save-id-type-documents">
+                            <span class="material-icons mr-2">save</span>
+                            <span class="label">Salva ID</span>
+                        </button>
+                    </div>
+                    <script type="text/javascript">
+                        async function renderTable(response) {
+                            const data = response.data;
+                            const pagination = response.pagination;
+
+                            const table = document.getElementById("table-search-documents");
+                            if (table) {
+                                const tbody = table.querySelector("tbody");
+                                const tfoot = table.querySelector("tfoot");
+
+                                tbody.innerHTML = data;
+                                const columns = tbody.querySelector("tr").querySelectorAll("td").length;
+                                tfoot.innerHTML = `
+                                    <tr class="bootstrap">
+                                        <th colspan="${columns}">
+                                            ${pagination}
+                                        </th>
+                                    </tr>
+                                `;
+
+                                bindPageNumbers();
+                            }
+                        }
+
+                        async function searchDocuments(page = 1, perPage = 50) {
+                            const selectElement = document.getElementById('id_order_states');
+                            const idOrderStates = Array
+                                .from(selectElement.selectedOptions)
+                                .map(option => option.value);
+                            const selectDocumentType = document.getElementById("id_type_document");
+                            const idTypeDocument = selectDocumentType.value;
+
+                            if (idOrderStates.length == 0) {
+                                alert("Selezionare almeno uno stato d'ordine");
+                                return false;
+                            }
+
+                            const request = await fetch("{{ path('mpstockadv_admin_stockimportexport_search_documents') }}", {
+                                method: "POST",
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'X-Requested-With': 'XMLHttpRequest',
+                                },
+                                body: JSON.stringify({
+                                    idTypeDocument: idTypeDocument,
+                                    idOrderStates: idOrderStates,
+                                    page: page,
+                                    perPage: perPage
+                                })
+                            });
+
+                            const response = await request.json();
+                            const table = document.getElementById("table-search-documents");
+                            if (table) {
+                                showLoadingOverlay(table);
+                                renderTable(response);
+                                hideLoadingOverlay(table);
+                            }
+                        }
+
+                        async function getTypeDocuments() {
+                            const request = await fetch("{{ path('mpstockadv_admin_stockimportexport_get_mvt_reason_id') }}", {
+                                method: "GET",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                }
+                            });
+
+                            const response = await request.json();
+                            document.getElementById("type-doc-ordine").value = response.document_types.order.id;
+                            document.getElementById("type-doc-invoice").value = response.document_types.invoice.id;
+                            document.getElementById("type-doc-delivery").value = response.document_types.delivery.id;
+                            document.getElementById("type-doc-return").value = response.document_types.return.id;
+                            document.getElementById("type-doc-credit-slip").value = response.document_types.credit_slip.id;
+                        }
+
+                        async function setTypeDocuments() {
+                            if (confirm("Salvare i codici documento?") == false) {
+                                return false;
+                            }
+
+                            const request = await fetch("{{ path('mpstockadv_admin_stockimportexport_set_mvt_reason_id') }}", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    id_type_order: document.getElementById("type-doc-ordine").value,
+                                    id_type_invoice: document.getElementById("type-doc-invoice").value,
+                                    id_type_delivery: document.getElementById("type-doc-delivery").value,
+                                    id_type_return: document.getElementById("type-doc-return").value,
+                                    id_type_credit_slip: document.getElementById("type-doc-credit-slip").value,
+                                }),
+                            });
+
+                            const response = await request.json();
+
+                            if (response.success || false) {
+                                alert("Codici documento salvati.");
+                            } else {
+                                alert("Errore duranta il salvataggio dei codici.");
+                            }
+                        }
+
+                        async function bindPageNumbers() {
+                            const pagesNav = document.querySelectorAll(".page-link.page-navigation");
+                            console.log("Navigator:", pagesNav);
+
+                            if (pagesNav) {
+                                pagesNav.forEach(item => {
+                                    item.addEventListener("click", async (e) => {
+                                        e.stopPropagation();
+                                        e.stopImmediatePropagation();
+
+                                        const button = e.target.closest("button");
+                                        const page = button.dataset.page;
+                                        console.log(`GO TO PAGE ${page}`);
+
+                                        await searchDocuments(page);
+                                    });
+                                });
+                            }
+                        }
+
+                        function showLoadingOverlay(table) {
+                            // Crea l'overlay se non esiste già
+                            let overlay = table.querySelector('.table-loading-overlay');
+                            if (!overlay) {
+                                overlay = document.createElement('div');
+                                overlay.className = 'table-loading-overlay';
+                                overlay.innerHTML = `
+                                    <div class="spinner-container">
+                                        <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                    </div>
+                                `;
+                                table.appendChild(overlay);
+                            }
+
+                            // Posiziona l'overlay sopra il tbody
+                            const tbody = table.querySelector('tbody');
+                            if (tbody) {
+                                const rect = tbody.getBoundingClientRect();
+                                overlay.style.width = `${rect.width}px`;
+                                overlay.style.height = `${rect.height}px`;
+                                overlay.style.top = `${tbody.offsetTop}px`;
+                                overlay.style.left = `${tbody.offsetLeft}px`;
+                            }
+
+                            overlay.style.display = 'flex';
+                        }
+
+                        function appendStyle() { // CSS necessario
+                            const overlay_css = document.getElementById("overlay_table_css");
+                            if (!overlay_css) {
+                                const style = document.createElement('style');
+                                style.id = "overlay_table_css";
+                                style.textContent = `
+                                    .table-loading-overlay {
+                                        position: absolute;
+                                        background: rgba(255, 255, 255, 0.7);
+                                        display: none;
+                                        justify-content: center;
+                                        align-items: center;
+                                        z-index: 1000;
+                                        pointer-events: none;
+                                    }
+                                    
+                                    .spinner-container {
+                                        position: relative;
+                                    }
+                                    
+                                    .spinner-border {
+                                        width: 3rem;
+                                        height: 3rem;
+                                    }
+                                `;
+                                document.head.appendChild(style);
+                            }
+                        }
+
+                        function hideLoadingOverlay(table) {
+                            const overlay = table.querySelector('.table-loading-overlay');
+                            if (overlay) {
+                                overlay.style.display = 'none';
+                            }
+                        }
+
+                        document.addEventListener("DOMContentLoaded", async () => {
+                            appendStyle();
+                            const table = document.getElementById("table-search-documents")
+                            await getTypeDocuments();
+
+                            const btnSearchDocuments = document.getElementById("btn-search-documents");
+                            if (btnSearchDocuments) {
+                                btnSearchDocuments.addEventListener("click", async (e) => {
+                                    const result = await searchDocuments();
+                                    console.log("RESULT", result);
+                                });
+                            }
+
+                            const btnSaveDocumentsId = document.getElementById("save-id-type-documents");
+                            if (btnSaveDocumentsId) {
+                                btnSaveDocumentsId.addEventListener("click", async (e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    e.stopImmediatePropagation();
+
+                                    setTypeDocuments();
+                                });
+                            }
+
+                            const checkAllDocuments = document.getElementById("check_all_found_documents");
+                            if (checkAllDocuments) {
+                                checkAllDocuments.addEventListener("click", (e) => {
+                                    const checked = e.target.checked;
+                                    const checkboxes = table.querySelectorAll("input[type=checkbox]");
+                                    checkboxes.forEach((item) => {
+                                        item.checked = checked;
+                                    });
+                                });
+                            }
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

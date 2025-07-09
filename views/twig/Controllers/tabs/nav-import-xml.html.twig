@@ -1,0 +1,148 @@
+<div class="tab-pane fade show active" id="import-xml" role="tabpanel" aria-labelledby="import-xml-tab">
+    <section class="card mb-4">
+        <div class="card-body">
+            <form id="import-xml-form" enctype="multipart/form-data">
+                <div class="form-group mb-3">
+                    <label for="xml-file" class="form-label">
+                        Seleziona file XML
+                    </label>
+                    <div class="custom-file">
+                        <input type="file" class="custom-file-input" id="xml-file" name="xml_file" accept=".xml" required/>
+                        <label class="custom-file-label" for="xml-file">
+                            Scegli file...
+                        </label>
+                    </div>
+                    <small class="form-text text-muted">
+                        Carica un file
+                        <strong>
+                            .xml
+                        </strong>
+                        per importare i movimenti di magazzino.
+                    </small>
+                </div>
+                <div class="d-flex justify-content-start align-items-center gap-2">
+                    <button type="button" class="btn btn-warning mt-2" id="btn-parse-xml-file">
+                        <span class="material-icons">
+                            preview
+                        </span>
+                        <span>
+                            Anteprima file
+                        </span>
+                    </button>
+
+                    <button type="button" class="btn btn-success mt-2" id="btn-import-selected" style="display: none;">
+                        <span class="material-icons">
+                            upload
+                        </span>
+                        <span>
+                            Importa Selezionati
+                        </span>
+                    </button>
+
+                    <button type="button" class="btn btn-info mt-2" id="btn-import-all" style="display: none;">
+                        <span class="material-icons">
+                            upload
+                        </span>
+                        <span>
+                            Importa Tutto
+                        </span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="card-body document-info">
+            <div class="d-flex align-items-center justify-content-start gap-2">
+                <div class="form-group">
+                    <label for="document-number">
+                        Numero
+                    </label>
+                    <input type="text" class="form-control" id="document-number" value="" readonly>
+                </div>
+                <div class="form-group">
+                    <label for="document-date">
+                        Data
+                    </label>
+                    <input type="text" class="form-control" id="document-date" value="" readonly>
+                    <input type="hidden" id="document-date-iso" value="">
+                </div>
+                <div class="form-group grow-1">
+                    <label for="document-supplie-namer">
+                        Fornitore
+                    </label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="document-supplier-id-span">
+                                --
+                            </span>
+                        </div>
+                        <input type="text" class="form-control" id="document-supplier-name" value="" readonly>
+                        <input type="hidden" name="document-supplier-id" id="document-supplier-id">
+                    </div>
+                </div>
+                <div class="form-group grow-1">
+                    <label for="document-movement-name">
+                        Movimento
+                    </label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text" id="document-movement-id-span" title="Id tipo di movimento" onhover="this.style.cursor='pointer'">
+                                --
+                            </span>
+                        </div>
+                        <input type="text" class="form-control" id="document-movement-name" value="" readonly>
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="document-movement-alias-span" title="Id alias movimento" onhover="this.style.cursor='pointer'">
+                                --
+                            </span>
+                        </div>
+                        <input type="hidden" name="document-movement-id" id="document-movement-id">
+                        <input type="hidden" name="document-movement-alias" id="document-movement-alias">
+                        <input type="hidden" name="document-movement-sign" id="document-movement-sign">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body table-container">
+            <table class="table table-condensed table-striped table-hover" id="table-import-xml">
+                <thead>
+                    <tr>
+                        <th>
+                            <input type="checkbox" class="input-checkbox" id="check-all-import">
+                        </th>
+                        <th>
+                            #
+                        </th>
+                        <th>
+                            Img
+                        </th>
+                        <th>
+                            Fornitore
+                        </th>
+                        <th>
+                            Riferimento
+                        </th>
+                        <th>
+                            Ean13
+                        </th>
+                        <th>
+                            Prodotto
+                        </th>
+                        <th>
+                            Combinazione
+                        </th>
+                        <th>
+                            Quantità
+                        </th>
+                        <th>
+                            Magazzino
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Dynamic data -->
+                </tbody>
+                <tbody></tbody>
+            </table>
+        </div>
+    </section>
+</div>

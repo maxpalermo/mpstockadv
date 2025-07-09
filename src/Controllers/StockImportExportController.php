@@ -2,7 +2,10 @@
 
 namespace MpSoft\MpStockAdv\Controllers;
 
+use MpSoft\MpStockAdv\Helpers\GetDocuments;
 use MpSoft\MpStockAdv\Helpers\MenuDataHelper;
+;
+use MpSoft\MpStockAdv\Helpers\OrderToJson;
 use MpSoft\MpStockAdv\Helpers\StockMvtImportHelper;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,49 +21,38 @@ class StockImportExportController extends FrameworkBundleAdminController
      */
     public function index(): Response
     {
+        $id_lang = (int) \Context::getContext()->language->id;
         $this->menuDataHelper = new MenuDataHelper();
-        $this->menuDataHelper->setTitle('Movimenti di magazzino');
-        $this->menuDataHelper->setIcon('inventory');
-        $this->menuDataHelper->injectMenuData(
-            [
-                [
-                    'icon' => 'inventory',
-                    'label' => 'Movimenti',
-                    'children' => [
-                        [
-                            'icon' => 'add',
-                            'label' => 'Nuovo Movimento',
-                            'href' => 'javascript:newMovement();',
-                        ],
-                        [
-                            'icon' => 'download',
-                            'label' => 'Importa Giacenze',
-                            'href' => 'javascript:confirmImport();',
-                        ],
-                    ],
-                ],
-                [
-                    'icon' => 'settings',
-                    'label' => 'Impostazioni',
-                    'children' => [
-                        [
-                            'icon' => 'tune',
-                            'label' => 'Preferenze',
-                            'href' => 'javascript:showModalPreferences();',
-                        ],
-                        [
-                            'icon' => 'lock_open',
-                            'label' => 'Permessi',
-                            'href' => 'javascript:showModalPermissions();',
-                        ],
-                    ],
-                ],
-            ]
-        );
+        $this->menuDataHelper->setTitle('Importazione/Esportazione movimenti');
+        $this->menuDataHelper->setIcon('upload download');
+        $this->menuDataHelper->initMenu();
         return $this->render(
             '@Modules/mpstockadv/views/twig/Controllers/StockImportExportController.index.html.twig',
             [
                 'toolbarMenuHtml' => $this->menuDataHelper->renderMenu(),
+                'order_states' => \OrderState::getOrderStates($id_lang),
+                'document_types' => [
+                    'order' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_ORDER'),
+                        'name' => 'Ordine',
+                    ],
+                    'invoice' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_INVOICE'),
+                        'name' => 'Fattura'
+                    ],
+                    'delivery' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_DELIVERY'),
+                        'name' => 'Nota ordine'
+                    ],
+                    'return' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_RETURN'),
+                        'name' => 'Reso'
+                    ],
+                    'credit_slip' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_CREDIT_SLIP'),
+                        'name' => 'Nota credito'
+                    ]
+                ]
             ]
         );
     }
@@ -187,5 +179,118 @@ class StockImportExportController extends FrameworkBundleAdminController
             'success' => true,
             'message' => 'Importazione movimenti da XML eseguita (mock)',
         ]);
+    }
+
+    public function exportOrderAction(Request $request): JsonResponse
+    {
+        $id_order = $request->get('id_order');
+        $type = $request->get('type');
+
+        $document = $this->prepareDocument($id_order, $type);
+
+        // TODO: implementare export reale
+        return new JsonResponse([
+            'success' => true,
+            'message' => 'Esportazione movimenti da ordini eseguita (mock)',
+            'id_order' => $id_order,
+            'type' => $type,
+            'document' => $document,
+        ]);
+    }
+
+    protected function prepareDocument($id_order, $type)
+    {
+        $order2Json = new OrderToJson();
+        $order2Json->createDocument($id_order, $type);
+        return $order2Json->getDocument();
+    }
+
+    public function setMvtReasonIdAction(Request $request)
+    {
+        $content = $request->getContent();
+        $jsonData = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        $id_type_order = (int) $jsonData['id_type_order'] ?? 0;
+        $id_type_invoice = (int) $jsonData['id_type_invoice'] ?? 0;
+        $id_type_delivery = (int) $jsonData['id_type_delivery'] ?? 0;
+        $id_type_return = (int) $jsonData['id_type_return'] ?? 0;
+        $id_type_credit_slip = (int) $jsonData['id_type_credit_slip'] ?? 0;
+
+        \Configuration::updateValue("MPSTOCKADV_TYPE_ORDER", $id_type_order);
+        \Configuration::updateValue("MPSTOCKADV_TYPE_INVOICE", $id_type_invoice);
+        \Configuration::updateValue("MPSTOCKADV_TYPE_DELIVERY", $id_type_delivery);
+        \Configuration::updateValue("MPSTOCKADV_TYPE_RETURN", $id_type_return);
+        \Configuration::updateValue("MPSTOCKADV_TYPE_CREDIT_SLIP", $id_type_credit_slip);
+
+        return $this->json([
+            'success' => true,
+            'message' => 'ID tipi di movimento aggiornati',
+        ]);
+    }
+
+    public function getMvtReasonIdAction()
+    {
+        return $this->json(
+            [
+                'success' => true,
+                'document_types' => [
+                    'order' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_ORDER'),
+                        'name' => 'Ordine',
+                    ],
+                    'invoice' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_INVOICE'),
+                        'name' => 'Fattura'
+                    ],
+                    'delivery' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_DELIVERY'),
+                        'name' => 'Nota ordine'
+                    ],
+                    'return' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_RETURN'),
+                        'name' => 'Reso'
+                    ],
+                    'credit_slip' => [
+                        'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_CREDIT_SLIP'),
+                        'name' => 'Nota credito'
+                    ]
+                ]
+            ]
+        );
+    }
+
+    public function searchDocumentsAction(Request $request)
+    {
+        $content = $request->getContent();
+        $json = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+
+        if ($json) {
+            $idOrderStates = $json['idOrderStates'];
+            $idTypeDocument = $json['idTypeDocument'];
+            $page = (int) $json['page'];
+            $perPage = (int) $json['perPage'];
+
+            $getDocuments = new GetDocuments($page, $perPage, $idOrderStates, $idTypeDocument);
+            $result = $getDocuments->run();
+
+            $twigData = $this->renderView(
+                '@Modules/mpstockadv/views/twig/Controllers/StockImportExport/tbody.html.twig',
+                ['rows' => $result['rows']]
+            );
+
+
+            $twigPagination = $this->renderView(
+                '@Modules/mpstockadv/views/twig/Components/pagination.html.twig',
+                [
+                    'pagination' => $result['pagination']
+                ]
+            );
+
+            return $this->json([
+                'success' => true,
+                'data' => $twigData,
+                'pagination' => $twigPagination,
+            ]);
+        }
     }
 }

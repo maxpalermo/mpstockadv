@@ -277,3 +277,23 @@ mpstockadv_controller_stockimportexport_import_xml:
   path: /admin/mpstockadv/stock-import-export/import-xml
   controller: MpSoft\MpStockAdv\Helpers\StockMvtImportHelper::importXmlAction
   methods: [POST]
+
+mpstockadv_export_order:
+  path: /admin/mpstockadv/order/{id_order}/export/{type}
+  controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::exportOrderAction
+  methods: [GET]
+
+mpstockadv_admin_stockimportexport_set_mvt_reason_id:
+  path: /admin/mpstockadv/stock-import-export/set-mvt-reason-id
+  controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::setMvtReasonIdAction
+  methods: [POST]
+
+mpstockadv_admin_stockimportexport_get_mvt_reason_id:
+  path: /admin/mpstockadv/stock-import-export/get-mvt-reason-id
+  controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::getMvtReasonIdAction
+  methods: [GET]
+
+mpstockadv_admin_stockimportexport_search_documents:
+  path: /admin/mpstockadv/stock-import-export/search-documents
+  controller: MpSoft\MpStockAdv\Controllers\StockImportExportController::searchDocumentsAction
+  methods: [POST]

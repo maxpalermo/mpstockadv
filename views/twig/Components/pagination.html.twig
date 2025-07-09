@@ -1,0 +1,50 @@
+<div class="d-flex justify-content-center align-items-center">
+    <nav class="paginator" aria-label="Page navigation" data-total-pages="{{ pagination.totalPages }}" data-current-page="{{ pagination.currentPage }}" data-per-pages="{{ pagination.perPages }}">
+        <ul class="pagination">
+            {# Prima pagina #}
+            <li class="page-item">
+                <button class="page-link page-navigation" aria-label="First" title="1" data-page="1">
+                    <span aria-hidden="true">
+                        <span class="material-icons">first_page</span>
+                    </span>
+                </button>
+            </li>
+
+            {# Freccia indietro #}
+            <li class="page-item {% if not pagination.hasPrevious %}disabled{% endif %}">
+                <button class="page-link page-navigation" aria-label="Previous" title="{{ pagination.currentPage - 1 }}" data-page="{{ pagination.currentPage - 1 }}">
+                    <span aria-hidden="true">
+                        <span class="material-icons">chevron_left</span>
+                    </span>
+                </button>
+            </li>
+
+            {# Pagine numeriche #}
+            {% for page in pagination.startPage..pagination.endPage %}
+            <li class="page-item {% if page == pagination.currentPage %}active{% endif %}">
+                <button class="page-link page-navigation" data-page="{{ page }}">
+                    {{ page }}
+                </button>
+            </li>
+            {% endfor %}
+
+            {# Freccia avanti #}
+            <li class="page-item {% if not pagination.hasNext %}disabled{% endif %}">
+                <button class="page-link page-navigation" aria-label="Next" title="{{ pagination.currentPage + 1 }}" data-page="{{ pagination.currentPage + 1 }}">
+                    <span aria-hidden="true">
+                        <span class="material-icons">chevron_right</span>
+                    </span>
+                </button>
+            </li>
+
+            {# Ultima pagina #}
+            <li class="page-item">
+                <button class="page-link page-navigation" aria-label="Last" title="{{ pagination.totalPages }}" data-page="{{ pagination.totalPages }}">
+                    <span aria-hidden="true">
+                        <span class="material-icons">last_page</span>
+                    </span>
+                </button>
+            </li>
+        </ul>
+    </nav>
+</div>

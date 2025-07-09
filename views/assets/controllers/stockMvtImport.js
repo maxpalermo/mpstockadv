@@ -81,14 +81,13 @@ function initDataTable() {
         language: {
             url: window.tableDataLanguageItUrl
         },
-        pageLength: 25,
+        pageLength: 1000,
         lengthMenu: [
-            [10, 25, 50, 100, 200, 500],
-            [10, 25, 50, 100, 200, 500]
+            [10, 25, 50, 100, 200, 500, 1000],
+            [10, 25, 50, 100, 200, 500, 1000]
         ],
         data: datasetXmlImport,
-        columns: [
-            {
+        columns: [{
                 name: "checkbox",
                 type: "checkbox",
                 className: "text-center",

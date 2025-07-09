@@ -42,8 +42,8 @@ body {
 }
 
 :is(body:not(.ps-bo-rebrand)):is(body:not(.no-smb-reskin)) .table tbody>tr:not(.fees):not(.fees_all):not(.range_sup):not(.range_inf):hover>td {
-    background-color: var(--primary) !important;
-    color: var(--light) !important;
+    background-color: #f1e978 !important;
+    color: #303030 !important;
 }
 
 .select2-container--open {

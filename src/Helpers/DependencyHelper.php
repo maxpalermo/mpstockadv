@@ -91,4 +91,19 @@ class DependencyHelper
         /** @var \Twig\Environment */
         $this->twig = $container->get('twig');
     }
+
+    protected function renderView(string $view, array $parameters = []): string
+    {
+        if ($this->container->has('templating') && $this->container->get('templating')->supports($view)) {
+            @trigger_error('Using the "templating" service is deprecated since version 4.3 and will be removed in 5.0; use Twig instead.', \E_USER_DEPRECATED);
+
+            return $this->container->get('templating')->render($view, $parameters);
+        }
+
+        if (!$this->container->has('twig')) {
+            throw new \LogicException('You can not use the "renderView" method if the Templating Component or the Twig Bundle are not available. Try running "composer require symfony/twig-bundle".');
+        }
+
+        return $this->container->get('twig')->render($view, $parameters);
+    }
 }

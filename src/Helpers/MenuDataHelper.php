@@ -96,6 +96,11 @@ class MenuDataHelper extends DependencyHelper
         return $this->menuData;
     }
 
+    public function initMenu()
+    {
+        $this->getDefaultMenuData();
+    }
+
     public function injectMenuData(array $values)
     {
         $this->getDefaultMenuData();

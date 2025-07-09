@@ -1,215 +1,113 @@
 {% extends '@PrestaShop/Admin/layout.html.twig' %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.bs.min.css') }}">
-    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-pagination.css') }}">
-    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-processing.css') }}">
-    <link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/css/style.css') }}">
+{{ parent() }}
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.bs.min.css') }}">
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-pagination.css') }}">
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/datatables/dt-processing.css') }}">
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.bs4.min.css') }}">
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/css/style.css') }}">
+<link rel="stylesheet" href="{{ asset('../modules/mpstockadv/views/assets/css/pagination.css') }}">
 {% endblock %}
 
 {% block javascripts %}
-    {{ parent() }}
-    <script src="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.min.js') }}"></script>
-    <script type="text/javascript">
-        const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}";
-        const parseXmlFileUrl = "{{ path('mpstockadv_controller_stockimportexport_parse_xml') }}"
-        const importXmlStockUrl = "{{ path('mpstockadv_controller_stockimportexport_import_xml') }}";
+{{ parent() }}
+<script src="{{ asset('../modules/mpstockadv/views/assets/toolbar-menu/moveTop.js') }}"></script>
+<script src="{{ asset('../modules/mpstockadv/views/assets/components/datatables/datatables.min.js') }}"></script>
+<script src="{{ asset('../modules/mpstockadv/views/assets/components/select2/select2.min.js') }}"></script>
+<script type="text/javascript">
+    const tableDataLanguageItUrl = "{{ asset('../modules/mpstockadv/views/assets/components/datatables/it-IT.json') }}",
+        parseXmlFileUrl = "{{ path('mpstockadv_controller_stockimportexport_parse_xml') }}",
+        importXmlStockUrl = "{{ path('mpstockadv_controller_stockimportexport_import_xml') }}";
 
-        window.tableDataLanguageItUrl = tableDataLanguageItUrl;
-        window.parseXmlFileUrl = parseXmlFileUrl;
-        window.importXmlStockUrl = importXmlStockUrl;
-    </script>
-    <script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvtImport.js') }}"></script>
+    window.tableDataLanguageItUrl = tableDataLanguageItUrl;
+    window.parseXmlFileUrl = parseXmlFileUrl;
+    window.importXmlStockUrl = importXmlStockUrl;
+</script>
+<script src="{{ asset('../modules/mpstockadv/views/assets/controllers/stockMvtImport.js') }}"></script>
 {% endblock %}
 
 {% block content %}
-    <div class="toolbar-menu">
-        {{ toolbarMenuHtml|raw }}
-    </div>
-    <div class="bootstrap mt-4">
-        <h2 class="mb-4">Importazione Movimenti Magazzino</h2>
+<div class="toolbar-menu">
+    {{ toolbarMenuHtml|raw }}
+</div>
+<div class="bootstrap mt-4">
+    <h2 class="mb-4">
+        Importazione Movimenti Magazzino
+    </h2>
 
-        <ul class="nav nav-tabs" id="importExportTabs" role="tablist">
-            <li class="nav-item">
-                <a class="nav-link active" id="import-xml-tab" data-toggle="tab" href="#import-xml" role="tab" aria-controls="import-xml" aria-selected="true">Importa da XML</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="export-xml-tab" data-toggle="tab" href="#export-xml" role="tab" aria-controls="export-xml" aria-selected="false">Export XML</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" id="import-order-detail-tab" data-toggle="tab" href="#import-order-detail" role="tab" aria-controls="import-order-detail" aria-selected="false">Importa da Ordini</a>
-            </li>
-        </ul>
 
-        <div class="tab-content" id="importExportTabsContent">
-            <div class="tab-pane fade show active" id="import-xml" role="tabpanel" aria-labelledby="import-xml-tab">
-                <!-- Sezione 1: Importa da XML -->
-                <section class="card mb-4">
-                    <div class="card-body">
-                        <form id="import-xml-form" enctype="multipart/form-data">
-                            <div class="form-group mb-3">
-                                <label for="xml-file" class="form-label">Seleziona file XML</label>
-                                <div class="custom-file">
-                                    <input type="file" class="custom-file-input" id="xml-file" name="xml_file" accept=".xml" required />
-                                    <label class="custom-file-label" for="xml-file">Scegli file...</label>
-                                </div>
-                                <small class="form-text text-muted">Carica un file <strong>.xml</strong> per importare i movimenti di magazzino.</small>
-                            </div>
-                            <div class="d-flex justify-content-start align-items-center gap-2">
-                                <button type="button" class="btn btn-warning mt-2" id="btn-parse-xml-file">
-                                    <span class="material-icons">preview</span>
-                                    <span>Anteprima file</span>
-                                </button>
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="nav-import-xml" data-toggle="tab" data-target="#tab-import-xml" type="button" role="tab" aria-controls="tab-import-xml" aria-selected="true">
+                <span class="material-icons">
+                    download
+                </span>
+                <span class="label">
+                    Importa da XML
+                </span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-export-xml" data-toggle="tab" data-target="#tab-export-xml" type="button" role="tab" aria-controls="tab-export-xml" aria-selected="false">
+                <span class="material-icons">
+                    upload
+                </span>
+                <span class="label">
+                    Esporta documenti
+                </span>
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="nav-import-mvt-reasons" data-toggle="tab" data-target="#tab-import-mvt-reasons" type="button" role="tab" aria-controls="tab-import-mvt-reasons" aria-selected="false">
+                <span class="material-icons">
+                    download
+                </span>
 
-                                <button type="button" class="btn btn-success mt-2" id="btn-import-selected" style="display: none;">
-                                    <span class="material-icons">upload</span>
-                                    <span>Importa Selezionati</span>
-                                </button>
-
-                                <button type="button" class="btn btn-info mt-2" id="btn-import-all" style="display: none;">
-                                    <span class="material-icons">upload</span>
-                                    <span>Importa Tutto</span>
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="card-body document-info">
-                        <div class="d-flex align-items-center justify-content-start gap-2">
-                            <div class="form-group">
-                                <label for="document-number">Numero</label>
-                                <input type="text" class="form-control" id="document-number" value="" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="document-date">Data</label>
-                                <input type="text" class="form-control" id="document-date" value="" readonly>
-                                <input type="hidden" id="document-date-iso" value="">
-                            </div>
-                            <div class="form-group grow-1">
-                                <label for="document-supplie-namer">Fornitore</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="document-supplier-id-span">--</span>
-                                    </div>
-                                    <input type="text" class="form-control" id="document-supplier-name" value="" readonly>
-                                    <input type="hidden" name="document-supplier-id" id="document-supplier-id">
-                                </div>
-                            </div>
-                            <div class="form-group grow-1">
-                                <label for="document-movement-name">Movimento</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text" id="document-movement-id-span" title="Id tipo di movimento" onhover="this.style.cursor='pointer'">--</span>
-                                    </div>
-                                    <input type="text" class="form-control" id="document-movement-name" value="" readonly>
-                                    <div class="input-group-append">
-                                        <span class="input-group-text" id="document-movement-alias-span" title="Id alias movimento" onhover="this.style.cursor='pointer'">--</span>
-                                    </div>
-                                    <input type="hidden" name="document-movement-id" id="document-movement-id">
-                                    <input type="hidden" name="document-movement-alias" id="document-movement-alias">
-                                    <input type="hidden" name="document-movement-sign" id="document-movement-sign">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body table-container">
-                        <table class="table table-condensed table-striped table-hover" id="table-import-xml">
-                            <thead>
-                                <tr>
-                                    <th>
-                                        <input type="checkbox" class="input-checkbox" id="check-all-import">
-                                    </th>
-                                    <th>#</th>
-                                    <th>Img</th>
-                                    <th>Fornitore</th>
-                                    <th>Riferimento</th>
-                                    <th>Ean13</th>
-                                    <th>Prodotto</th>
-                                    <th>Combinazione</th>
-                                    <th>Quantità</th>
-                                    <th>Magazzino</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Dynamic data -->
-                            <tbody>
-                        </table>
-                    </div>
-                </section>
-            </div>
+                <span class="label">
+                    Importa tipi di movimento
+                </span>
+            </button>
+        </li>
+    </ul>
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" id="tab-import-xml" role="tabpanel" aria-labelledby="nav-import-xml">
+            {% include '@Modules/mpstockadv/views/twig/Controllers/tabs/nav-import-xml.html.twig' with _context %}
         </div>
+        <div class="tab-pane fade" id="tab-export-xml" role="tabpanel" aria-labelledby="nav-export-xml">
+            {% include '@Modules/mpstockadv/views/twig/Controllers/tabs/nav-export-xml.html.twig' with _context %}
+        </div>
+        <div class="tab-pane fade" id="tab-import-mvt-reasons" role="tabpanel" aria-labelledby="nav-import-mvt-reasons">
+            {% include '@Modules/mpstockadv/views/twig/Controllers/tabs/nav-import-mvt-reasons.html.twig' with _context %}
+        </div>
+    </div>
+</div>
 
-        <div class="tab-pane fade" id="export-xml" role="tabpanel" aria-labelledby="export-xml-tab">
-            <!-- Sezione Export XML -->
-            <!-- Sezione 1: Importa Tipi di Movimento (CSV/JSON) -->
-            <section class="card mb-4">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Importa Tipi di Movimento</h5>
-                </div>
-                <div class="card-body">
+<!-- Dialog per stato importazione e errori -->
+<dialog id="import-status-dialog" class="bootstrap">
+    <div class="card">
+        <div class="card-body">
+            <form method="dialog">
+                <h4 id="import-status-title">
+                    Stato Importazione
+                </h4>
+                <div id="import-status-content">
                     <p>
-                        Carica un file
-                        <strong>CSV</strong>
-                        o
-                        <strong>JSON</strong>
-                        per importare i tipi di movimento magazzino dalle versioni precedenti del modulo.
+                        In attesa di avviare un'importazione...
                     </p>
-                    <form id="import-mvt-reason-form" enctype="multipart/form-data">
-                        <div class="form-group mb-2">
-                            <label for="mvt-reason-type">Tipo di file da importare:</label>
-                            <select name="mvt_reason_type" id="mvt-reason-type" class="form-control" required>
-                                <option value="all">File completo</option>
-                                <option value="reasons">File dei tipi di movimento senza nome</option>
-                                <option value="lang">File lingua dei tipi di movimento</option>
-                            </select>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label for="mvt-reason-file" class="form-label">Seleziona file</label>
-                            <div class="input-group">
-                                <input type="file" name="mvt_reason_file" id="mvt-reason-file" accept=".csv,.json" class="form-control" required />
-                                <label class="input-group-text" for="mvt-reason-file">Scegli...</label>
-                            </div>
-                            <small id="mvt-reason-file-name" class="form-text text-muted"></small>
-                        </div>
-                        <button type="submit" class="btn btn-success mt-2">Importa Tipi Movimento</button>
-                    </form>
                 </div>
-            </section>
+            </form>
         </div>
-
-        <div class="tab-pane fade" id="import-order-detail" role="tabpanel" aria-labelledby="import-order-detail-tab">
-            <!-- Sezione 2: Importa Movimenti da Ordini PrestaShop -->
-            <section class="card mb-4">
-                <div class="card-header bg-info text-white">
-                    <h5 class="mb-0">Importa Movimenti da Ordini PrestaShop</h5>
-                </div>
-                <div class="card-body">
-                    <p>Importa i movimenti di magazzino generati dagli ordini già presenti in PrestaShop.</p>
-                    <form id="import-orders-form">
-                        <button type="submit" class="btn btn-primary">Importa Movimenti da Ordini</button>
-                    </form>
-                </div>
-            </section>
+        <div class="card-footer d-flex justify-content-center align-items-center gap-2">
+            <button id="close-dialog" class="bootstrap btn btn-primary">
+                <span class="material-icons">
+                    close
+                </span>
+                <span class="bold ml-2">
+                    Chiudi
+                </span>
+            </button>
         </div>
     </div>
-
-    <!-- Dialog per stato importazione e errori -->
-    <dialog id="import-status-dialog" class="bootstrap">
-        <div class="card">
-            <div class="card-body">
-                <form method="dialog">
-                    <h4 id="import-status-title">Stato Importazione</h4>
-                    <div id="import-status-content">
-                        <p>In attesa di avviare un'importazione...</p>
-                    </div>
-                </form>
-            </div>
-            <div class="card-footer d-flex justify-content-center align-items-center gap-2">
-                <button id="close-dialog" class="bootstrap btn btn-primary">
-                    <span class="material-icons">close</span>
-                    <span class="bold ml-2">Chiudi</span>
-                </button>
-            </div>
-        </div>
-    </dialog>
+</dialog>
 {% endblock %}

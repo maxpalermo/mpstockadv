@@ -85,17 +85,17 @@ div.dt-processing>div:last-child>div:nth-child(4) {
 }
 
 .table-hover tbody tr:hover {
-    background-color: #25b9d7 !important;
-    color: #fcfcfc !important;
+    background-color: #f1e978 !important;
+    color: #303030 !important;
 }
 
 .table-hover tbody tr:hover td {
-    background-color: #25b9d7 !important;
-    color: #fcfcfc !important;
+    background-color: #f1e978 !important;
+    color: #303030 !important;
 }
 
 
 :is(body:not(.ps-bo-rebrand)):is(body:not(.no-smb-reskin)) .table tbody>tr:not(.fees):not(.fees_all):not(.range_sup):not(.range_inf):hover>td {
-    background-color: #25b9d7 !important;
-    color: #fcfcfc !important;
+    background-color: #f1e978 !important;
+    color: #303030 !important;
 }

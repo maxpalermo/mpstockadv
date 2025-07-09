@@ -1,0 +1,49 @@
+<div class="card">
+    <div class="card-body">
+        <div class="d-flex justify-content-center align-items-center mt-2 mb-2 gap-2">
+            <button class="btn btn-primary d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-order">
+                <span class="material-icons">article</span>
+                <span class="btn-label">Esporta ordine</span>
+            </button>
+            {% if has_delivery %}
+                <button class="btn btn-warning d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-note">
+                    <span class="material-icons">article</span>
+                    <span class="btn-label">Esporta nota</span>
+                </button>
+            {% endif %}
+            {% if has_invoice %}
+                <button class="btn btn-danger d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-invoice">
+                    <span class="material-icons">article</span>
+                    <span class="btn-label">Esporta fattura</span>
+                </button>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnExportOrder = document.getElementById('btn-export-order');
+        const btnExportNote = document.getElementById('btn-export-note');
+        const btnExportInvoice = document.getElementById('btn-export-invoice');
+
+        btnExportOrder.addEventListener('click', function() {
+            const url = `{{ path('mpstockadv_export_order', { 'id_order': id_order, 'type': 'order' }) }}`;
+            window.location.href = url;
+        });
+
+        if (btnExportNote) {
+            btnExportNote.addEventListener('click', function() {
+                const url = `{{ path('mpstockadv_export_order', { 'id_order': id_order, 'type': 'delivery' }) }}`;
+                window.location.href = url;
+            });
+        }
+
+        if (btnExportInvoice) {
+            btnExportInvoice.addEventListener('click', function() {
+                const url = `{{ path('mpstockadv_export_order', { 'id_order': id_order, 'type': 'invoice' }) }}`;
+                window.location.href = url;
+            });
+        }
+    });
+</script>

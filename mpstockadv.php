@@ -22,16 +22,20 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use MpSoft\MpStockAdv\Helpers\TwigManager;
 use MpSoft\MpStockAdv\Helpers\UpdateTablesHelper;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
 
 class MpStockAdv extends Module
 {
+    /** @var \Twig\Environment */
+    private $twig;
+
     public function __construct()
     {
         $this->name = 'mpstockadv';
         $this->tab = 'administration';
-        $this->version = '0.1.5.8087';
+        $this->version = '0.1.6.25';
         $this->author = 'Massimiliano Palermo';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
@@ -68,29 +72,41 @@ class MpStockAdv extends Module
         // Aggiornamento tabelle
         $this->updateTables();
 
+        $hooks = [
+            'actionAdminControllerSetMedia',
+            'actionOrderStatusPostUpdate',
+            'actionOrderStatusUpdate',
+            'actionOrderAddBefore',
+            'actionOrderAddAfter',
+            'actionOrderUpdateBefore',
+            'actionOrderUpdateAfter',
+            'actionOrderDeleteBefore',
+            'actionOrderDeleteAfter',
+            'actionOrderDetailAddBefore',
+            'actionOrderDetailAddAfter',
+            'actionOrderDetailUpdateBefore',
+            'actionOrderDetailUpdateAfter',
+            'actionOrderDetailDeleteBefore',
+            'actionOrderDetailDeleteAfter',
+            'actionOrderReturn',
+            'actionOrderReturnAddBefore',
+            'actionOrderReturnAddAfter',
+            'actionOrderReturnUpdateBefore',
+            'actionOrderReturnUpdateAfter',
+            'actionOrderReturnDeleteBefore',
+            'actionOrderReturnDeleteAfter',
+            'displayAdminOrder',
+            'displayAdminOrderCreateExtraButtons',
+            'displayAdminOrderMain',
+            'displayAdminOrderMainBottom',
+            'displayAdminOrderSide',
+            'displayAdminOrderSideBottom',
+            'displayAdminOrderTabContent',
+            'displayAdminOrderTabLink',
+            'displayAdminOrderTop',
+        ];
         // Registrazione hook
-        return $this->registerHook('actionAdminControllerSetMedia')
-            && $this->registerHook('actionOrderStatusPostUpdate')
-            && $this->registerHook('actionOrderStatusUpdate')
-            && $this->registerHook('actionOrderAddBefore')
-            && $this->registerHook('actionOrderAddAfter')
-            && $this->registerHook('actionOrderUpdateBefore')
-            && $this->registerHook('actionOrderUpdateAfter')
-            && $this->registerHook('actionOrderDeleteBefore')
-            && $this->registerHook('actionOrderDeleteAfter')
-            && $this->registerHook('actionOrderDetailAddBefore')
-            && $this->registerHook('actionOrderDetailAddAfter')
-            && $this->registerHook('actionOrderDetailUpdateBefore')
-            && $this->registerHook('actionOrderDetailUpdateAfter')
-            && $this->registerHook('actionOrderDetailDeleteBefore')
-            && $this->registerHook('actionOrderDetailDeleteAfter')
-            && $this->registerHook('actionOrderReturn')
-            && $this->registerHook('actionOrderReturnAddBefore')
-            && $this->registerHook('actionOrderReturnAddAfter')
-            && $this->registerHook('actionOrderReturnUpdateBefore')
-            && $this->registerHook('actionOrderReturnUpdateAfter')
-            && $this->registerHook('actionOrderReturnDeleteBefore')
-            && $this->registerHook('actionOrderReturnDeleteAfter');
+        return $this->registerHook($hooks);
     }
 
     public function uninstall()
@@ -129,7 +145,7 @@ class MpStockAdv extends Module
         ];
 
         //exit(Tools::dieObject($tableStructures));
-        return $twig->render('@Modules/mpstockadv/views/twig/MpStockAdv/GetContent.html.twig', [
+        return $twig->render('@Modules/mpstockadv/views/twig/Module/GetContent.html.twig', [
             'tables' => $struct
         ]);
     }
@@ -140,6 +156,60 @@ class MpStockAdv extends Module
     }
 
     // --- HOOKS ---
+
+    public function hookDisplayAdminOrder($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order</div>";
+    }
+
+    public function hookDisplayAdminOrderCreateExtraButtons($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Create Extra Buttons</div>";
+    }
+    public function hookDisplayAdminOrderMain($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Main</div>";
+    }
+    public function hookDisplayAdminOrderMainBottom($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Main Bottom</div>";
+    }
+    public function hookDisplayAdminOrderSide($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Side</div>";
+    }
+    public function hookDisplayAdminOrderSideBottom($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Side Bottom</div>";
+    }
+    public function hookDisplayAdminOrderTabContent($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Tab Content</div>";
+    }
+    public function hookDisplayAdminOrderTabLink($params)
+    {
+        return "<div class='box-danger'>Hook Display Admin Order Tab Link</div>";
+    }
+    public function hookDisplayAdminOrderTop($params)
+    {
+        $twig = SymfonyContainer::getInstance()->get('twig');
+        $id_order = (int) $params['id_order'];
+        $order = new Order($id_order);
+        if (!Validate::isLoadedObject($order)) {
+            return false;
+        }
+        $hasDelivery = $order->delivery_number ?: false;
+        $hasInvoice = $order->invoice_number ?: false;
+
+        return $twig->render(
+            '@Modules/mpstockadv/views/twig/Module/DisplayAdminOrderTop.html.twig',
+            [
+                'id_order' => $id_order,
+                'has_delivery' => $hasDelivery,
+                'has_invoice' => $hasInvoice,
+            ]
+        );
+    }
 
     /**
      * Caricamento media backend.
