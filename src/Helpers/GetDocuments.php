@@ -58,20 +58,29 @@ class GetDocuments extends DependencyHelper
         $typeReturn = \Configuration::get("MPSTOCKADV_TYPE_RETURN");
         $typeCreditSlip = \Configuration::get("MPSTOCKADV_TYPE_CREDIT_SLIP");
 
+        $queryTypeDocument = '';
+
         switch ($typeDocument) {
             case $typeOrder:
+                $queryTypeDocument = '';
                 break;
             case $typeInvoice:
+                $queryTypeDocument = " AND invoice_number != 0 ";
                 break;
             case $typeDelivery:
+                $queryTypeDocument = " AND delivery_number != 0 ";
                 break;
             case $typeReturn:
-                break;
             case $typeCreditSlip:
-                break;
+                $this->totalRows = 0;
+                return [
+                    'totalRows' => 0,
+                    'rows' => [],
+                    'pagination' => false,
+                ];
         }
 
-        $query = "
+        $query = <<<QUERY
             SELECT
                 o.id_order,
                 o.reference,
@@ -86,11 +95,20 @@ class GetDocuments extends DependencyHelper
                 ON (o.current_state=osl.id_order_state AND osl.id_lang={$id_lang})
             INNER JOIN
                 {$pfx}customer c
-                ON (o.id_customer=c.id_customer)    
-            WHERE
-                o.current_state IN ({$orderStateList})
-            ORDER BY o.id_order DESC
-        ";
+                ON (o.id_customer=c.id_customer)
+            WHERE 1
+            
+        QUERY;
+
+        $queryWhere = " AND o.current_state IN ({$orderStateList}) ";
+        $queryOrderBy = " ORDER BY o.id_order DESC";
+
+        if ($orderStateList) {
+            $query .= $queryWhere;
+        }
+        $query .= $queryTypeDocument;
+
+        $query .= $queryOrderBy;
 
         $statement = $this->connection->executeQuery($query);
         $result = $statement->fetchAllAssociative();
@@ -102,6 +120,7 @@ class GetDocuments extends DependencyHelper
         }
 
         return [
+            'totalRows' => $this->totalRows,
             'rows' => $this->chunk,
             'pagination' => $this->createPagination(),
         ];
@@ -115,6 +134,7 @@ class GetDocuments extends DependencyHelper
 
         $pagination = new PaginationHelper($currentPage, $perPage, $totalRows);
         $paginator = [
+            'totalRows' => $totalRows,
             'currentPage' => $pagination->getCurrentPage(),
             'totalPages' => $pagination->getTotalPages(),
             'startPage' => max(1, $currentPage - 2),

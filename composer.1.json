@@ -1,12 +1,18 @@
 {
     "name": "mpsoft/mpstockadv",
     "description": "Gestione Magazzino Avanzato",
-    "authors": [{
-        "name": "Massimiliano Palermo",
-        "email": "maxx.palermo@gmail.com"
-    }],
+    "authors": [
+        {
+            "name": "Massimiliano Palermo",
+            "email": "maxx.palermo@gmail.com"
+        }
+    ],
     "require": {
-        "php": ">=7.4.0"
+        "php": ">=7.4.0",
+        "symfony/serializer": "^6.0",
+        "symfony/http-foundation": "^6.0",
+        "symfony/form": "^6.0",
+        "symfony/validator": "^6.0"
     },
     "autoload": {
         "psr-4": {

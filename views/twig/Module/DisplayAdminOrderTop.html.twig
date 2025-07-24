@@ -6,43 +6,100 @@
                 <span class="btn-label">Esporta ordine</span>
             </button>
             {% if has_delivery %}
-                <button class="btn btn-warning d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-note">
-                    <span class="material-icons">article</span>
-                    <span class="btn-label">Esporta nota</span>
-                </button>
+            <button class="btn btn-warning d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-note">
+                <span class="material-icons">article</span>
+                <span class="btn-label">Esporta nota</span>
+            </button>
             {% endif %}
             {% if has_invoice %}
-                <button class="btn btn-danger d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-invoice">
-                    <span class="material-icons">article</span>
-                    <span class="btn-label">Esporta fattura</span>
-                </button>
+            <button class="btn btn-danger d-flex justify-content-start align-items-center gap-2 btn-export" id="btn-export-invoice">
+                <span class="material-icons">article</span>
+                <span class="btn-label">Esporta fattura</span>
+            </button>
             {% endif %}
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
+    async function exportDocument(id, type) {
+        const request = await fetch("{{ path('mpstockadv_admin_stockimportexport_export') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({
+                ids: [id],
+                typeDocument: type
+            })
+        });
+
+        const response = await request.json();
+        if (response.success) {
+            const xml = response.xml;
+            const currentDate = getCurrentDateTimeFormatted();
+            const filename = `export-${currentDate}.xml`;
+            downloadXmlString(response.xml, filename);
+        }
+    }
+
+    function downloadXmlString(xmlString, filename = 'documento.xml') {
+        // 1. Creare un Blob dalla stringa XML
+        // Specifichiamo il tipo MIME corretto per XML
+        const blob = new Blob([xmlString], {
+            type: 'application/xml;charset=utf-8'
+        });
+
+        // 2. Creare un URL oggetto dal Blob
+        const url = URL.createObjectURL(blob);
+
+        // 3. Creare un elemento <a> in memoria
+        const a = document.createElement('a');
+        a.style.display = 'none'; // Nascondi l'elemento
+        document.body.appendChild(a); // Aggiungi l'elemento al DOM (anche se nascosto, è necessario per il clic)
+
+        // 4. Impostare l'attributo href e download
+        a.href = url;
+        a.download = filename; // Nome del file che verrà scaricato
+
+        // 5. Simulare il clic sull'elemento <a>
+        a.click();
+
+        // 6. Rimuovere l'elemento <a> dal DOM e rilasciare l'URL oggetto
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url); // Rilascia l'URL oggetto per liberare memoria
+    }
+
+    function getCurrentDateTimeFormatted() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = (now.getMonth() + 1).toString().padStart(2, '0');
+        const day = now.getDate().toString().padStart(2, '0');
+        const hours = now.getHours().toString().padStart(2, '0');
+        const minutes = now.getMinutes().toString().padStart(2, '0');
+        const seconds = now.getSeconds().toString().padStart(2, '0');
+        return `${year}${month}${day}-${hours}${minutes}${seconds}`;
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         const btnExportOrder = document.getElementById('btn-export-order');
         const btnExportNote = document.getElementById('btn-export-note');
         const btnExportInvoice = document.getElementById('btn-export-invoice');
 
-        btnExportOrder.addEventListener('click', function() {
-            const url = `{{ path('mpstockadv_export_order', { 'id_order': id_order, 'type': 'order' }) }}`;
-            window.location.href = url;
+        btnExportOrder.addEventListener('click', async () => {
+            await exportDocument("{{ id_order }}", "order");
         });
 
         if (btnExportNote) {
-            btnExportNote.addEventListener('click', function() {
-                const url = `{{ path('mpstockadv_export_order', { 'id_order': id_order, 'type': 'delivery' }) }}`;
-                window.location.href = url;
+            btnExportNote.addEventListener('click', async () => {
+                await exportDocument("{{ id_order }}", "delivery");
             });
         }
 
         if (btnExportInvoice) {
-            btnExportInvoice.addEventListener('click', function() {
-                const url = `{{ path('mpstockadv_export_order', { 'id_order': id_order, 'type': 'invoice' }) }}`;
-                window.location.href = url;
+            btnExportInvoice.addEventListener('click', async () => {
+                await exportDocument("{{ id_order }}", "invoice");
             });
         }
     });

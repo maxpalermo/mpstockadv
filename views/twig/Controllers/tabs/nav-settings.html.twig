@@ -1,0 +1,85 @@
+<div class="card bootstrap">
+    <div class="card-header">
+        <h3>
+            <span class="material-icons">settings</span>
+            <span>Impostazioni</span>
+        </h3>
+    </div>
+    <div class="card-body">
+        <div class="d-flex justify-content-start align-items-top gap-3">
+            <div class="form-wrapper">
+                <div class="form-group" style="max-width: 250px;">
+                    <h3>
+                        Tipi di documento
+                    </h3>
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <div class="form-group">
+                                <div class="input-group">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text">Ordine</span>
+                                    </div>
+                                    <input type="text" id="type-doc-ordine" class="form-control type-doc text-right fixed-width-sm">
+                                </div>
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Fattura</span>
+                                </div>
+                                <input type="text" id="type-doc-invoice" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Nota d'ordine</span>
+                                </div>
+                                <input type="text" id="type-doc-delivery" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Reso</span>
+                                </div>
+                                <input type="text" id="type-doc-return" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                        <li class="list-group-item">
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text">Nota credito</span>
+                                </div>
+                                <input type="text" id="type-doc-credit-slip" class="form-control type-doc text-right fixed-width-sm">
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="d-flex justify-content-end align-items-center mt-4">
+                        <button type="button" class="btn btn-primary" id="save-id-type-documents">
+                            <span class="material-icons mr-2">save</span>
+                            <span class="label">Salva ID</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-wrapper">
+                <div class="form-group" style="max-width: 250px;">
+                    <h3>Modulo pagamento contrassegno</h3>
+                    <select name="select-payment-module[]" id="select-payment-module" class="select2 form-control" multiple>
+                        {% for item in payment_modules %}
+                        <option value="{{ item }}" {% if item in payment_modules_selected %}selected{% endif %}>{{ item }}</option>
+                        {% endfor %}
+                    </select>
+                    <div class="d-flex justify-content-end align-items-center mt-4">
+                        <button type="button" class="btn btn-primary" id="btn-save-payment-modules">
+                            <span class="material-icons mr-2">save</span>
+                            <span class="label">Salva Moduli</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

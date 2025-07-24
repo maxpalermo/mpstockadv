@@ -1,0 +1,143 @@
+{
+    "invoices": [{
+        "document_type": "",
+        "order_id": "",
+        "order_date": "",
+        "order_reference": "",
+        "current_status": "",
+        "invoice_id": "",
+        "invoice_number": "",
+        "invoice_date": "",
+        "products_tax_excl": "",
+        "discounts_tax_excl": "",
+        "shipping_tax_excl": "",
+        "wrapping_tax_excl": "",
+        "products_tax_incl": "",
+        "discounts_tax_incl": "",
+        "shipping_tax_incl": "",
+        "wrapping_tax_incl": "",
+        "total_tax_excl": "",
+        "total_taxes": "",
+        "total_tax_incl": "",
+        "total_paid": "",
+        "vat_code": "",
+        "rounds": "",
+        "nc": "",
+        "payment": "",
+        "carrier": "",
+        "shop_address": "",
+        "foreign": "",
+        "discount_note": "",
+        "customer": {
+            "id": "",
+            "id_customer": "",
+            "gender": "",
+            "firstname": "",
+            "lastname": "",
+            "birthday": "",
+            "pec": "",
+            "uid": "",
+            "email": "",
+            "new": "",
+            "address_delivery": {
+                "subject": "",
+                "company": "",
+                "firstname": "",
+                "lastname": "",
+                "address1": "",
+                "address2": "",
+                "postcode": "",
+                "city": "",
+                "state_name": "",
+                "country_name": "",
+                "phone": "",
+                "phone_mobile": "",
+                "vat_number": "",
+                "dni": "",
+                "state": "",
+                "country": ""
+            },
+            "address_invoice": {
+                "subject": "",
+                "company": "",
+                "firstname": "",
+                "lastname": "",
+                "address1": "",
+                "address2": "",
+                "postcode": "",
+                "city": "",
+                "state_name": "",
+                "country_name": "",
+                "phone": "",
+                "phone_mobile": "",
+                "vat_number": "",
+                "dni": "",
+                "state": "",
+                "country": ""
+            }
+        },
+        "rows": [{
+            "ean13": "",
+            "reference": "",
+            "original_price_tax_excl": "",
+            "product_price_tax_excl": "",
+            "original_price_tax_incl": "",
+            "discount_percent": "",
+            "reduction_amount": "",
+            "price_tax_excl": "",
+            "unit_price_tax_excl": "",
+            "unit_price_tax_incl": "",
+            "qty": "",
+            "total_tax_excl": "",
+            "total_price_tax_excl": "",
+            "total_price_tax_incl": "",
+            "total_tax_incl": "",
+            "tax_rate": "",
+            "product_id": "",
+            "product_attribute_id": "",
+            "product_check_qty": {
+                "employee": "",
+                "date_checked": "",
+                "is_checked": ""
+            },
+            "product_name": "",
+            "size": "",
+            "color": "",
+            "stock_service": "",
+            "product_in_stock": "",
+            "product_refunded": "",
+            "product_returned": "",
+            "product_reinjected": "",
+            "image_url": "",
+            "customization": "",
+            "attributes": {
+                "lev_0": {
+                    "id_attribute_group": "",
+                    "group": "",
+                    "name": ""
+                },
+                "lev_1": {
+                    "id_attribute_group": "",
+                    "group": "",
+                    "name": ""
+                },
+                "lev_2": {
+                    "id_attribute_group": "",
+                    "group": "",
+                    "name": ""
+                }
+            },
+            "product_position": {
+                "warehouse": "",
+                "shelf": "",
+                "col": "",
+                "level": ""
+            }
+        }],
+        "fees": {
+            "fee_tax_excl": "",
+            "fee_tax_rate": "",
+            "fee_tax_incl": ""
+        }
+    }]
+}

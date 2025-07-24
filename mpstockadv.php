@@ -22,6 +22,7 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+use MpSoft\MpStockAdv\Handlers\OrderDetailHandler;
 use MpSoft\MpStockAdv\Helpers\TwigManager;
 use MpSoft\MpStockAdv\Helpers\UpdateTablesHelper;
 use PrestaShop\PrestaShop\Adapter\SymfonyContainer;
@@ -35,7 +36,7 @@ class MpStockAdv extends Module
     {
         $this->name = 'mpstockadv';
         $this->tab = 'administration';
-        $this->version = '0.1.6.25';
+        $this->version = '0.1.7.27';
         $this->author = 'Massimiliano Palermo';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = ['min' => '8.0.0', 'max' => _PS_VERSION_];
@@ -74,27 +75,11 @@ class MpStockAdv extends Module
 
         $hooks = [
             'actionAdminControllerSetMedia',
+            'actionObjectAddAfter',
+            'actionObjectUpdateAfter',
+            'actionObjectDeleteAfter',
             'actionOrderStatusPostUpdate',
             'actionOrderStatusUpdate',
-            'actionOrderAddBefore',
-            'actionOrderAddAfter',
-            'actionOrderUpdateBefore',
-            'actionOrderUpdateAfter',
-            'actionOrderDeleteBefore',
-            'actionOrderDeleteAfter',
-            'actionOrderDetailAddBefore',
-            'actionOrderDetailAddAfter',
-            'actionOrderDetailUpdateBefore',
-            'actionOrderDetailUpdateAfter',
-            'actionOrderDetailDeleteBefore',
-            'actionOrderDetailDeleteAfter',
-            'actionOrderReturn',
-            'actionOrderReturnAddBefore',
-            'actionOrderReturnAddAfter',
-            'actionOrderReturnUpdateBefore',
-            'actionOrderReturnUpdateAfter',
-            'actionOrderReturnDeleteBefore',
-            'actionOrderReturnDeleteAfter',
             'displayAdminOrder',
             'displayAdminOrderCreateExtraButtons',
             'displayAdminOrderMain',
@@ -201,7 +186,9 @@ class MpStockAdv extends Module
         $hasDelivery = $order->delivery_number ?: false;
         $hasInvoice = $order->invoice_number ?: false;
 
-        return $twig->render(
+        $spacer = "<div class='box-danger'>Hook Display Admin Order Top Link</div>";
+
+        return $spacer . $twig->render(
             '@Modules/mpstockadv/views/twig/Module/DisplayAdminOrderTop.html.twig',
             [
                 'id_order' => $id_order,
@@ -231,93 +218,30 @@ class MpStockAdv extends Module
     {
     }
 
-    // --- Order hooks ---
-    public function hookActionOrderAddBefore($params)
+    public function hookActionObjectAddAfter($params)
     {
-    }
-
-    public function hookActionOrderAddAfter($params)
-    {
-    }
-
-    public function hookActionOrderUpdateBefore($params)
-    {
-    }
-
-    public function hookActionOrderUpdateAfter($params)
-    {
-    }
-
-    public function hookActionOrderDeleteBefore($params)
-    {
-    }
-
-    public function hookActionOrderDeleteAfter($params)
-    {
-    }
-
-    // --- OrderDetail hooks ---
-    public function hookActionOrderDetailAddBefore($params)
-    {
-    }
-
-    public function hookActionOrderDetailAddAfter($params)
-    {
-        /** @var OrderDetail */
-        $orderDetail = $params['object'];
-
-        $id_order = $orderDetail->id_order;
-        $order = new Order($id_order);
-        if (!Validate::isLoadedObject($order)) {
-            return false;
+        $object = $params['object'];
+        if ($object instanceof OrderDetail) {
+            $class = new OrderDetailHandler();
+            $class->hookOrderDetailAddAfter($params);
         }
-
-
-
     }
 
-    public function hookActionOrderDetailUpdateBefore($params)
+    public function hookActionObjectUpdateAfter($params)
     {
+        $object = $params['object'];
+        if ($object instanceof OrderDetail) {
+            $class = new OrderDetailHandler();
+            $class->hookOrderDetailAddAfter($params);
+        }
     }
 
-    public function hookActionOrderDetailUpdateAfter($params)
+    public function hookActionObjectDeleteAfter($params)
     {
-    }
-
-    public function hookActionOrderDetailDeleteBefore($params)
-    {
-    }
-
-    public function hookActionOrderDetailDeleteAfter($params)
-    {
-    }
-
-    // --- OrderReturn hooks ---
-    public function hookActionOrderReturn($params)
-    {
-    }
-
-    public function hookActionOrderReturnAddBefore($params)
-    {
-    }
-
-    public function hookActionOrderReturnAddAfter($params)
-    {
-    }
-
-    public function hookActionOrderReturnUpdateBefore($params)
-    {
-    }
-
-    public function hookActionOrderReturnUpdateAfter($params)
-    {
-    }
-
-    public function hookActionOrderReturnDeleteBefore($params)
-    {
-    }
-
-    public function hookActionOrderReturnDeleteAfter($params)
-    {
+        $object = $params['object'];
+        if ($object instanceof OrderDetail) {
+            $class = new OrderDetailHandler();
+            $class->hookOrderDetailDeleteAfter($params);
+        }
     }
 }

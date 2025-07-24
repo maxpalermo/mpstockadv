@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<invoices><invoice>
+  <document_type>78</document_type>
+  <order_id>139008</order_id>
+  <order_date>2025-07-09 22:52:31</order_date>
+  <order_reference>1000139008</order_reference>
+  <current_status>QW-GLS INSERITO </current_status>
+  <invoice_id>139008</invoice_id>
+  <invoice_number>6235</invoice_number>
+  <invoice_date>2025-07-10 09:41:52</invoice_date>
+  <products_tax_excl>41.83</products_tax_excl>
+  <discounts_tax_excl>0</discounts_tax_excl>
+  <shipping_tax_excl>6.48</shipping_tax_excl>
+  <wrapping_tax_excl>0</wrapping_tax_excl>
+  <products_tax_incl>51.030000</products_tax_incl>
+  <discounts_tax_incl>0.000000</discounts_tax_incl>
+  <shipping_tax_incl>7.900000</shipping_tax_incl>
+  <wrapping_tax_incl>0.000000</wrapping_tax_incl>
+  <total_tax_excl>48.300000</total_tax_excl>
+  <total_taxes>10.63</total_taxes>
+  <total_tax_incl>58.930000</total_tax_incl>
+  <total_paid>58.930000</total_paid>
+  <vat_code></vat_code>
+  <rounds>0</rounds>
+  <nc>0</nc>
+  <payment>CARTA DI CREDITO</payment>
+  <carrier>GLS Corriere Espresso</carrier>
+  <shop_address>www.dalavoro.com - site by: Soc. IMPRENDO s.r.l.s. - Via Mafalda di Savoia 28,30 - P.iva: IT03412990784 - 87013 Fagnano Castello (Cs) - Cosenza - Italia</shop_address>
+  <foreign>0</foreign>
+  <discount_note></discount_note>
+  <customer>
+    <id>DL109281</id>
+    <id_customer>109281</id_customer>
+    <gender></gender>
+    <firstname>Giulia</firstname>
+    <lastname>Piccinotti</lastname>
+    <birthday>0000-00-00</birthday>
+    <pec></pec>
+    <uid></uid>
+    <email>giuliapiccinotti03@gmail.com</email>
+    <new>1</new>
+    <address_delivery>
+      <subject>F</subject>
+      <company>Giulia Piccinotti</company>
+      <firstname>Giulia</firstname>
+      <lastname>Piccinotti</lastname>
+      <address1>Via Pieve, 9 </address1>
+      <address2></address2>
+      <postcode>25027</postcode>
+      <city>Quinzano D Oglio</city>
+      <state_name>BRESCIA</state_name>
+      <country_name>ITALIA</country_name>
+      <phone>3347759842</phone>
+      <phone_mobile>3347759842</phone_mobile>
+      <vat_number></vat_number>
+      <dni></dni>
+      <state>BS</state>
+      <country>IT</country>
+    </address_delivery>
+    <address_invoice>
+      <subject>F</subject>
+      <company>Giulia Piccinotti</company>
+      <firstname>Giulia</firstname>
+      <lastname>Piccinotti</lastname>
+      <address1>Via Pieve, 9 </address1>
+      <address2></address2>
+      <postcode>25027</postcode>
+      <city>Quinzano D'oglio</city>
+      <state_name>BRESCIA</state_name>
+      <country_name>ITALIA</country_name>
+      <phone>3347759842</phone>
+      <phone_mobile>3347759842</phone_mobile>
+      <vat_number></vat_number>
+      <dni></dni>
+      <state>BS</state>
+      <country>IT</country>
+    </address_invoice>
+  </customer>
+  <rows>
+    <row>
+      <ean13>8050687033312</ean13>
+      <reference>ISA045200</reference>
+      <original_price_tax_excl>21.311475</original_price_tax_excl>
+      <product_price_tax_excl>21.311475</product_price_tax_excl>
+      <original_price_tax_incl>26</original_price_tax_incl>
+      <discount_percent>35.00</discount_percent>
+      <reduction_amount>0</reduction_amount>
+      <price_tax_excl>13.852459</price_tax_excl>
+      <unit_price_tax_excl>13.852459</unit_price_tax_excl>
+      <unit_price_tax_incl>16.900000</unit_price_tax_incl>
+      <qty>2</qty>
+      <total_tax_excl>27.700000</total_tax_excl>
+      <total_price_tax_excl>27.700000</total_price_tax_excl>
+      <total_price_tax_incl>33.800000</total_price_tax_incl>
+      <total_tax_incl>33.800000</total_tax_incl>
+      <tax_rate>22</tax_rate>
+      <product_id>63</product_id>
+      <product_attribute_id>539</product_attribute_id>
+      <product_check_qty>
+        <employee>Magazzino Uno</employee>
+        <date_checked>05/01/2024 15:52:42</date_checked>
+        <is_checked>1</is_checked>
+      </product_check_qty>
+      <product_name>CASACCA COLLO A V COTONE VERDE ISACCO 045200</product_name>
+      <size>M</size>
+      <color>VERDE</color>
+      <stock_service>0</stock_service>
+      <product_in_stock>37</product_in_stock>
+      <product_refunded>0</product_refunded>
+      <product_returned>0</product_returned>
+      <product_reinjected>0</product_reinjected>
+      <image_url>/var/www/vhosts/dalavoro.com/httpdocs/img/p/1/7/6/9/4/17694-small_default.jpg</image_url>
+      <customization/>
+      <attributes>
+        <lev_0>
+          <id_attribute_group>13</id_attribute_group>
+          <group>Taglie Disponibili</group>
+          <name>M</name>
+        </lev_0>
+        <lev_1>
+          <id_attribute_group>14</id_attribute_group>
+          <group>Colore</group>
+          <name>Verde</name>
+        </lev_1>
+        <lev_2>
+          <id_attribute_group>15</id_attribute_group>
+          <group>Rifiniture</group>
+          <name>Monocolore</name>
+        </lev_2>
+      </attributes>
+      <product_position>
+        <warehouse>Mg-1</warehouse>
+        <shelf>Sc-E</shelf>
+        <col>CL-7</col>
+        <level>L-3</level>
+      </product_position>
+    </row>
+    <row>
+      <ean13>8050687031066</ean13>
+      <reference>ISA044200</reference>
+      <original_price_tax_excl>21.721311</original_price_tax_excl>
+      <product_price_tax_excl>21.721311</product_price_tax_excl>
+      <original_price_tax_incl>26.5</original_price_tax_incl>
+      <discount_percent>35.00</discount_percent>
+      <reduction_amount>0</reduction_amount>
+      <price_tax_excl>14.118852</price_tax_excl>
+      <unit_price_tax_excl>14.118852</unit_price_tax_excl>
+      <unit_price_tax_incl>17.225000</unit_price_tax_incl>
+      <qty>1</qty>
+      <total_tax_excl>14.120000</total_tax_excl>
+      <total_price_tax_excl>14.120000</total_price_tax_excl>
+      <total_price_tax_incl>17.230000</total_price_tax_incl>
+      <total_tax_incl>17.230000</total_tax_incl>
+      <tax_rate>22</tax_rate>
+      <product_id>2527</product_id>
+      <product_attribute_id>32541</product_attribute_id>
+      <product_check_qty>
+        <employee>Marco Ser</employee>
+        <date_checked>23/07/2024 09:00:33</date_checked>
+        <is_checked>1</is_checked>
+      </product_check_qty>
+      <product_name>PANTALONE CON ELASTICO COTONE VERDE ISACCO 044200</product_name>
+      <size>L</size>
+      <color>VERDE</color>
+      <stock_service>0</stock_service>
+      <product_in_stock>34</product_in_stock>
+      <product_refunded>0</product_refunded>
+      <product_returned>0</product_returned>
+      <product_reinjected>0</product_reinjected>
+      <image_url>/var/www/vhosts/dalavoro.com/httpdocs/img/p/4/4/0/2/4402-small_default.jpg</image_url>
+      <customization/>
+      <attributes>
+        <lev_0>
+          <id_attribute_group>13</id_attribute_group>
+          <group>Taglie Disponibili</group>
+          <name>L</name>
+        </lev_0>
+        <lev_1>
+          <id_attribute_group>14</id_attribute_group>
+          <group>Colore</group>
+          <name>Verde</name>
+        </lev_1>
+        <lev_2>
+          <id_attribute_group>15</id_attribute_group>
+          <group>Rifiniture</group>
+          <name>Monocolore</name>
+        </lev_2>
+      </attributes>
+      <product_position>
+        <warehouse>Mg-1</warehouse>
+        <shelf>Sc-A</shelf>
+        <col>CL-5</col>
+        <level>L-3</level>
+      </product_position>
+    </row>
+    <row>
+      <ean13>8250620250001</ean13>
+      <reference>VOLTSH/25</reference>
+      <original_price_tax_excl>0.000000</original_price_tax_excl>
+      <product_price_tax_excl>0.000000</product_price_tax_excl>
+      <original_price_tax_incl>0</original_price_tax_incl>
+      <discount_percent>0</discount_percent>
+      <reduction_amount>0</reduction_amount>
+      <price_tax_excl>0.000000</price_tax_excl>
+      <unit_price_tax_excl>0.000000</unit_price_tax_excl>
+      <unit_price_tax_incl>0.000000</unit_price_tax_incl>
+      <qty>1</qty>
+      <total_tax_excl>0.000000</total_tax_excl>
+      <total_price_tax_excl>0.000000</total_price_tax_excl>
+      <total_price_tax_incl>0.000000</total_price_tax_incl>
+      <total_tax_incl>0.000000</total_tax_incl>
+      <tax_rate>22</tax_rate>
+      <product_id>9271</product_id>
+      <product_attribute_id>115205</product_attribute_id>
+      <product_check_qty>
+        <employee>Marco Ser</employee>
+        <date_checked>25/06/2025 09:32:39</date_checked>
+        <is_checked>1</is_checked>
+      </product_check_qty>
+      <product_name>VOLANTINO T-SHIRT STAMPATE</product_name>
+      <size>UNICA</size>
+      <color></color>
+      <stock_service>-1</stock_service>
+      <product_in_stock>680</product_in_stock>
+      <product_refunded>0</product_refunded>
+      <product_returned>0</product_returned>
+      <product_reinjected>0</product_reinjected>
+      <image_url>/var/www/vhosts/dalavoro.com/httpdocs/img/p/2/9/5/9/0/29590-small_default.jpg</image_url>
+      <customization/>
+      <attributes>
+        <lev_0>
+          <id_attribute_group>13</id_attribute_group>
+          <group>Taglie Disponibili</group>
+          <name>UNICA</name>
+        </lev_0>
+      </attributes>
+      <product_position></product_position>
+    </row>
+  </rows>
+  <fees>
+    <fee_tax_excl>0</fee_tax_excl>
+    <fee_tax_rate>0</fee_tax_rate>
+    <fee_tax_incl>0</fee_tax_incl>
+  </fees>
+</invoice>
+
+</invoices>

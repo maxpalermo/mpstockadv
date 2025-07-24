@@ -1,7 +1,7 @@
 {% for row in rows %}
 <tr>
     <td class="text-center fixed-width-sm">
-        <input type="checkbox" class="form-control" style="width: 24px;">
+        <input type="checkbox" class="form-control" style="width: 24px;" data-id="{{ row.id_order }}">
     </td>
     <td class="text-right fixed-width-md">
         <strong>{{ row.id_order }}</strong>

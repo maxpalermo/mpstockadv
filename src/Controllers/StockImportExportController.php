@@ -5,7 +5,7 @@ namespace MpSoft\MpStockAdv\Controllers;
 use MpSoft\MpStockAdv\Helpers\GetDocuments;
 use MpSoft\MpStockAdv\Helpers\MenuDataHelper;
 ;
-use MpSoft\MpStockAdv\Helpers\OrderToJson;
+use MpSoft\MpStockAdv\Helpers\OrderToJsonHelper;
 use MpSoft\MpStockAdv\Helpers\StockMvtImportHelper;
 use PrestaShopBundle\Controller\Admin\FrameworkBundleAdminController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -52,7 +52,31 @@ class StockImportExportController extends FrameworkBundleAdminController
                         'id' => (int) \Configuration::get('MPSTOCKADV_TYPE_CREDIT_SLIP'),
                         'name' => 'Nota credito'
                     ]
-                ]
+                ],
+                'payment_modules' => (function () {
+                    $paymentModules = \PaymentModule::getPaymentModules();
+                    $paymentModules = array_map(function ($module) {
+                        return $module['name'];
+                    }, $paymentModules);
+                    if (!in_array('mpcodfee', $paymentModules)) {
+                        $paymentModules[] = 'mpcodfee';
+                    }
+                    return $paymentModules;
+                })(),
+                // Gestione sicura del valore JSON della configurazione
+                'payment_modules_selected' => (function () {
+                    $selectedModulesJson = \Configuration::get("MPSTOCKADV_PAYMENT_MODULES");
+                    $selectedModules = [];
+                    if (!empty($selectedModulesJson)) {
+                        try {
+                            $selectedModules = json_decode($selectedModulesJson, true, 512, JSON_THROW_ON_ERROR);
+                        } catch (\JsonException $e) {
+                            $selectedModules = [];
+                            // Facoltativo: log dell'errore
+                        }
+                    }
+                    return $selectedModules;
+                })(),
             ]
         );
     }
@@ -183,25 +207,30 @@ class StockImportExportController extends FrameworkBundleAdminController
 
     public function exportOrderAction(Request $request): JsonResponse
     {
-        $id_order = $request->get('id_order');
-        $type = $request->get('type');
+        $id_orders = $request->get('ids');
+        $type = $request->get('typeDocument');
 
-        $document = $this->prepareDocument($id_order, $type);
+        if (in_array($type, ['order', 'invoice', 'delivery', 'return', 'credit_slip'])) {
+            $typeKey = \Tools::strtoupper("MPSTOCKADV_TYPE_{$type}");
+            $type = (int) \Configuration::get($typeKey);
+        }
 
-        // TODO: implementare export reale
-        return new JsonResponse([
+        $invoiceXml = new OrderToJsonHelper();
+        $invoice = $invoiceXml->createDocuments($type, $id_orders);
+
+        return $this->json([
             'success' => true,
             'message' => 'Esportazione movimenti da ordini eseguita (mock)',
-            'id_order' => $id_order,
+            'ids' => $id_orders,
             'type' => $type,
-            'document' => $document,
+            'document' => $invoice,
         ]);
     }
 
     protected function prepareDocument($id_order, $type)
     {
-        $order2Json = new OrderToJson();
-        $order2Json->createDocument($id_order, $type);
+        $order2Json = new OrderToJsonHelper();
+        $order2Json->createDocuments($type, [$id_order]);
         return $order2Json->getDocument();
     }
 
@@ -279,18 +308,54 @@ class StockImportExportController extends FrameworkBundleAdminController
             );
 
 
-            $twigPagination = $this->renderView(
-                '@Modules/mpstockadv/views/twig/Components/pagination.html.twig',
-                [
-                    'pagination' => $result['pagination']
-                ]
-            );
+            if ($result['pagination']) {
+                $twigPagination = $this->renderView(
+                    '@Modules/mpstockadv/views/twig/Components/pagination.html.twig',
+                    [
+                        'pagination' => $result['pagination']
+                    ]
+                );
+            }
 
             return $this->json([
                 'success' => true,
                 'data' => $twigData,
-                'pagination' => $twigPagination,
+                'pagination' => $twigPagination ?? '',
             ]);
         }
+    }
+
+    public function exportDocumentsAction(Request $request)
+    {
+        $content = $request->getContent();
+        $json = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $ids = $json['ids'];
+        $type = $json['typeDocument'];
+
+        if (in_array($type, ['order', 'invoice', 'delivery', 'return', 'credit_slip'])) {
+            $typeKey = \Tools::strtoupper("MPSTOCKADV_TYPE_{$type}");
+            $type = (int) \Configuration::get($typeKey);
+        }
+
+        $orderXml = new OrderToJsonHelper();
+        $document = $orderXml->createDocuments($type, $ids);
+        $xml = $orderXml->toXml();
+
+        return $this->json([
+            'success' => true,
+            'document' => $document,
+            'xml' => $xml,
+        ]);
+    }
+
+    public function savePaymentModulesAction(Request $request)
+    {
+        $content = $request->getContent();
+        $json = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+        $ids = $json['ids'];
+        \Configuration::updateValue("MPSTOCKADV_PAYMENT_MODULES", json_encode($ids));
+        return $this->json([
+            'success' => true,
+        ]);
     }
 }

@@ -119,4 +119,31 @@ class StockMvt
             KEY `id_stock_mvt_reason` (`id_stock_mvt_reason`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;";
     }
+
+    public function save()
+    {
+        $prefix = _DB_PREFIX_;
+        $sql = "INSERT INTO `{$prefix}stock_mvt` (
+            `id_stock`,
+            `id_order`,
+            `id_stock_mvt_reason`,
+            `id_employee`,
+            `id_supply_order`,
+            `physical_quantity`,
+            `price_te`,
+            `date_add`,
+            `date_upd`
+        ) VALUES (
+            {$this->getStockId()},
+            {$this->getOrderId()},
+            {$this->getStockMvtReasonId()},
+            {$this->getEmployeeId()},
+            {$this->getSupplyOrderId()},
+            {$this->getPhysicalQuantity()},
+            {$this->getPriceTe()},
+            NOW(),
+            NOW()
+        )";
+        Db::getInstance()->execute($sql);
+    }
 }
